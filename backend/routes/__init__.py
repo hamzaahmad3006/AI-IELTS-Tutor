@@ -10,6 +10,7 @@ from . import (
     onboarding,
     profile,
     reading,
+    speaking,
     writing,
 )
 
@@ -21,6 +22,7 @@ api_router.include_router(profile.router)
 api_router.include_router(writing.router)
 api_router.include_router(reading.router)
 api_router.include_router(listening.router)
+api_router.include_router(speaking.router)
 api_router.include_router(dashboard.router)
 
 __all__ = ["api_router"]

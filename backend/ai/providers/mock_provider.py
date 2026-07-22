@@ -20,9 +20,16 @@ def _clamp_band(value: float) -> float:
     return max(0.0, min(9.0, _round_half(value)))
 
 
-def _essay_from(messages: list[Message]) -> str:
+def _user_text(messages: list[Message]) -> str:
     for message in reversed(messages):
         if message.get("role") == "user":
+            return message.get("content", "")
+    return ""
+
+
+def _system_text(messages: list[Message]) -> str:
+    for message in messages:
+        if message.get("role") == "system":
             return message.get("content", "")
     return ""
 
@@ -38,11 +45,12 @@ class MockProvider(LLMProvider):
         temperature: float = 0.2,
         max_tokens: int = 1024,
     ) -> LLMResult:
-        essay = _essay_from(messages)
-        words = re.findall(r"[A-Za-z']+", essay)
+        text = _user_text(messages)
+        is_speaking = "Speaking examiner" in _system_text(messages)
+        words = re.findall(r"[A-Za-z']+", text)
         word_count = len(words)
         unique_ratio = (len(set(w.lower() for w in words)) / word_count) if word_count else 0.0
-        sentences = max(1, len(re.findall(r"[.!?]+", essay)))
+        sentences = max(1, len(re.findall(r"[.!?]+", text)))
         avg_sentence_len = word_count / sentences
 
         # Heuristic bands (purely illustrative until real AI scoring is enabled).
@@ -50,22 +58,39 @@ class MockProvider(LLMProvider):
         lexical = _clamp_band(4.5 + unique_ratio * 4.0)
         grammar = _clamp_band(length_band - 0.5)
         coherence = _clamp_band(4.5 + min(2.5, avg_sentence_len / 8.0))
-        task = _clamp_band(length_band if word_count >= 150 else length_band - 1.0)
-        overall = _clamp_band((task + coherence + lexical + grammar) / 4.0)
 
-        data = {
-            "task_response": task,
-            "coherence_cohesion": coherence,
-            "lexical_resource": lexical,
-            "grammatical_range": grammar,
-            "overall_band": overall,
-            "feedback_summary": (
-                "Mock evaluation: your response is on-topic; focus on a wider "
-                "range of complex structures and more precise vocabulary to lift "
-                "your band. (Enable a real AI provider for detailed feedback.)"
-            ),
-            "improved_essay": essay.strip(),
-        }
+        if is_speaking:
+            fluency = _clamp_band(4.5 + min(2.5, word_count / 80.0))
+            pronunciation = _clamp_band(length_band)
+            overall = _clamp_band((fluency + lexical + grammar + pronunciation) / 4.0)
+            data = {
+                "fluency_coherence": fluency,
+                "lexical_resource": lexical,
+                "grammatical_range": grammar,
+                "pronunciation": pronunciation,
+                "overall_band": overall,
+                "feedback_summary": (
+                    "Mock evaluation: your response is on-topic; reduce hesitation "
+                    "and use a wider range of connectives and precise vocabulary to "
+                    "lift your band. (Enable a real AI provider for detailed feedback.)"
+                ),
+            }
+        else:
+            task = _clamp_band(length_band if word_count >= 150 else length_band - 1.0)
+            overall = _clamp_band((task + coherence + lexical + grammar) / 4.0)
+            data = {
+                "task_response": task,
+                "coherence_cohesion": coherence,
+                "lexical_resource": lexical,
+                "grammatical_range": grammar,
+                "overall_band": overall,
+                "feedback_summary": (
+                    "Mock evaluation: your response is on-topic; focus on a wider "
+                    "range of complex structures and more precise vocabulary to lift "
+                    "your band. (Enable a real AI provider for detailed feedback.)"
+                ),
+                "improved_essay": text.strip(),
+            }
         content = json.dumps(data)
         approx_tokens = word_count + 60
         return LLMResult(
