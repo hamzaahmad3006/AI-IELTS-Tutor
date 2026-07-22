@@ -151,7 +151,7 @@ Everything **not yet completed** to finish the project, organized by area. Check
 - [ ] Planner: generate/adapt study plans + tasks
 - [ ] Speaking: session creation (LiveKit token), finish, scoring, history
 - [x] Writing: submission, AI scoring, improved essay (POST/GET attempts) — [ ] prompt delivery + history
-- [ ] Reading: passage/question delivery, grading, band mapping, explanations
+- [x] Reading (backend): passage/question delivery (no answer leak), auto-grading, raw→band mapping, per-question explanations — [ ] AI question generation
 - [ ] Listening: clip/question delivery, grading, band mapping, feedback
 - [ ] Analytics: overview, prediction, insights
 - [ ] Vocabulary (SRS) + grammar lesson endpoints
