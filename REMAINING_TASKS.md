@@ -150,7 +150,7 @@ Everything **not yet completed** to finish the project, organized by area. Check
 - [x] Onboarding submit + profile GET/PATCH — [ ] adaptive diagnostic + baseline computation
 - [ ] Planner: generate/adapt study plans + tasks
 - [ ] Speaking: session creation (LiveKit token), finish, scoring, history
-- [ ] Writing: prompt delivery, submission, scoring, improved essay, history
+- [x] Writing: submission, AI scoring, improved essay (POST/GET attempts) — [ ] prompt delivery + history
 - [ ] Reading: passage/question delivery, grading, band mapping, explanations
 - [ ] Listening: clip/question delivery, grading, band mapping, feedback
 - [ ] Analytics: overview, prediction, insights
@@ -160,19 +160,19 @@ Everything **not yet completed** to finish the project, organized by area. Check
 
 ---
 
-## 7. AI Layer (not started)
+## 7. AI Layer
 
-- [ ] `LLMProvider` port (provider-agnostic abstraction)
-- [ ] Groq provider adapter
-- [ ] AI orchestrator + task routing policy
-- [ ] Prompt registry (versioned templates) per module
-- [ ] Rubric-as-code scoring schemas (Speaking + Writing)
-- [ ] Structured-output validation + bounded self-repair
+- [x] `LLMProvider` port (provider-agnostic abstraction) + offline mock provider
+- [x] Groq provider adapter (OpenAI-compatible via httpx)
+- [x] AI orchestrator (Writing scoring) — [ ] full multi-task routing policy
+- [ ] Prompt registry (versioned templates) per module — partial (Writing rubric prompt exists)
+- [x] Rubric-as-code scoring schema (Writing) — [ ] Speaking rubric
+- [x] Structured-output validation (Pydantic) — [ ] bounded self-repair
 - [ ] AI memory / weakness model (store + retriever + updater)
 - [ ] Adaptive difficulty controller (EMA + severity decay)
 - [ ] Band predictor
 - [ ] Question/passage/audio generation
-- [ ] AI usage logging (tokens, cost, latency) + `ai_interactions` table
+- [x] AI usage captured on writing attempts (provider/model/tokens) — [ ] dedicated `ai_interactions` table (cost, latency)
 - [ ] Offline eval harness (gold-set MAE gate)
 - [ ] Future adapters scaffolding (LangGraph / CrewAI / AutoGen / OpenAI / Gemini / Claude)
 

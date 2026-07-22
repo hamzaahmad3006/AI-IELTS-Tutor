@@ -9,11 +9,21 @@ from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from ai.orchestrator import AIOrchestrator
+from ai.providers import build_provider
 from core.security import JWTError, decode_token
 from db.session import get_db
 from models.user import User
 
 _bearer = HTTPBearer(auto_error=True)
+
+
+def get_orchestrator() -> AIOrchestrator:
+    """Provide an AI orchestrator bound to the configured provider.
+
+    Swapping Groq for another provider/orchestrator is a config change only.
+    """
+    return AIOrchestrator(build_provider())
 
 
 async def get_current_user(
