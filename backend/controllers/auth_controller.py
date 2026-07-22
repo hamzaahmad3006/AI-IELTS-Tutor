@@ -1,14 +1,30 @@
-"""Auth controller: request/response schemas + business logic.
+"""Auth controller: request/response schemas + database-backed business logic.
 
-NOTE: this is a scaffold. Password hashing (Argon2id), JWT issuance, refresh-
-token rotation and RBAC are stubbed and must be implemented before production
-per the SRS (sections 18 & 33)."""
+Implements registration, login, refresh-token rotation and logout with
+Argon2id password hashing and JWT access tokens (SRS sections 18 & 33)."""
 
 from __future__ import annotations
+
+from datetime import datetime, timedelta, timezone
+
+from fastapi import HTTPException, status
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from core.config import get_settings
+from core.security import (
+    create_access_token,
+    generate_refresh_token,
+    hash_password,
+    hash_refresh_token,
+    verify_password,
+)
+from models.user import RefreshToken, User
 
 from .base import CamelModel
 
 
+# ---------- Schemas ----------
 class LoginRequest(CamelModel):
     email: str
     password: str
@@ -18,6 +34,10 @@ class RegisterRequest(CamelModel):
     full_name: str
     email: str
     password: str
+
+
+class RefreshRequest(CamelModel):
+    refresh_token: str
 
 
 class AuthenticatedUser(CamelModel):
@@ -31,7 +51,7 @@ class AuthTokens(CamelModel):
     access_token: str
     refresh_token: str
     token_type: str = "bearer"
-    expires_in: int = 900
+    expires_in: int
 
 
 class AuthResponse(CamelModel):
@@ -39,37 +59,115 @@ class AuthResponse(CamelModel):
     tokens: AuthTokens
 
 
+# ---------- Controller ----------
 class AuthController:
-    """Handles authentication use-cases."""
-
     @staticmethod
-    def login(payload: LoginRequest) -> AuthResponse:
-        # TODO: verify Argon2id hash + issue signed JWT + persist refresh token.
-        return AuthResponse(
-            user=AuthenticatedUser(
-                id="usr_1",
-                email=payload.email,
-                full_name="Sarah",
-                role="learner",
-            ),
-            tokens=AuthTokens(
-                access_token="stub.access.token",
-                refresh_token="stub.refresh.token",
-            ),
+    async def _issue_tokens(session: AsyncSession, user: User) -> AuthTokens:
+        settings = get_settings()
+        access = create_access_token(subject=user.id, role=user.role)
+        raw_refresh = generate_refresh_token()
+        session.add(
+            RefreshToken(
+                user_id=user.id,
+                token_hash=hash_refresh_token(raw_refresh),
+                expires_at=datetime.now(timezone.utc)
+                + timedelta(days=settings.refresh_token_ttl_days),
+            )
+        )
+        await session.flush()
+        return AuthTokens(
+            access_token=access,
+            refresh_token=raw_refresh,
+            expires_in=settings.access_token_ttl_min * 60,
         )
 
     @staticmethod
-    def register(payload: RegisterRequest) -> AuthResponse:
-        # TODO: create user row, hash password, issue tokens.
-        return AuthResponse(
-            user=AuthenticatedUser(
-                id="usr_new",
-                email=payload.email,
-                full_name=payload.full_name,
-                role="learner",
-            ),
-            tokens=AuthTokens(
-                access_token="stub.access.token",
-                refresh_token="stub.refresh.token",
-            ),
+    def _to_user_dto(user: User) -> AuthenticatedUser:
+        return AuthenticatedUser(
+            id=user.id, email=user.email, full_name=user.full_name, role=user.role
         )
+
+    @classmethod
+    async def register(
+        cls, session: AsyncSession, payload: RegisterRequest
+    ) -> AuthResponse:
+        existing = await session.scalar(
+            select(User).where(User.email == payload.email.lower())
+        )
+        if existing is not None:
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail="An account with this email already exists",
+            )
+        user = User(
+            email=payload.email.lower(),
+            password_hash=hash_password(payload.password),
+            full_name=payload.full_name,
+            role="learner",
+        )
+        session.add(user)
+        await session.flush()
+        tokens = await cls._issue_tokens(session, user)
+        return AuthResponse(user=cls._to_user_dto(user), tokens=tokens)
+
+    @classmethod
+    async def login(
+        cls, session: AsyncSession, payload: LoginRequest
+    ) -> AuthResponse:
+        user = await session.scalar(
+            select(User).where(User.email == payload.email.lower())
+        )
+        if user is None or not verify_password(payload.password, user.password_hash):
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Invalid email or password",
+            )
+        if not user.is_active:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN, detail="Account is disabled"
+            )
+        tokens = await cls._issue_tokens(session, user)
+        return AuthResponse(user=cls._to_user_dto(user), tokens=tokens)
+
+    @classmethod
+    async def refresh(
+        cls, session: AsyncSession, payload: RefreshRequest
+    ) -> AuthResponse:
+        token_hash = hash_refresh_token(payload.refresh_token)
+        record = await session.scalar(
+            select(RefreshToken).where(RefreshToken.token_hash == token_hash)
+        )
+        now = datetime.now(timezone.utc)
+        expires_at = record.expires_at if record is not None else None
+        # SQLite returns naive datetimes; treat stored values as UTC.
+        if expires_at is not None and expires_at.tzinfo is None:
+            expires_at = expires_at.replace(tzinfo=timezone.utc)
+        if (
+            record is None
+            or record.revoked_at is not None
+            or expires_at is None
+            or expires_at <= now
+        ):
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Invalid or expired refresh token",
+            )
+        # Rotate: revoke the presented token, issue a fresh pair.
+        record.revoked_at = now
+        user = await session.get(User, record.user_id)
+        if user is None:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED, detail="User not found"
+            )
+        tokens = await cls._issue_tokens(session, user)
+        return AuthResponse(user=cls._to_user_dto(user), tokens=tokens)
+
+    @staticmethod
+    async def logout(session: AsyncSession, payload: RefreshRequest) -> None:
+        record = await session.scalar(
+            select(RefreshToken).where(
+                RefreshToken.token_hash == hash_refresh_token(payload.refresh_token)
+            )
+        )
+        if record is not None and record.revoked_at is None:
+            record.revoked_at = datetime.now(timezone.utc)
