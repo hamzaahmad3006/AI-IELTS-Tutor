@@ -17,7 +17,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from core.config import get_settings
-from db.session import init_models
+from db.session import init_models, seed_admin
 from middleware import CorrelationIdMiddleware, register_exception_handlers
 from routes import api_router
 
@@ -26,10 +26,11 @@ API_V1_PREFIX = "/v1"
 
 @asynccontextmanager
 async def lifespan(_: FastAPI) -> AsyncIterator[None]:
-    # Dev convenience: auto-create tables when running on SQLite.
-    # Production (PostgreSQL) uses Alembic migrations instead.
+    # Dev convenience: auto-create tables + seed an admin when running on SQLite.
+    # Production (PostgreSQL) uses Alembic migrations + a provisioned admin.
     if get_settings().is_sqlite:
         await init_models()
+        await seed_admin()
     yield
 
 

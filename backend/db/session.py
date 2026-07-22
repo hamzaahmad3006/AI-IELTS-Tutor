@@ -52,3 +52,28 @@ async def init_models() -> None:
 
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
+
+
+async def seed_admin() -> None:
+    """Dev/demo: ensure a default admin account exists (SQLite only)."""
+    from sqlalchemy import select
+
+    from core.security import hash_password
+    from models.user import User
+
+    settings = get_settings()
+    async with SessionLocal() as session:
+        existing = await session.scalar(
+            select(User).where(User.email == settings.seed_admin_email)
+        )
+        if existing is None:
+            session.add(
+                User(
+                    email=settings.seed_admin_email,
+                    password_hash=hash_password(settings.seed_admin_password),
+                    full_name="Platform Admin",
+                    role="admin",
+                    email_verified=True,
+                )
+            )
+            await session.commit()

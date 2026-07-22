@@ -172,7 +172,7 @@ Everything **not yet completed** to finish the project, organized by area. Check
 - [ ] Adaptive difficulty controller (EMA + severity decay)
 - [ ] Band predictor
 - [ ] Question/passage/audio generation
-- [x] AI usage captured on writing attempts (provider/model/tokens) — [ ] dedicated `ai_interactions` table (cost, latency)
+- [x] AI usage logging: `ai_interactions` table (provider/model/tokens/latency/cost) written on every scoring call
 - [ ] Offline eval harness (gold-set MAE gate)
 - [ ] Future adapters scaffolding (LangGraph / CrewAI / AutoGen / OpenAI / Gemini / Claude)
 
@@ -197,7 +197,7 @@ Everything **not yet completed** to finish the project, organized by area. Check
 - [ ] User management (list, suspend, role assignment)
 - [ ] Content management: passages, audio, questions, cue cards, writing prompts, vocabulary, grammar lessons (CRUD + versioning)
 - [ ] Platform analytics & reports
-- [ ] AI usage monitoring (tokens, cost, latency, error rate, budget alerts)
+- [x] AI usage monitoring endpoint `GET /admin/ai-usage` (tokens, cost, latency, error rate, by-model) — [ ] budget alerts
 - [ ] Subscription/plan management (future, feature-flagged)
 
 ---

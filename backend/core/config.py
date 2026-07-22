@@ -33,6 +33,10 @@ class Settings(BaseSettings):
     ai_provider: str = "groq"
     groq_api_key: str = ""
 
+    # Dev/demo admin (seeded on SQLite startup so the admin panel is usable).
+    seed_admin_email: str = "admin@ielts.local"
+    seed_admin_password: str = "AdminPass123"
+
     @property
     def is_sqlite(self) -> bool:
         return self.database_url.startswith("sqlite")
