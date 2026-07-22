@@ -14,6 +14,7 @@ from ai.orchestrator import AIOrchestrator, ScoringError
 from models.speaking import SpeakingAttempt
 from models.user import User
 
+from .ai_usage_controller import record_ai_interaction
 from .base import CamelModel
 
 
@@ -97,6 +98,9 @@ class SpeakingController:
         attempt.ai_model = usage.model
         attempt.total_tokens = usage.total_tokens
         attempt.status = "scored"
+        await record_ai_interaction(
+            session, user_id=user.id, feature="speaking", usage=usage
+        )
         await session.flush()
         return _to_response(attempt)
 

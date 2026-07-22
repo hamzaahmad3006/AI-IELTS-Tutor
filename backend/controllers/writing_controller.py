@@ -13,6 +13,7 @@ from ai.orchestrator import AIOrchestrator, ScoringError
 from models.attempt import WritingAttempt
 from models.user import User
 
+from .ai_usage_controller import record_ai_interaction
 from .base import CamelModel
 
 
@@ -106,6 +107,9 @@ class WritingController:
         attempt.ai_model = usage.model
         attempt.total_tokens = usage.total_tokens
         attempt.status = "scored"
+        await record_ai_interaction(
+            session, user_id=user.id, feature="writing", usage=usage
+        )
         await session.flush()
         return _to_response(attempt)
 

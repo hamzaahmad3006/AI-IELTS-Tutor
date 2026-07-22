@@ -1,5 +1,6 @@
 """ORM models package. Importing this registers all tables on Base.metadata."""
 
+from .ai_interaction import AIInteraction
 from .attempt import WritingAttempt
 from .content import AudioClip, ListeningQuestion, Passage, Question
 from .listening import ListeningAttempt
@@ -20,4 +21,5 @@ __all__ = [
     "ListeningQuestion",
     "ListeningAttempt",
     "SpeakingAttempt",
+    "AIInteraction",
 ]
