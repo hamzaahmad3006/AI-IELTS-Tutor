@@ -120,7 +120,7 @@ Everything **not yet completed** to finish the project, organized by area. Check
 
 - [x] Pydantic `Settings` (env-driven config) + `.env` loading
 - [x] Async SQLAlchemy engine + session (Supabase PostgreSQL / SQLite dev)
-- [x] Alembic migrations setup (async env) — [ ] initial schema migration (per SRS §15) still to generate
+- [x] Alembic migrations setup (async env) + initial schema migration (users, refresh_tokens, learner_profiles) — extend as new models land
 - [ ] Repository layer (base + per-aggregate repos)
 - [x] Service/use-case logic + dependency injection (auth) — extend to other domains
 - [x] Unit-of-Work / transaction handling (request-scoped commit/rollback)
@@ -147,7 +147,7 @@ Everything **not yet completed** to finish the project, organized by area. Check
 
 ## 6. Backend — Domain Endpoints
 
-- [ ] Onboarding + profile CRUD + diagnostic + baseline computation
+- [x] Onboarding submit + profile GET/PATCH — [ ] adaptive diagnostic + baseline computation
 - [ ] Planner: generate/adapt study plans + tasks
 - [ ] Speaking: session creation (LiveKit token), finish, scoring, history
 - [ ] Writing: prompt delivery, submission, scoring, improved essay, history
