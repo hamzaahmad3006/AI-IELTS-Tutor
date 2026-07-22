@@ -118,12 +118,12 @@ Everything **not yet completed** to finish the project, organized by area. Check
 
 ## 4. Backend — Foundation
 
-- [ ] Pydantic `Settings` (env-driven config) + `.env` loading
-- [ ] Async SQLAlchemy engine + session (Supabase PostgreSQL)
-- [ ] Alembic migrations setup + initial schema (per SRS §15)
+- [x] Pydantic `Settings` (env-driven config) + `.env` loading
+- [x] Async SQLAlchemy engine + session (Supabase PostgreSQL / SQLite dev)
+- [x] Alembic migrations setup (async env) — [ ] initial schema migration (per SRS §15) still to generate
 - [ ] Repository layer (base + per-aggregate repos)
-- [ ] Service layer (use-case logic) + dependency injection
-- [ ] Unit-of-Work / transaction handling
+- [x] Service/use-case logic + dependency injection (auth) — extend to other domains
+- [x] Unit-of-Work / transaction handling (request-scoped commit/rollback)
 - [ ] Structured logging + correlation propagation (extend middleware)
 - [ ] Rate limiting (Redis token bucket)
 - [ ] Redis integration (cache + queue)
@@ -134,12 +134,12 @@ Everything **not yet completed** to finish the project, organized by area. Check
 
 ## 5. Backend — Auth & Security
 
-- [ ] Real user registration (Argon2id hashing)
-- [ ] JWT access token issuance + verification
-- [ ] Refresh token storage + rotation + reuse detection
-- [ ] RBAC dependencies (`require_roles`) + own-resource checks
+- [x] Real user registration (Argon2id hashing)
+- [x] JWT access token issuance + verification
+- [x] Refresh token storage + rotation — [ ] full reuse-detection family revocation
+- [x] RBAC dependencies (`require_roles`) — [ ] own-resource checks
 - [ ] Password policy + login rate limiting / lockout
-- [ ] `/auth/me`, `/auth/refresh`, `/auth/logout` endpoints
+- [x] `/auth/me`, `/auth/refresh`, `/auth/logout` endpoints
 - [ ] Audit logging for admin actions
 - [ ] TLS/secrets management, input validation hardening
 
