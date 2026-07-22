@@ -14,6 +14,7 @@ from models.reading import ReadingAttempt
 from models.user import User
 
 from .base import CamelModel
+from .grading import is_correct
 
 
 # ---------- Schemas ----------
@@ -56,19 +57,6 @@ class ReadingResultResponse(CamelModel):
     total_questions: int
     band: float
     per_question: list[PerQuestionResult]
-
-
-# ---------- Grading helpers ----------
-def _normalize(value: Any) -> Any:
-    if isinstance(value, list):
-        return sorted(str(v).strip().lower() for v in value)
-    if value is None:
-        return ""
-    return str(value).strip().lower()
-
-
-def _is_correct(submitted: Any, correct: Any) -> bool:
-    return _normalize(submitted) == _normalize(correct)
 
 
 # ---------- Seeding (dev/demo content) ----------
@@ -188,7 +176,7 @@ class ReadingController:
         per_question: list[PerQuestionResult] = []
         for q in questions:
             submitted = answers.get(q.id)
-            correct = _is_correct(submitted, q.correct_answer)
+            correct = is_correct(submitted, q.correct_answer)
             if correct:
                 raw += 1
             per_question.append(

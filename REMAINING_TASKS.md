@@ -152,7 +152,7 @@ Everything **not yet completed** to finish the project, organized by area. Check
 - [ ] Speaking: session creation (LiveKit token), finish, scoring, history
 - [x] Writing: submission, AI scoring, improved essay (POST/GET attempts) — [ ] prompt delivery + history
 - [x] Reading (backend): passage/question delivery (no answer leak), auto-grading, raw→band mapping, per-question explanations — [ ] AI question generation
-- [ ] Listening: clip/question delivery, grading, band mapping, feedback
+- [x] Listening (backend): clip/question delivery (no answer leak), auto-grading, band mapping, per-question feedback with audio timestamps — [ ] AI question generation, signed audio URLs
 - [ ] Analytics: overview, prediction, insights
 - [ ] Vocabulary (SRS) + grammar lesson endpoints
 - [ ] Mock test assembly + scoring

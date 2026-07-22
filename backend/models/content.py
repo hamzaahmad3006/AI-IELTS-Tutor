@@ -28,6 +28,40 @@ class Passage(Base, TimestampMixin):
     source: Mapped[str] = mapped_column(String(20), default="seed", nullable=False)
 
 
+class AudioClip(Base, TimestampMixin):
+    __tablename__ = "audio_clips"
+
+    id: Mapped[str] = mapped_column(String(32), primary_key=True, default=_uuid)
+    title: Mapped[str] = mapped_column(String(200), nullable=False)
+    object_key: Mapped[str] = mapped_column(String(300), nullable=False)
+    transcript: Mapped[str] = mapped_column(Text, nullable=False)
+    duration_sec: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
+    exam_type: Mapped[str] = mapped_column(String(20), default="academic", nullable=False)
+    difficulty: Mapped[str] = mapped_column(String(20), default="medium", nullable=False)
+    accent: Mapped[str | None] = mapped_column(String(40), nullable=True)
+    source: Mapped[str] = mapped_column(String(20), default="seed", nullable=False)
+
+
+class ListeningQuestion(Base, TimestampMixin):
+    __tablename__ = "listening_questions"
+
+    id: Mapped[str] = mapped_column(String(32), primary_key=True, default=_uuid)
+    audio_id: Mapped[str] = mapped_column(
+        String(32),
+        ForeignKey("audio_clips.id", ondelete="CASCADE"),
+        index=True,
+        nullable=False,
+    )
+    order_index: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
+    type: Mapped[str] = mapped_column(String(30), nullable=False)
+    prompt: Mapped[str] = mapped_column(Text, nullable=False)
+    options: Mapped[Any | None] = mapped_column(JSON, nullable=True)
+    correct_answer: Mapped[Any] = mapped_column(JSON, nullable=False)
+    explanation: Mapped[str | None] = mapped_column(Text, nullable=True)
+    answer_timestamp: Mapped[str | None] = mapped_column(String(20), nullable=True)
+    difficulty: Mapped[str] = mapped_column(String(20), default="medium", nullable=False)
+
+
 class Question(Base, TimestampMixin):
     __tablename__ = "questions"
 
