@@ -5,6 +5,7 @@ from .content import AudioClip, ListeningQuestion, Passage, Question
 from .listening import ListeningAttempt
 from .profile import LearnerProfile
 from .reading import ReadingAttempt
+from .speaking import SpeakingAttempt
 from .user import RefreshToken, User
 
 __all__ = [
@@ -18,4 +19,5 @@ __all__ = [
     "AudioClip",
     "ListeningQuestion",
     "ListeningAttempt",
+    "SpeakingAttempt",
 ]

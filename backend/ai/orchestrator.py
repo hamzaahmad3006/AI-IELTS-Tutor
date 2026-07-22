@@ -6,6 +6,7 @@ from __future__ import annotations
 from pydantic import BaseModel, Field
 
 from ai.provider import LLMProvider, LLMResult
+from ai.rubrics.speaking_rubric import build_speaking_messages
 from ai.rubrics.writing_rubric import build_writing_messages, round_ielts
 
 
@@ -17,6 +18,15 @@ class WritingScore(BaseModel):
     overall_band: float = Field(ge=0, le=9)
     feedback_summary: str
     improved_essay: str
+
+
+class SpeakingScore(BaseModel):
+    fluency_coherence: float = Field(ge=0, le=9)
+    lexical_resource: float = Field(ge=0, le=9)
+    grammatical_range: float = Field(ge=0, le=9)
+    pronunciation: float = Field(ge=0, le=9)
+    overall_band: float = Field(ge=0, le=9)
+    feedback_summary: str
 
 
 class ScoringError(Exception):
@@ -53,6 +63,36 @@ class AIOrchestrator:
                 + score.coherence_cohesion
                 + score.lexical_resource
                 + score.grammatical_range
+            )
+            / 4.0
+        )
+        return score, result
+
+    async def score_speaking(
+        self, *, transcript: str, part: int | None = None, weakness_summary: str = ""
+    ) -> tuple[SpeakingScore, LLMResult]:
+        messages = build_speaking_messages(transcript, part, weakness_summary)
+        result = await self._provider.complete(
+            messages=messages, json_object=True, temperature=0.2, max_tokens=800
+        )
+        if result.data is None:
+            raise ScoringError("Provider did not return a JSON object")
+
+        try:
+            score = SpeakingScore.model_validate(result.data)
+        except Exception as exc:  # noqa: BLE001 - normalize to domain error
+            raise ScoringError(f"Invalid score payload: {exc}") from exc
+
+        score.fluency_coherence = round_ielts(score.fluency_coherence)
+        score.lexical_resource = round_ielts(score.lexical_resource)
+        score.grammatical_range = round_ielts(score.grammatical_range)
+        score.pronunciation = round_ielts(score.pronunciation)
+        score.overall_band = round_ielts(
+            (
+                score.fluency_coherence
+                + score.lexical_resource
+                + score.grammatical_range
+                + score.pronunciation
             )
             / 4.0
         )
