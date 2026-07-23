@@ -149,8 +149,8 @@ Everything **not yet completed** to finish the project, organized by area. Check
 
 - [x] Onboarding submit + profile GET/PATCH — [ ] adaptive diagnostic + baseline computation
 - [ ] Planner: generate/adapt study plans + tasks
-- [x] Speaking: transcript AI scoring (4 criteria, rubric-as-code) — [ ] session creation (LiveKit token), finish, history
-- [x] Writing: submission, AI scoring, improved essay (POST/GET attempts) — [ ] prompt delivery + history
+- [x] Speaking: transcript AI scoring (4 criteria, rubric-as-code) + history — [ ] session creation (LiveKit token), finish
+- [x] Writing: submission, AI scoring, improved essay (POST/GET attempts) + history — [ ] prompt delivery
 - [x] Reading (backend): passage/question delivery (no answer leak), auto-grading, raw→band mapping, per-question explanations — [ ] AI question generation
 - [x] Listening (backend): clip/question delivery (no answer leak), auto-grading, band mapping, per-question feedback with audio timestamps — [ ] AI question generation, signed audio URLs
 - [x] Analytics: progress (per-module + overall from attempts) + band prediction — [ ] insights, real dashboard overview (currently mock)

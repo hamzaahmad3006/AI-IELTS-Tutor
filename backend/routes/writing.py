@@ -4,10 +4,12 @@ from __future__ import annotations
 
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Depends, Query, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from ai.orchestrator import AIOrchestrator
+from controllers.history_controller import HistoryController, WritingHistoryPage
+from controllers.pagination import DEFAULT_LIMIT
 from controllers.writing_controller import (
     WritingController,
     WritingResultResponse,
@@ -36,6 +38,16 @@ async def submit_attempt(
     orchestrator: Orchestrator,
 ) -> WritingResultResponse:
     return await WritingController.submit(session, current, orchestrator, payload)
+
+
+@router.get("/history", response_model=WritingHistoryPage)
+async def history(
+    current: CurrentUser,
+    session: DbSession,
+    cursor: Annotated[str | None, Query()] = None,
+    limit: Annotated[int, Query(ge=1, le=50)] = DEFAULT_LIMIT,
+) -> WritingHistoryPage:
+    return await HistoryController.writing(session, current, cursor, limit)
 
 
 @router.get("/attempts/{attempt_id}", response_model=WritingResultResponse)
