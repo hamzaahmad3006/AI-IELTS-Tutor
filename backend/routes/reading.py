@@ -7,6 +7,8 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, Query, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from controllers.history_controller import HistoryController, ReadingHistoryPage
+from controllers.pagination import DEFAULT_LIMIT
 from controllers.reading_controller import (
     PassageResponse,
     ReadingController,
@@ -42,6 +44,16 @@ async def submit_attempt(
     payload: ReadingSubmitRequest, current: CurrentUser, session: DbSession
 ) -> ReadingResultResponse:
     return await ReadingController.submit(session, current, payload)
+
+
+@router.get("/history", response_model=ReadingHistoryPage)
+async def history(
+    current: CurrentUser,
+    session: DbSession,
+    cursor: Annotated[str | None, Query()] = None,
+    limit: Annotated[int, Query(ge=1, le=50)] = DEFAULT_LIMIT,
+) -> ReadingHistoryPage:
+    return await HistoryController.reading(session, current, cursor, limit)
 
 
 @router.get("/attempts/{attempt_id}", response_model=ReadingResultResponse)

@@ -7,12 +7,14 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, Query, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from controllers.history_controller import HistoryController, ListeningHistoryPage
 from controllers.listening_controller import (
     ClipResponse,
     ListeningController,
     ListeningResultResponse,
     ListeningSubmitRequest,
 )
+from controllers.pagination import DEFAULT_LIMIT
 from db.session import get_db
 from dependencies import get_current_user
 from models.user import User
@@ -42,6 +44,16 @@ async def submit_attempt(
     payload: ListeningSubmitRequest, current: CurrentUser, session: DbSession
 ) -> ListeningResultResponse:
     return await ListeningController.submit(session, current, payload)
+
+
+@router.get("/history", response_model=ListeningHistoryPage)
+async def history(
+    current: CurrentUser,
+    session: DbSession,
+    cursor: Annotated[str | None, Query()] = None,
+    limit: Annotated[int, Query(ge=1, le=50)] = DEFAULT_LIMIT,
+) -> ListeningHistoryPage:
+    return await HistoryController.listening(session, current, cursor, limit)
 
 
 @router.get("/attempts/{attempt_id}", response_model=ListeningResultResponse)
