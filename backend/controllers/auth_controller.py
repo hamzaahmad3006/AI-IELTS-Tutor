@@ -8,6 +8,7 @@ from __future__ import annotations
 from datetime import datetime, timedelta, timezone
 
 from fastapi import HTTPException, status
+from pydantic import field_validator
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -19,6 +20,7 @@ from core.security import (
     hash_refresh_token,
     verify_password,
 )
+from core.validation import validate_email, validate_password
 from models.user import RefreshToken, User
 
 from .base import CamelModel
@@ -29,11 +31,34 @@ class LoginRequest(CamelModel):
     email: str
     password: str
 
+    @field_validator("email")
+    @classmethod
+    def _email(cls, value: str) -> str:
+        return validate_email(value)
+
 
 class RegisterRequest(CamelModel):
     full_name: str
     email: str
     password: str
+
+    @field_validator("full_name")
+    @classmethod
+    def _name(cls, value: str) -> str:
+        name = value.strip()
+        if len(name) < 2:
+            raise ValueError("Enter your full name")
+        return name
+
+    @field_validator("email")
+    @classmethod
+    def _email(cls, value: str) -> str:
+        return validate_email(value)
+
+    @field_validator("password")
+    @classmethod
+    def _password(cls, value: str) -> str:
+        return validate_password(value)
 
 
 class RefreshRequest(CamelModel):

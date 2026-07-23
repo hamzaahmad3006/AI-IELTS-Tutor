@@ -138,10 +138,10 @@ Everything **not yet completed** to finish the project, organized by area. Check
 - [x] JWT access token issuance + verification
 - [x] Refresh token storage + rotation — [ ] full reuse-detection family revocation
 - [x] RBAC dependencies (`require_roles`) — [ ] own-resource checks
-- [ ] Password policy + login rate limiting / lockout
+- [x] Password policy (strength) + email/name field validation — [ ] login rate limiting / lockout
 - [x] `/auth/me`, `/auth/refresh`, `/auth/logout` endpoints
 - [ ] Audit logging for admin actions
-- [ ] TLS/secrets management, input validation hardening
+- [x] Input validation hardening (field validators + RFC 7807 problem+json contract with correlation IDs) — [ ] TLS/secrets management
 
 ---
 
