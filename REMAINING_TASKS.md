@@ -153,7 +153,7 @@ Everything **not yet completed** to finish the project, organized by area. Check
 - [x] Writing: submission, AI scoring, improved essay (POST/GET attempts) — [ ] prompt delivery + history
 - [x] Reading (backend): passage/question delivery (no answer leak), auto-grading, raw→band mapping, per-question explanations — [ ] AI question generation
 - [x] Listening (backend): clip/question delivery (no answer leak), auto-grading, band mapping, per-question feedback with audio timestamps — [ ] AI question generation, signed audio URLs
-- [ ] Analytics: overview, prediction, insights
+- [x] Analytics: progress (per-module + overall from attempts) + band prediction — [ ] insights, real dashboard overview (currently mock)
 - [ ] Vocabulary (SRS) + grammar lesson endpoints
 - [ ] Mock test assembly + scoring
 - [ ] Notifications / reminders
@@ -170,7 +170,7 @@ Everything **not yet completed** to finish the project, organized by area. Check
 - [x] Structured-output validation (Pydantic) — [ ] bounded self-repair
 - [ ] AI memory / weakness model (store + retriever + updater)
 - [ ] Adaptive difficulty controller (EMA + severity decay)
-- [ ] Band predictor
+- [x] Band predictor (transparent heuristic: weekly velocity + projection + confidence)
 - [ ] Question/passage/audio generation
 - [x] AI usage logging: `ai_interactions` table (provider/model/tokens/latency/cost) written on every scoring call
 - [ ] Offline eval harness (gold-set MAE gate)
