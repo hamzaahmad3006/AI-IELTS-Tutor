@@ -1,10 +1,36 @@
-"""Dashboard controller: assembles the home overview payload."""
+"""Dashboard controller: composes the real Home overview from stored data.
+
+Matches the DashboardData shape the React Native Home screen already expects
+(greeting, streak, band prediction, module levels, coach message, checklist)."""
 
 from __future__ import annotations
 
+from datetime import date, datetime, timezone
+
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from core.predictor import round_half
+from models.attempt import WritingAttempt
+from models.listening import ListeningAttempt
+from models.profile import LearnerProfile
+from models.reading import ReadingAttempt
+from models.speaking import SpeakingAttempt
+from models.user import User
+
+from .analytics_controller import AnalyticsController
 from .base import CamelModel
 
+_MODULE_LABELS = {
+    "speaking": "Speaking",
+    "writing": "Writing",
+    "reading": "Reading",
+    "listening": "Listening",
+}
+_ATTEMPT_MODELS = (WritingAttempt, SpeakingAttempt, ReadingAttempt, ListeningAttempt)
 
+
+# ---------- Schemas (camelCase to the client) ----------
 class BandPrediction(CamelModel):
     predicted_band: float
     confidence: float
@@ -44,56 +70,142 @@ class DashboardData(CamelModel):
     checklist_completion_pct: int
 
 
+# ---------- Helpers ----------
+async def _activity_dates(session: AsyncSession, user_id: str) -> set[date]:
+    dates: set[date] = set()
+    for model in _ATTEMPT_MODELS:
+        rows = await session.scalars(
+            select(model.created_at).where(model.user_id == user_id)
+        )
+        for created_at in rows:
+            ts = created_at if created_at.tzinfo else created_at.replace(tzinfo=timezone.utc)
+            dates.add(ts.date())
+    return dates
+
+
+def _streak(dates: set[date]) -> int:
+    if not dates:
+        return 0
+    today = datetime.now(timezone.utc).date()
+    cursor = today if today in dates else None
+    if cursor is None:
+        return 0
+    streak = 0
+    from datetime import timedelta
+
+    while cursor in dates:
+        streak += 1
+        cursor = cursor - timedelta(days=1)
+    return streak
+
+
 class DashboardController:
     @staticmethod
-    def overview(user_id: str) -> DashboardData:
-        # TODO: derive from real attempts, scores, weaknesses and predictions.
+    async def overview(session: AsyncSession, user: User) -> DashboardData:
+        profile = await session.scalar(
+            select(LearnerProfile).where(LearnerProfile.user_id == user.id)
+        )
+        target = profile.target_band if profile else 7.0
+
+        progress = await AnalyticsController.progress(session, user)
+        prediction = await AnalyticsController.prediction(session, user)
+
+        current_by_module = {m.module: m.current_band for m in progress.modules}
+        predicted_overall = prediction.predicted_overall or progress.overall_band or 0.0
+
+        # Weakest module with data drives the coach + active tile.
+        with_data = {m: b for m, b in current_by_module.items() if b is not None}
+        weakest = min(with_data, key=lambda m: with_data[m]) if with_data else "speaking"
+
+        distance = round_half(max(0.0, target - predicted_overall))
+        progress_to_target = (
+            max(0.0, min(1.0, predicted_overall / target)) if target > 0 else 0.0
+        )
+
+        band_prediction = BandPrediction(
+            predicted_band=predicted_overall,
+            confidence=prediction.confidence,
+            distance_to_target=distance,
+            based_on_sessions=progress.total_attempts,
+            progress_to_target=round(progress_to_target, 2),
+        )
+
+        if with_data:
+            coach_msg = (
+                f"Great consistency! Let's focus on {_MODULE_LABELS[weakest]} today "
+                f"to close the gap to your Band {target:g} goal."
+            )
+        else:
+            coach_msg = (
+                "Welcome! Complete a practice in any module and I'll start tracking "
+                "your progress and predicting your band."
+            )
+        coach = DailyCoachMessage(id="coach_daily", title="Daily Coach", message=coach_msg)
+
+        modules: list[ModuleProgress] = []
+        baselines = (
+            {
+                "speaking": profile.baseline_speaking,
+                "writing": profile.baseline_writing,
+                "reading": profile.baseline_reading,
+                "listening": profile.baseline_listening,
+            }
+            if profile
+            else {}
+        )
+        for module_name in _MODULE_LABELS:
+            level = current_by_module.get(module_name)
+            if level is None:
+                level = baselines.get(module_name) or 0.0
+            modules.append(
+                ModuleProgress(
+                    module=module_name,
+                    current_level=level,
+                    is_active=(module_name == weakest),
+                )
+            )
+
+        # Recommendation checklist (until the study planner lands). An item is
+        # marked complete if the learner already practiced that area today.
+        today = datetime.now(timezone.utc).date()
+        dates_by_module = await _activity_dates(session, user.id)
+        practiced_today = today in dates_by_module
+        checklist = [
+            ChecklistItem(
+                id="rec_weak",
+                title=f"{_MODULE_LABELS[weakest]} practice session",
+                subtitle="Priority: High",
+                is_completed=practiced_today,
+                completed_at=today.isoformat() if practiced_today else None,
+                priority="high",
+            ),
+            ChecklistItem(
+                id="rec_writing",
+                title="1 Writing Task 2 essay",
+                subtitle="~20 min",
+                is_completed=False,
+                completed_at=None,
+                priority="medium",
+            ),
+            ChecklistItem(
+                id="rec_vocab",
+                title="Vocabulary review",
+                subtitle="15 min session",
+                is_completed=False,
+                completed_at=None,
+                priority=None,
+            ),
+        ]
+        completed = sum(1 for item in checklist if item.is_completed)
+        pct = round(completed / len(checklist) * 100)
+
+        first_name = (user.full_name or "there").split(" ")[0]
         return DashboardData(
-            greeting_name="Sarah",
-            streak_days=5,
-            prediction=BandPrediction(
-                predicted_band=7.0,
-                confidence=0.72,
-                distance_to_target=0.5,
-                based_on_sessions=3,
-                progress_to_target=0.78,
-            ),
-            coach=DailyCoachMessage(
-                id="coach_1",
-                title="Daily Coach",
-                message="You're doing great in Lexical Resource!",
-            ),
-            modules=[
-                ModuleProgress(module="speaking", current_level=7.5, is_active=True),
-                ModuleProgress(module="writing", current_level=6.5, is_active=False),
-                ModuleProgress(module="reading", current_level=7.0, is_active=False),
-                ModuleProgress(module="listening", current_level=7.5, is_active=False),
-            ],
-            checklist=[
-                ChecklistItem(
-                    id="task_1",
-                    title="Speaking Drill - Part 2 Topics",
-                    subtitle="Completed 10:30 AM",
-                    is_completed=True,
-                    completed_at="2026-07-22T10:30:00Z",
-                    priority=None,
-                ),
-                ChecklistItem(
-                    id="task_2",
-                    title="1 Writing Task 1 Essay",
-                    subtitle="Priority: High",
-                    is_completed=False,
-                    completed_at=None,
-                    priority="high",
-                ),
-                ChecklistItem(
-                    id="task_3",
-                    title='Vocabulary: Synonyms for "Important"',
-                    subtitle="15 min session",
-                    is_completed=False,
-                    completed_at=None,
-                    priority=None,
-                ),
-            ],
-            checklist_completion_pct=50,
+            greeting_name=first_name,
+            streak_days=_streak(dates_by_module),
+            prediction=band_prediction,
+            coach=coach,
+            modules=modules,
+            checklist=checklist,
+            checklist_completion_pct=pct,
         )
