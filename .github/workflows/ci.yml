@@ -1,0 +1,46 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  backend:
+    name: Backend (compile + migrations + smoke)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: backend/requirements.txt
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Compile check
+        run: python -m compileall -q .
+
+      - name: Alembic migrations (upgrade + downgrade)
+        env:
+          DATABASE_URL: sqlite+aiosqlite:///./ci_migrations.db
+        run: |
+          alembic upgrade head
+          alembic downgrade base
+          rm -f ci_migrations.db
+
+      - name: Smoke test suites
+        run: python tests/run_smoke.py

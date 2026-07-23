@@ -218,7 +218,7 @@ Everything **not yet completed** to finish the project, organized by area. Check
 - [ ] Frontend component tests — React Native Testing Library
 - [ ] Frontend E2E — Detox
 - [ ] Backend unit tests (services, repos, validators) — pytest
-- [ ] Backend integration tests (API + DB via testcontainers)
+- [x] Backend integration smoke suites (TestClient + SQLite) for all verticals, run in isolated processes via `tests/run_smoke.py` — [ ] broaden to pytest unit tests + Postgres/testcontainers
 - [ ] AI evaluation suite (rubric MAE vs gold set)
 - [ ] Voice pipeline tests (latency budget, FSM, barge-in)
 - [ ] Load tests (k6/Locust) against SLOs
@@ -230,7 +230,7 @@ Everything **not yet completed** to finish the project, organized by area. Check
 
 - [ ] Dockerfiles (api, worker, voice) + docker-compose (local)
 - [ ] Environment configs (dev/staging/prod)
-- [ ] CI/CD pipeline (lint → typecheck → test → build → deploy)
+- [x] CI: backend compile + Alembic up/down + smoke suites on every push/PR (GitHub Actions) — [ ] frontend typecheck/build, lint, deploy stages
 - [ ] Observability: metrics (Prometheus), tracing (OpenTelemetry), dashboards + alerts
 - [ ] Health/readiness probes wired to real dependencies
 - [ ] Kubernetes manifests / Helm (future)
