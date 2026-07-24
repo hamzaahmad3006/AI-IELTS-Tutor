@@ -44,3 +44,30 @@ jobs:
 
       - name: Smoke test suites
         run: python tests/run_smoke.py
+
+  docker:
+    name: Docker (build + health check)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build backend image
+        run: docker build -t ai-ielts-backend ./backend
+
+      - name: Run container and verify /health
+        run: |
+          docker run -d --name api -p 8000:8000 \
+            -e DATABASE_URL=sqlite+aiosqlite:////tmp/ci.db \
+            ai-ielts-backend
+          ok=""
+          for i in $(seq 1 30); do
+            if curl -fsS http://localhost:8000/health > /tmp/health.json 2>/dev/null; then
+              ok="yes"; break
+            fi
+            sleep 2
+          done
+          echo "--- container logs ---"; docker logs api | tail -30
+          docker rm -f api > /dev/null
+          if [ -z "$ok" ]; then echo "health check failed"; exit 1; fi
+          grep -q '"status":"ok"' /tmp/health.json

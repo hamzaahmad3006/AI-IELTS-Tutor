@@ -229,7 +229,7 @@ Everything **not yet completed** to finish the project, organized by area. Check
 
 ## 12. DevOps / Infra
 
-- [ ] Dockerfiles (api, worker, voice) + docker-compose (local)
+- [x] Dockerfile (api, multi-stage, non-root) + docker-compose (API + Postgres) + CI image build & health check — [ ] worker/voice images
 - [ ] Environment configs (dev/staging/prod)
 - [x] CI: backend compile + Alembic up/down + smoke suites on every push/PR (GitHub Actions) — [ ] frontend typecheck/build, lint, deploy stages
 - [ ] Observability: metrics (Prometheus), tracing (OpenTelemetry), dashboards + alerts
