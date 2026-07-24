@@ -8,7 +8,6 @@ from . import (
     analytics,
     auth,
     dashboard,
-    health,
     listening,
     me,
     onboarding,
@@ -18,8 +17,9 @@ from . import (
     writing,
 )
 
+# NOTE: health/readiness probes are mounted at the app root (see main.py), not
+# under the /v1 API prefix, so orchestrators can reach /health and /ready.
 api_router = APIRouter()
-api_router.include_router(health.router)
 api_router.include_router(auth.router)
 api_router.include_router(onboarding.router)
 api_router.include_router(profile.router)
