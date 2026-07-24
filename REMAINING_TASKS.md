@@ -140,7 +140,7 @@ Everything **not yet completed** to finish the project, organized by area. Check
 - [x] RBAC dependencies (`require_roles`) — [ ] own-resource checks
 - [x] Password policy (strength) + email/name field validation — [ ] login rate limiting / lockout
 - [x] `/auth/me`, `/auth/refresh`, `/auth/logout` endpoints
-- [ ] Audit logging for admin actions
+- [x] Audit logging for admin actions (`audit_logs` table, written on user changes)
 - [x] Input validation hardening (field validators + RFC 7807 problem+json contract with correlation IDs) — [ ] TLS/secrets management
 
 ---
@@ -194,7 +194,7 @@ Everything **not yet completed** to finish the project, organized by area. Check
 ## 9. Admin Panel (not started)
 
 - [ ] Admin auth + dashboard overview (KPIs)
-- [ ] User management (list, suspend, role assignment)
+- [x] User management: list (paginated + search), suspend/reactivate, role assignment (privileged roles super-admin-gated), audit-logged
 - [ ] Content management: passages, audio, questions, cue cards, writing prompts, vocabulary, grammar lessons (CRUD + versioning)
 - [ ] Platform analytics & reports
 - [x] AI usage monitoring endpoint `GET /admin/ai-usage` (tokens, cost, latency, error rate, by-model) — [ ] budget alerts

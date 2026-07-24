@@ -8,7 +8,14 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from controllers.admin_users_controller import (
+    AdminUserItem,
+    AdminUsersController,
+    AdminUserPage,
+    UserUpdateRequest,
+)
 from controllers.ai_usage_controller import AIUsageController, AIUsageResponse
+from controllers.pagination import DEFAULT_LIMIT
 from db.session import get_db
 from dependencies import require_roles
 from models.user import User
@@ -28,3 +35,24 @@ async def ai_usage(
     date_to: Annotated[date | None, Query(alias="to")] = None,
 ) -> AIUsageResponse:
     return await AIUsageController.summary(session, feature, date_from, date_to)
+
+
+@router.get("/users", response_model=AdminUserPage)
+async def list_users(
+    admin: AdminUser,
+    session: DbSession,
+    search: Annotated[str | None, Query()] = None,
+    cursor: Annotated[str | None, Query()] = None,
+    limit: Annotated[int, Query(ge=1, le=50)] = DEFAULT_LIMIT,
+) -> AdminUserPage:
+    return await AdminUsersController.list_users(session, cursor, limit, search)
+
+
+@router.patch("/users/{user_id}", response_model=AdminUserItem)
+async def update_user(
+    user_id: str,
+    payload: UserUpdateRequest,
+    admin: AdminUser,
+    session: DbSession,
+) -> AdminUserItem:
+    return await AdminUsersController.update_user(session, admin, user_id, payload)

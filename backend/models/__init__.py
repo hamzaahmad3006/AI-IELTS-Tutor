@@ -2,6 +2,7 @@
 
 from .ai_interaction import AIInteraction
 from .attempt import WritingAttempt
+from .audit import AuditLog
 from .content import AudioClip, ListeningQuestion, Passage, Question
 from .listening import ListeningAttempt
 from .profile import LearnerProfile
@@ -22,4 +23,5 @@ __all__ = [
     "ListeningAttempt",
     "SpeakingAttempt",
     "AIInteraction",
+    "AuditLog",
 ]
