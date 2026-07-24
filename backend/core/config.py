@@ -37,6 +37,12 @@ class Settings(BaseSettings):
     seed_admin_email: str = "admin@ielts.local"
     seed_admin_password: str = "AdminPass123"
 
+    # Rate limiting (in-memory per-process; back with Redis for multi-instance).
+    rate_limit_enabled: bool = True
+    rate_limit_login_per_min: int = 10
+    rate_limit_register_per_min: int = 5
+    rate_limit_ai_per_min: int = 20
+
     @property
     def is_sqlite(self) -> bool:
         return self.database_url.startswith("sqlite")

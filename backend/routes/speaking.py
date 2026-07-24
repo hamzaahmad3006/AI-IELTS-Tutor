@@ -15,6 +15,8 @@ from controllers.speaking_controller import (
     SpeakingResultResponse,
     SpeakingSubmitRequest,
 )
+from core.config import get_settings
+from core.rate_limit import limit_by_user
 from db.session import get_db
 from dependencies import get_current_user, get_orchestrator
 from models.user import User
@@ -24,12 +26,14 @@ router = APIRouter(prefix="/speaking", tags=["speaking"])
 DbSession = Annotated[AsyncSession, Depends(get_db)]
 CurrentUser = Annotated[User, Depends(get_current_user)]
 Orchestrator = Annotated[AIOrchestrator, Depends(get_orchestrator)]
+_ai_limit = get_settings().rate_limit_ai_per_min
 
 
 @router.post(
     "/attempts",
     response_model=SpeakingResultResponse,
     status_code=status.HTTP_201_CREATED,
+    dependencies=[Depends(limit_by_user("ai_speaking", _ai_limit))],
 )
 async def submit_attempt(
     payload: SpeakingSubmitRequest,

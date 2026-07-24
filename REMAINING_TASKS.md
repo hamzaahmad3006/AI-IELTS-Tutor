@@ -125,7 +125,7 @@ Everything **not yet completed** to finish the project, organized by area. Check
 - [x] Service/use-case logic + dependency injection (auth) — extend to other domains
 - [x] Unit-of-Work / transaction handling (request-scoped commit/rollback)
 - [ ] Structured logging + correlation propagation (extend middleware)
-- [ ] Rate limiting (Redis token bucket)
+- [x] Rate limiting (in-memory fixed-window on auth + AI endpoints, 429 problem+json + Retry-After) — [ ] Redis backing for multi-instance
 - [ ] Redis integration (cache + queue)
 - [ ] Background job runner (Celery/arq) + task definitions
 - [ ] Full exception taxonomy + handlers (extend current RFC 7807)

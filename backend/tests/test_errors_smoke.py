@@ -5,6 +5,8 @@ from __future__ import annotations
 import os
 
 os.environ.setdefault("DATABASE_URL", "sqlite+aiosqlite:///./test_errors.db")
+# This suite exercises validation, not rate limiting (it registers repeatedly).
+os.environ.setdefault("RATE_LIMIT_ENABLED", "false")
 
 from fastapi.testclient import TestClient  # noqa: E402
 

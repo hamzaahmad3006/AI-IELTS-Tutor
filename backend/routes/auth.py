@@ -15,6 +15,8 @@ from controllers.auth_controller import (
     RefreshRequest,
     RegisterRequest,
 )
+from core.config import get_settings
+from core.rate_limit import limit_by_ip
 from db.session import get_db
 from dependencies import get_current_user
 from models.user import User
@@ -22,18 +24,24 @@ from models.user import User
 router = APIRouter(prefix="/auth", tags=["auth"])
 
 DbSession = Annotated[AsyncSession, Depends(get_db)]
+_settings = get_settings()
 
 
 @router.post(
     "/register",
     response_model=AuthResponse,
     status_code=status.HTTP_201_CREATED,
+    dependencies=[Depends(limit_by_ip("register", _settings.rate_limit_register_per_min))],
 )
 async def register(payload: RegisterRequest, session: DbSession) -> AuthResponse:
     return await AuthController.register(session, payload)
 
 
-@router.post("/login", response_model=AuthResponse)
+@router.post(
+    "/login",
+    response_model=AuthResponse,
+    dependencies=[Depends(limit_by_ip("login", _settings.rate_limit_login_per_min))],
+)
 async def login(payload: LoginRequest, session: DbSession) -> AuthResponse:
     return await AuthController.login(session, payload)
 
