@@ -7,6 +7,11 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from controllers.adaptive_controller import (
+    AdaptiveController,
+    DifficultyResponse,
+    RecommendationsResponse,
+)
 from controllers.weakness_controller import WeaknessListResponse, WeaknessService
 from db.session import get_db
 from dependencies import get_current_user
@@ -25,3 +30,17 @@ async def weaknesses(
     include_resolved: Annotated[bool, Query(alias="includeResolved")] = False,
 ) -> WeaknessListResponse:
     return await WeaknessService.list_for_user(session, current.id, include_resolved)
+
+
+@router.get("/adaptive-difficulty", response_model=DifficultyResponse)
+async def adaptive_difficulty(
+    current: CurrentUser, session: DbSession
+) -> DifficultyResponse:
+    return await AdaptiveController.difficulty_overview(session, current)
+
+
+@router.get("/recommendations", response_model=RecommendationsResponse)
+async def recommendations(
+    current: CurrentUser, session: DbSession
+) -> RecommendationsResponse:
+    return await AdaptiveController.recommendations(session, current)

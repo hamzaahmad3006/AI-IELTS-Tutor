@@ -13,6 +13,7 @@ from models.content import AudioClip, ListeningQuestion
 from models.listening import ListeningAttempt
 from models.user import User
 
+from .adaptive_controller import resolve_difficulty
 from .base import CamelModel
 from .grading import is_correct
 from .weakness_controller import WeaknessService
@@ -146,13 +147,24 @@ class ListeningController:
 
     @classmethod
     async def get_clip(
-        cls, session: AsyncSession, difficulty: str | None, exam_type: str
+        cls,
+        session: AsyncSession,
+        user_id: str,
+        difficulty: str | None,
+        exam_type: str,
     ) -> ClipResponse:
         await _ensure_seeded(session)
-        query = select(AudioClip).where(AudioClip.exam_type == exam_type)
-        if difficulty:
-            query = query.where(AudioClip.difficulty == difficulty)
-        clip = await session.scalar(query.limit(1))
+        if difficulty is None or difficulty == "adaptive":
+            difficulty, _, _ = await resolve_difficulty(session, user_id, "listening")
+        clip = await session.scalar(
+            select(AudioClip)
+            .where(AudioClip.exam_type == exam_type, AudioClip.difficulty == difficulty)
+            .limit(1)
+        )
+        if clip is None:
+            clip = await session.scalar(
+                select(AudioClip).where(AudioClip.exam_type == exam_type).limit(1)
+            )
         if clip is None:
             clip = await session.scalar(select(AudioClip).limit(1))
         if clip is None:
