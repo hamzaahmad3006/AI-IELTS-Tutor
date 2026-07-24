@@ -164,6 +164,7 @@ Everything **not yet completed** to finish the project, organized by area. Check
 
 - [x] `LLMProvider` port (provider-agnostic abstraction) + offline mock provider
 - [x] Groq provider adapter (OpenAI-compatible via httpx)
+- [x] Adaptive difficulty resolver (recent-band → easy/medium/hard, wired into Reading/Listening delivery) + weakness-driven recommendations (`/me/adaptive-difficulty`, `/me/recommendations`)
 - [x] AI orchestrator (Writing scoring) — [ ] full multi-task routing policy
 - [ ] Prompt registry (versioned templates) per module — partial (Writing rubric prompt exists)
 - [x] Rubric-as-code scoring schemas (Writing + Speaking)

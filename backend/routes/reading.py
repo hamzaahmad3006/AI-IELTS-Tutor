@@ -32,7 +32,7 @@ async def get_passage(
     difficulty: Annotated[str | None, Query()] = None,
     exam_type: Annotated[str, Query(alias="examType")] = "academic",
 ) -> PassageResponse:
-    return await ReadingController.get_passage(session, difficulty, exam_type)
+    return await ReadingController.get_passage(session, current.id, difficulty, exam_type)
 
 
 @router.post(

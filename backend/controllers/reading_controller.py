@@ -13,6 +13,7 @@ from models.content import Passage, Question
 from models.reading import ReadingAttempt
 from models.user import User
 
+from .adaptive_controller import resolve_difficulty
 from .base import CamelModel
 from .grading import is_correct
 from .weakness_controller import WeaknessService
@@ -136,13 +137,24 @@ class ReadingController:
 
     @classmethod
     async def get_passage(
-        cls, session: AsyncSession, difficulty: str | None, exam_type: str
+        cls,
+        session: AsyncSession,
+        user_id: str,
+        difficulty: str | None,
+        exam_type: str,
     ) -> PassageResponse:
         await _ensure_seeded(session)
-        query = select(Passage).where(Passage.exam_type == exam_type)
-        if difficulty:
-            query = query.where(Passage.difficulty == difficulty)
-        passage = await session.scalar(query.limit(1))
+        if difficulty is None or difficulty == "adaptive":
+            difficulty, _, _ = await resolve_difficulty(session, user_id, "reading")
+        passage = await session.scalar(
+            select(Passage)
+            .where(Passage.exam_type == exam_type, Passage.difficulty == difficulty)
+            .limit(1)
+        )
+        if passage is None:
+            passage = await session.scalar(
+                select(Passage).where(Passage.exam_type == exam_type).limit(1)
+            )
         if passage is None:
             passage = await session.scalar(select(Passage).limit(1))
         if passage is None:
