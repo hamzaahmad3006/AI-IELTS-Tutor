@@ -1,0 +1,38 @@
+# Local development stack: FastAPI backend + PostgreSQL.
+#   docker compose up --build
+# API on http://localhost:8000 (docs at /docs). Migrations run on startup.
+
+services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: aitutor
+      POSTGRES_PASSWORD: aitutor
+      POSTGRES_DB: aitutor
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U aitutor -d aitutor"]
+      interval: 5s
+      timeout: 3s
+      retries: 12
+
+  api:
+    build: ./backend
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql+asyncpg://aitutor:aitutor@db:5432/aitutor
+      JWT_SECRET: dev_secret_change_me
+      AI_PROVIDER: groq
+      # GROQ_API_KEY: set to enable real AI (otherwise the offline mock is used)
+      RATE_LIMIT_ENABLED: "true"
+    command: sh -c "alembic upgrade head && uvicorn main:app --host 0.0.0.0 --port 8000"
+    ports:
+      - "8000:8000"
+
+volumes:
+  pgdata:
