@@ -15,6 +15,7 @@ from models.user import User
 
 from .ai_usage_controller import record_ai_interaction
 from .base import CamelModel
+from .weakness_controller import WeaknessService, criteria_below_threshold
 
 
 class WritingSubmitRequest(CamelModel):
@@ -110,6 +111,16 @@ class WritingController:
         await record_ai_interaction(
             session, user_id=user.id, feature="writing", usage=usage
         )
+        weak_tags = criteria_below_threshold(
+            {
+                "task_response": score.task_response,
+                "coherence_cohesion": score.coherence_cohesion,
+                "lexical_resource": score.lexical_resource,
+                "grammatical_range": score.grammatical_range,
+            }
+        )
+        if weak_tags:
+            await WeaknessService.record(session, user.id, "writing", weak_tags)
         await session.flush()
         return _to_response(attempt)
 

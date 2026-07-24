@@ -168,7 +168,7 @@ Everything **not yet completed** to finish the project, organized by area. Check
 - [ ] Prompt registry (versioned templates) per module — partial (Writing rubric prompt exists)
 - [x] Rubric-as-code scoring schemas (Writing + Speaking)
 - [x] Structured-output validation (Pydantic) — [ ] bounded self-repair
-- [ ] AI memory / weakness model (store + retriever + updater)
+- [x] AI weakness memory: record from scored attempts (rising severity + decay), `GET /me/weaknesses` by priority — [ ] semantic (pgvector) retriever
 - [ ] Adaptive difficulty controller (EMA + severity decay)
 - [x] Band predictor (transparent heuristic: weekly velocity + projection + confidence)
 - [ ] Question/passage/audio generation

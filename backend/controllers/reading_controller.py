@@ -15,6 +15,7 @@ from models.user import User
 
 from .base import CamelModel
 from .grading import is_correct
+from .weakness_controller import WeaknessService
 
 
 # ---------- Schemas ----------
@@ -214,6 +215,11 @@ class ReadingController:
             band=band,
         )
         session.add(attempt)
+        wrong_tags = list(
+            dict.fromkeys(pq.type for pq in per_question if not pq.correct)
+        )
+        if wrong_tags:
+            await WeaknessService.record(session, user.id, "reading", wrong_tags)
         await session.flush()
         return ReadingResultResponse(
             attempt_id=attempt.id,

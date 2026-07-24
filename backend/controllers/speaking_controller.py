@@ -16,6 +16,7 @@ from models.user import User
 
 from .ai_usage_controller import record_ai_interaction
 from .base import CamelModel
+from .weakness_controller import WeaknessService, criteria_below_threshold
 
 
 class SpeakingSubmitRequest(CamelModel):
@@ -101,6 +102,16 @@ class SpeakingController:
         await record_ai_interaction(
             session, user_id=user.id, feature="speaking", usage=usage
         )
+        weak_tags = criteria_below_threshold(
+            {
+                "fluency_coherence": score.fluency_coherence,
+                "lexical_resource": score.lexical_resource,
+                "grammatical_range": score.grammatical_range,
+                "pronunciation": score.pronunciation,
+            }
+        )
+        if weak_tags:
+            await WeaknessService.record(session, user.id, "speaking", weak_tags)
         await session.flush()
         return _to_response(attempt)
 
