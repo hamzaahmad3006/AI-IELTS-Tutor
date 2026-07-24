@@ -7,12 +7,33 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
+from core.rate_limit import RateLimitExceeded
+
 
 def _correlation_id(request: Request) -> str:
     return getattr(request.state, "correlation_id", "")
 
 
 def register_exception_handlers(app: FastAPI) -> None:
+    @app.exception_handler(RateLimitExceeded)
+    async def rate_limit_handler(
+        request: Request, exc: RateLimitExceeded
+    ) -> JSONResponse:
+        return JSONResponse(
+            status_code=429,
+            content={
+                "type": "https://errors.aitutor.app/rate_limited",
+                "title": "Too many requests. Please slow down.",
+                "status": 429,
+                "code": "rate_limited",
+                "correlationId": _correlation_id(request),
+            },
+            headers={
+                "Retry-After": str(exc.retry_after),
+                "X-RateLimit-Limit": str(exc.limit),
+            },
+        )
+
     @app.exception_handler(StarletteHTTPException)
     async def http_exception_handler(
         request: Request, exc: StarletteHTTPException
