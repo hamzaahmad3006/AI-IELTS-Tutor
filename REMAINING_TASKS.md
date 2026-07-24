@@ -195,7 +195,7 @@ Everything **not yet completed** to finish the project, organized by area. Check
 
 - [ ] Admin auth + dashboard overview (KPIs)
 - [x] User management: list (paginated + search), suspend/reactivate, role assignment (privileged roles super-admin-gated), audit-logged
-- [ ] Content management: passages, audio, questions, cue cards, writing prompts, vocabulary, grammar lessons (CRUD + versioning)
+- [x] Content management: reading passages + questions CRUD (audit-logged, RBAC content_editor/admin) — [ ] audio, cue cards, writing prompts, vocabulary, grammar lessons; versioning
 - [ ] Platform analytics & reports
 - [x] AI usage monitoring endpoint `GET /admin/ai-usage` (tokens, cost, latency, error rate, by-model) — [ ] budget alerts
 - [ ] Subscription/plan management (future, feature-flagged)

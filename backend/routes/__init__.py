@@ -4,6 +4,7 @@ from fastapi import APIRouter
 
 from . import (
     admin,
+    admin_content,
     analytics,
     auth,
     dashboard,
@@ -27,6 +28,7 @@ api_router.include_router(listening.router)
 api_router.include_router(speaking.router)
 api_router.include_router(analytics.router)
 api_router.include_router(admin.router)
+api_router.include_router(admin_content.router)
 api_router.include_router(dashboard.router)
 
 __all__ = ["api_router"]
