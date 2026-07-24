@@ -9,6 +9,7 @@ from .profile import LearnerProfile
 from .reading import ReadingAttempt
 from .speaking import SpeakingAttempt
 from .user import RefreshToken, User
+from .weakness import Weakness
 
 __all__ = [
     "User",
@@ -24,4 +25,5 @@ __all__ = [
     "SpeakingAttempt",
     "AIInteraction",
     "AuditLog",
+    "Weakness",
 ]
