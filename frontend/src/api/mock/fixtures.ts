@@ -7,6 +7,8 @@
 import type {
   AuthResponse,
   DashboardData,
+  PredictionResponse,
+  ProgressResponse,
   SpeakingSession,
   WritingFeedback,
 } from '../../types';
@@ -74,6 +76,26 @@ export const MOCK_DASHBOARD: DashboardData = {
     },
   ],
   checklistCompletionPct: 50,
+};
+
+export const MOCK_PROGRESS: ProgressResponse = {
+  modules: [
+    { module: 'speaking', attempts: 4, currentBand: 7.5, averageBand: 7.0 },
+    { module: 'writing', attempts: 3, currentBand: 6.5, averageBand: 6.0 },
+    { module: 'reading', attempts: 5, currentBand: 7.0, averageBand: 6.5 },
+    { module: 'listening', attempts: 2, currentBand: 7.5, averageBand: 7.0 },
+  ],
+  overallBand: 7.0,
+  totalAttempts: 14,
+};
+
+export const MOCK_PREDICTION: PredictionResponse = {
+  predictedOverall: 7.0,
+  confidence: 0.72,
+  horizonDate: '2026-10-15',
+  modules: { speaking: 7.5, writing: 6.5, reading: 7.0, listening: 7.5 },
+  velocityPerWeek: { speaking: 0.12, writing: 0.15, reading: 0.05, listening: 0.1 },
+  note: 'Estimate based on your recent trajectory; not an official IELTS result.',
 };
 
 export const MOCK_SPEAKING_SESSION: SpeakingSession = {

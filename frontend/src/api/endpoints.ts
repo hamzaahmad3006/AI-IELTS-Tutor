@@ -32,6 +32,8 @@ export const ENDPOINTS = {
     attempt: (id: string): string => `/writing/attempts/${id}`,
   },
   analytics: {
+    overview: '/analytics/overview',
+    progress: '/analytics/progress',
     prediction: '/analytics/prediction',
   },
 } as const;
