@@ -5,15 +5,19 @@
  */
 
 import type {
+  AdaptiveDifficultyResponse,
   AuthResponse,
   DashboardData,
   ListeningClip,
   ListeningResult,
   PredictionResponse,
+  ProfileResponse,
   ProgressResponse,
   ReadingPassage,
   ReadingResult,
+  RecommendationsResponse,
   SpeakingSession,
+  WeaknessList,
   WritingFeedback,
 } from '../../types';
 
@@ -100,6 +104,43 @@ export const MOCK_PREDICTION: PredictionResponse = {
   modules: { speaking: 7.5, writing: 6.5, reading: 7.0, listening: 7.5 },
   velocityPerWeek: { speaking: 0.12, writing: 0.15, reading: 0.05, listening: 0.1 },
   note: 'Estimate based on your recent trajectory; not an official IELTS result.',
+};
+
+export const MOCK_PROFILE: ProfileResponse = {
+  userId: 'usr_mock_1',
+  examType: 'academic',
+  selfLevel: 'intermediate',
+  cefrLevel: 'B2',
+  targetBand: 7.5,
+  examDate: '2026-10-15',
+  dailyMinutes: 60,
+  baselines: { speaking: 6.5, writing: 6.0, reading: 6.5, listening: 7.0 },
+  consentVoice: true,
+  consentAi: true,
+};
+
+export const MOCK_WEAKNESSES: WeaknessList = {
+  items: [
+    { module: 'writing', tag: 'grammatical_range', severity: 0.44, occurrences: 3, lastSeenAt: '2026-07-24T09:00:00Z', resolved: false, priority: 0.42 },
+    { module: 'reading', tag: 'true_false_notgiven', severity: 0.25, occurrences: 1, lastSeenAt: '2026-07-23T09:00:00Z', resolved: false, priority: 0.2 },
+  ],
+};
+
+export const MOCK_ADAPTIVE_DIFFICULTY: AdaptiveDifficultyResponse = {
+  modules: [
+    { module: 'speaking', difficulty: 'medium', recentBand: 6.5, rationale: 'Recent average band 6.5 maps to medium.' },
+    { module: 'writing', difficulty: 'medium', recentBand: 6.0, rationale: 'Recent average band 6.0 maps to medium.' },
+    { module: 'reading', difficulty: 'hard', recentBand: 7.0, rationale: 'Recent average band 7.0 maps to hard.' },
+    { module: 'listening', difficulty: 'medium', recentBand: null, rationale: 'No history yet; starting at medium.' },
+  ],
+};
+
+export const MOCK_RECOMMENDATIONS: RecommendationsResponse = {
+  items: [
+    { module: 'writing', tag: 'grammatical_range', title: 'Grammatical Range & Accuracy', action: 'Practice complex sentence structures and review common grammar errors.', severity: 0.44, difficulty: 'medium' },
+    { module: 'reading', tag: 'true_false_notgiven', title: 'True/False/Not Given', action: 'Practice distinguishing contradicted vs. absent information.', severity: 0.25, difficulty: 'hard' },
+  ],
+  message: 'Focus on these areas to move toward your target band.',
 };
 
 export const MOCK_READING_PASSAGE: ReadingPassage = {

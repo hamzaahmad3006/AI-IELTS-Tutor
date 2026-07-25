@@ -8,6 +8,9 @@ export type ProficiencyLevel = 'beginner' | 'intermediate' | 'advanced';
 
 export type Difficulty = 'easy' | 'medium' | 'hard' | 'adaptive';
 
+/** A resolved difficulty (never 'adaptive'). */
+export type ConcreteDifficulty = 'easy' | 'medium' | 'hard';
+
 /** IELTS band value: 0–9 in 0.5 increments (validated at the boundary). */
 export type Band = number;
 

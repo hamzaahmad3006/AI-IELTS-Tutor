@@ -3,6 +3,8 @@ export * from './client';
 export * from './config';
 export * from './endpoints';
 export { authApi } from './authApi';
+export { profileApi } from './profileApi';
+export { meApi } from './meApi';
 export { dashboardApi } from './dashboardApi';
 export { analyticsApi } from './analyticsApi';
 export { readingApi } from './readingApi';
