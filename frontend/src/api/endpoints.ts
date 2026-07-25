@@ -31,6 +31,18 @@ export const ENDPOINTS = {
     attempts: '/writing/attempts',
     attempt: (id: string): string => `/writing/attempts/${id}`,
   },
+  reading: {
+    passages: '/reading/passages',
+    attempts: '/reading/attempts',
+    attempt: (id: string): string => `/reading/attempts/${id}`,
+    history: '/reading/history',
+  },
+  listening: {
+    clips: '/listening/clips',
+    attempts: '/listening/attempts',
+    attempt: (id: string): string => `/listening/attempts/${id}`,
+    history: '/listening/history',
+  },
   analytics: {
     overview: '/analytics/overview',
     progress: '/analytics/progress',
