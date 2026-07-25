@@ -49,18 +49,35 @@ npm run android             # or: npm run ios
 
 ## Backend — run
 
+Runs on SQLite with zero config (see [backend/README.md](backend/README.md) for full details):
+
 ```bash
 cd backend
 python -m venv .venv && source .venv/Scripts/activate   # Windows Git Bash
 pip install -r requirements.txt
 uvicorn main:app --reload --port 8000
-# Docs: http://localhost:8000/docs
+# Docs: http://localhost:8000/docs   Health: http://localhost:8000/health
 ```
 
-The Android emulator reaches the host backend at `http://10.0.2.2:8000/v1` (already set in `frontend/src/api/config.ts`).
+Or with Docker (API + PostgreSQL):
 
-## Implemented in this milestone
+```bash
+docker compose up --build
+```
 
-- Design system (light/dark), shared component library, navigation, Redux + persistence.
-- Screens from the approved Stitch designs: **Splash, Onboarding (Target Band), Home Dashboard, Speaking Interview, Writing Feedback**, plus **Login / Register / Forgot Password** and tab placeholders (Practice, Progress, Coach, Profile).
-- Backend scaffold: health, auth (stub), dashboard overview, correlation-id + error middleware, camelCase responses matching the frontend types.
+Common tasks are wrapped in the root `Makefile` (`make help`, `make test`, `make run`, `make migrate`, `make docker-up`). The Android emulator reaches the host backend at `http://10.0.2.2:8000/v1` (set in `frontend/src/api/config.ts`).
+
+## Status
+
+**Backend** — substantially built and covered by CI (compile → migrations → smoke suites → Docker build/health):
+
+- Auth (JWT access + rotating refresh, RBAC), onboarding & profile
+- All four modules: **Writing & Speaking** AI-scored (rubric-as-code, provider-agnostic `LLMProvider` → Groq or offline mock); **Reading & Listening** auto-graded with band mapping; per-module history (cursor pagination)
+- **Weakness memory** (rising severity + decay), **adaptive difficulty**, and weakness-driven **recommendations**
+- **Analytics**: per-module progress + band prediction; real **dashboard overview**
+- **Admin**: user management + AI-usage monitoring + reading-content CRUD (audit-logged)
+- Validation + RFC 7807 error contract, rate limiting, correlation IDs, Dockerized, GitHub Actions CI
+
+**Frontend** — design system + navigation + Redux, and 5 approved Stitch screens (Splash, Onboarding Target-Band, Home, Speaking, Writing Feedback) + Auth + tab stubs, currently on **mock data** (`API_CONFIG.useMock = true`). Wiring to the live backend and the remaining screens are the main outstanding work.
+
+The full, continuously-updated backlog is in [REMAINING_TASKS.md](REMAINING_TASKS.md).
