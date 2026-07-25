@@ -16,9 +16,11 @@ import type {
   ReadingPassage,
   ReadingResult,
   RecommendationsResponse,
+  SpeakingResult,
   SpeakingSession,
   WeaknessList,
   WritingFeedback,
+  WritingResult,
 } from '../../types';
 
 export const MOCK_AUTH: AuthResponse = {
@@ -202,6 +204,39 @@ export const MOCK_LISTENING_RESULT: ListeningResult = {
     { questionId: 'lq2', type: 'mcq', correct: true, submitted: 'Science building 2nd floor', correctAnswer: 'Science building 2nd floor', explanation: 'Second floor of the science building.', answerTimestamp: '00:20-00:26' },
     { questionId: 'lq3', type: 'form_completion', correct: true, submitted: 'ten', correctAnswer: 'ten', explanation: 'Open until ten at night.', answerTimestamp: '00:06-00:10' },
   ],
+};
+
+export const MOCK_WRITING_RESULT: WritingResult = {
+  attemptId: 'wr_mock_1',
+  status: 'scored',
+  taskType: 2,
+  wordCount: 184,
+  overallBand: 6.5,
+  criteria: {
+    taskResponse: 7.0,
+    coherenceCohesion: 6.5,
+    lexicalResource: 6.0,
+    grammaticalRange: 6.5,
+  },
+  feedbackSummary:
+    'Clear position and relevant ideas; widen your range of complex structures and precise vocabulary to lift your band.',
+  improvedEssay:
+    'Nowadays, technology has become increasingly important in our lives...',
+};
+
+export const MOCK_SPEAKING_RESULT: SpeakingResult = {
+  attemptId: 'sp_mock_1',
+  status: 'scored',
+  part: 2,
+  overallBand: 6.5,
+  criteria: {
+    fluencyCoherence: 6.5,
+    lexicalResource: 6.0,
+    grammaticalRange: 6.5,
+    pronunciation: 7.0,
+  },
+  feedbackSummary:
+    'Good pronunciation and fluency; reduce fillers and use a wider range of connectives.',
 };
 
 export const MOCK_SPEAKING_SESSION: SpeakingSession = {

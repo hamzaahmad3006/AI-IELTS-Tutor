@@ -29,12 +29,14 @@ export const ENDPOINTS = {
   },
   speaking: {
     sessions: '/speaking/sessions',
+    attempts: '/speaking/attempts',
     attempt: (id: string): string => `/speaking/attempts/${id}`,
     history: '/speaking/history',
   },
   writing: {
     attempts: '/writing/attempts',
     attempt: (id: string): string => `/writing/attempts/${id}`,
+    history: '/writing/history',
   },
   reading: {
     passages: '/reading/passages',
