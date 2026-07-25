@@ -14,12 +14,25 @@ import { API_CONFIG } from './config';
 import type { ApiProblem } from '../types';
 
 type TokenProvider = () => string | null;
+/** Performs a token refresh and resolves the new access token (or null). */
+type RefreshHandler = () => Promise<string | null>;
 
 let getAccessToken: TokenProvider = () => null;
+let refreshHandler: RefreshHandler | null = null;
+let refreshInFlight: Promise<string | null> | null = null;
 
 export const setAuthTokenProvider = (provider: TokenProvider): void => {
   getAccessToken = provider;
 };
+
+/** Wire the refresh flow (set from the app root, backed by Redux). */
+export const setRefreshHandler = (handler: RefreshHandler): void => {
+  refreshHandler = handler;
+};
+
+interface RetryableConfig extends InternalAxiosRequestConfig {
+  _retry?: boolean;
+}
 
 export const apiClient: AxiosInstance = axios.create({
   baseURL: API_CONFIG.baseUrl,
@@ -34,6 +47,35 @@ apiClient.interceptors.request.use(
       config.headers.set('Authorization', `Bearer ${token}`);
     }
     return config;
+  },
+);
+
+// On 401, refresh the access token once (single-flight) and retry the request.
+apiClient.interceptors.response.use(
+  (response) => response,
+  async (error: AxiosError): Promise<unknown> => {
+    const original = error.config as RetryableConfig | undefined;
+    const status = error.response?.status;
+    const url = original?.url ?? '';
+    const isAuthPath =
+      url.includes('/auth/login') ||
+      url.includes('/auth/register') ||
+      url.includes('/auth/refresh');
+
+    if (status === 401 && original && !original._retry && !isAuthPath && refreshHandler) {
+      original._retry = true;
+      if (!refreshInFlight) {
+        refreshInFlight = refreshHandler().finally(() => {
+          refreshInFlight = null;
+        });
+      }
+      const newToken = await refreshInFlight;
+      if (newToken) {
+        original.headers.set('Authorization', `Bearer ${newToken}`);
+        return apiClient(original);
+      }
+    }
+    return Promise.reject(error);
   },
 );
 

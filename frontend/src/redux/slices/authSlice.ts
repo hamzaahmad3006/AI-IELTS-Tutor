@@ -46,6 +46,29 @@ export const registerThunk = createAsyncThunk<
   }
 });
 
+/** Rotate tokens using the stored refresh token. */
+export const refreshThunk = createAsyncThunk<
+  AuthResponse,
+  string,
+  { rejectValue: string }
+>('auth/refresh', async (refreshToken, { rejectWithValue }) => {
+  try {
+    return await authApi.refresh(refreshToken);
+  } catch (error) {
+    return rejectWithValue((error as ApiProblem).title);
+  }
+});
+
+/** Revoke the refresh token server-side, then clear local state. */
+export const logoutThunk = createAsyncThunk<void, string | undefined>(
+  'auth/logoutServer',
+  async (refreshToken) => {
+    if (refreshToken) {
+      await authApi.logout(refreshToken);
+    }
+  },
+);
+
 const authSlice = createSlice({
   name: 'auth',
   initialState,
@@ -90,6 +113,25 @@ const authSlice = createSlice({
       .addCase(registerThunk.rejected, (state, action) => {
         state.isBootstrapping = false;
         state.error = action.payload ?? 'Registration failed';
+      })
+      // Refresh updates the token pair without touching auth status.
+      .addCase(refreshThunk.fulfilled, (state, action) => {
+        state.user = action.payload.user;
+        state.tokens = action.payload.tokens;
+        state.isAuthenticated = true;
+      })
+      .addCase(refreshThunk.rejected, (state) => {
+        // Refresh failed -> force a clean sign-out.
+        state.user = null;
+        state.tokens = null;
+        state.isAuthenticated = false;
+      })
+      // Server logout: clear local session regardless of the call's outcome.
+      .addCase(logoutThunk.fulfilled, (state) => {
+        state.user = null;
+        state.tokens = null;
+        state.isAuthenticated = false;
+        state.error = null;
       });
   },
 });

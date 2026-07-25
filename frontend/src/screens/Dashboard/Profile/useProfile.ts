@@ -4,7 +4,7 @@ import { useCallback } from 'react';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import {
-  logout,
+  logoutThunk,
   toggleTheme,
   useAppDispatch,
   useAppSelector,
@@ -26,15 +26,20 @@ export const useProfile = (): UseProfileResult => {
   const navigation = useNavigation<Nav>();
   const user = useAppSelector((state) => state.auth.user);
   const themeMode = useAppSelector((state) => state.theme.mode);
+  const refreshToken = useAppSelector(
+    (state) => state.auth.tokens?.refreshToken,
+  );
 
   const onToggleTheme = useCallback((): void => {
     dispatch(toggleTheme());
   }, [dispatch]);
 
   const onLogout = useCallback((): void => {
-    dispatch(logout());
-    navigation.reset({ index: 0, routes: [{ name: 'Splash' }] });
-  }, [dispatch, navigation]);
+    // Revoke the refresh token server-side, then reset to the entry flow.
+    void dispatch(logoutThunk(refreshToken)).finally(() => {
+      navigation.reset({ index: 0, routes: [{ name: 'Splash' }] });
+    });
+  }, [dispatch, navigation, refreshToken]);
 
   return { user, themeMode, onToggleTheme, onLogout };
 };

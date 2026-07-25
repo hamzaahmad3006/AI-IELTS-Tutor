@@ -107,7 +107,7 @@ Everything **not yet completed** to finish the project, organized by area. Check
 - [ ] Redux slices for: speaking, writing, reading, listening, planner, analytics, vocabulary, coach, offline
 - [ ] RTK Query (or thunks) for all real endpoints
 - [ ] Replace mock API (`useMock`) wiring with real backend calls
-- [ ] Token refresh flow (interceptor: 401 → refresh → retry / logout)
+- [x] Token refresh flow (single-flight 401 → refresh → retry; server logout via `logoutThunk`) — verified against a live backend — [ ] wire remaining screens off mock
 - [ ] Secure token storage (Keychain/Keystore) instead of plain AsyncStorage
 - [ ] Offline queue + deferred sync + conflict resolution
 - [ ] Push notifications / reminders integration

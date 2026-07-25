@@ -10,13 +10,27 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { NavigationContainer } from '@react-navigation/native';
 import { Provider } from 'react-redux';
 import { PersistGate } from 'redux-persist/integration/react';
-import { store, persistor } from './src/redux';
-import { setAuthTokenProvider } from './src/api';
+import { store, persistor, refreshThunk } from './src/redux';
+import { setAuthTokenProvider, setRefreshHandler } from './src/api';
 import { RootNavigator } from './src/AppNavigation';
 import { PALETTE } from './src/constants';
 
 // Bridge the persisted access token into the axios client (no circular import).
 setAuthTokenProvider(() => store.getState().auth.tokens?.accessToken ?? null);
+
+// On a 401, the client asks Redux to rotate the refresh token, then retries.
+setRefreshHandler(async () => {
+  const refreshToken = store.getState().auth.tokens?.refreshToken;
+  if (!refreshToken) {
+    return null;
+  }
+  try {
+    const result = await store.dispatch(refreshThunk(refreshToken)).unwrap();
+    return result.tokens.accessToken;
+  } catch {
+    return null;
+  }
+});
 
 const Loading: React.FC = () => (
   <View style={styles.loading}>
