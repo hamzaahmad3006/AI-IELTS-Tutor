@@ -15,6 +15,11 @@ export const ENDPOINTS = {
   profile: {
     root: '/profile',
   },
+  me: {
+    weaknesses: '/me/weaknesses',
+    adaptiveDifficulty: '/me/adaptive-difficulty',
+    recommendations: '/me/recommendations',
+  },
   planner: {
     generate: '/plans/generate',
     active: '/plans/active',
