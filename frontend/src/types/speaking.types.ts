@@ -46,9 +46,30 @@ export interface SpeakingCriteriaScore {
   pronunciation: Band;
 }
 
+export interface SpeakingSubmit {
+  transcript: string;
+  part?: SpeakingPart;
+  durationSec?: number;
+}
+
 export interface SpeakingResult {
   attemptId: string;
-  overallBand: Band;
-  criteria: SpeakingCriteriaScore;
-  feedbackSummary: string;
+  status: string;
+  part: SpeakingPart | null;
+  overallBand: Band | null;
+  criteria: SpeakingCriteriaScore | null;
+  feedbackSummary: string | null;
+}
+
+export interface SpeakingHistoryItem {
+  attemptId: string;
+  part: SpeakingPart | null;
+  overallBand: Band | null;
+  status: string;
+  createdAt: string;
+}
+
+export interface SpeakingHistoryPage {
+  items: SpeakingHistoryItem[];
+  nextCursor: string | null;
 }
