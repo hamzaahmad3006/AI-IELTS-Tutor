@@ -4,5 +4,6 @@ export * from './config';
 export * from './endpoints';
 export { authApi } from './authApi';
 export { dashboardApi } from './dashboardApi';
+export { analyticsApi } from './analyticsApi';
 export { speakingApi } from './speakingApi';
 export { writingApi } from './writingApi';
