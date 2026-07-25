@@ -7,8 +7,12 @@
 import type {
   AuthResponse,
   DashboardData,
+  ListeningClip,
+  ListeningResult,
   PredictionResponse,
   ProgressResponse,
+  ReadingPassage,
+  ReadingResult,
   SpeakingSession,
   WritingFeedback,
 } from '../../types';
@@ -96,6 +100,67 @@ export const MOCK_PREDICTION: PredictionResponse = {
   modules: { speaking: 7.5, writing: 6.5, reading: 7.0, listening: 7.5 },
   velocityPerWeek: { speaking: 0.12, writing: 0.15, reading: 0.05, listening: 0.1 },
   note: 'Estimate based on your recent trajectory; not an official IELTS result.',
+};
+
+export const MOCK_READING_PASSAGE: ReadingPassage = {
+  id: 'pa_mock_1',
+  title: 'The History of Tea',
+  body:
+    'Tea is one of the most widely consumed beverages in the world. According to ' +
+    'historical records, tea originated in China, where it was first used as a ' +
+    'medicinal drink. The processing of the leaves determines the type of tea: ' +
+    'green tea is barely oxidized, whereas black tea is produced by allowing the ' +
+    'leaves to oxidize fully.',
+  examType: 'academic',
+  difficulty: 'medium',
+  topic: 'history',
+  wordCount: 62,
+  questions: [
+    { id: 'q1', type: 'mcq', prompt: 'Where did tea originate?', options: ['India', 'China', 'Japan', 'England'] },
+    { id: 'q2', type: 'true_false_notgiven', prompt: 'Tea was first used as a medicinal drink.', options: ['true', 'false', 'not_given'] },
+    { id: 'q3', type: 'short_answer', prompt: 'Which tea is produced by full oxidation?', options: null },
+  ],
+};
+
+export const MOCK_READING_RESULT: ReadingResult = {
+  attemptId: 'ra_mock_1',
+  passageId: 'pa_mock_1',
+  rawScore: 2,
+  totalQuestions: 3,
+  band: 6.0,
+  perQuestion: [
+    { questionId: 'q1', type: 'mcq', correct: true, submitted: 'China', correctAnswer: 'China', explanation: 'The passage states tea originated in China.' },
+    { questionId: 'q2', type: 'true_false_notgiven', correct: true, submitted: 'true', correctAnswer: 'true', explanation: 'It was first used medicinally.' },
+    { questionId: 'q3', type: 'short_answer', correct: false, submitted: 'green', correctAnswer: 'black', explanation: 'Black tea is fully oxidized.' },
+  ],
+};
+
+export const MOCK_LISTENING_CLIP: ListeningClip = {
+  id: 'au_mock_1',
+  title: 'University Orientation',
+  audioUrl: '/media/seed/audio/orientation.mp3',
+  durationSec: 45,
+  examType: 'academic',
+  difficulty: 'medium',
+  accent: 'British',
+  questions: [
+    { id: 'lq1', type: 'short_answer', prompt: 'What do you need to borrow books?', options: null },
+    { id: 'lq2', type: 'mcq', prompt: 'Where is the main computer lab?', options: ['Library', 'Science building 2nd floor', 'Arts building', 'Science building 3rd floor'] },
+    { id: 'lq3', type: 'form_completion', prompt: 'The library closes at ____ on weekdays.', options: null },
+  ],
+};
+
+export const MOCK_LISTENING_RESULT: ListeningResult = {
+  attemptId: 'la_mock_1',
+  audioId: 'au_mock_1',
+  rawScore: 3,
+  totalQuestions: 3,
+  band: 7.5,
+  perQuestion: [
+    { questionId: 'lq1', type: 'short_answer', correct: true, submitted: 'student card', correctAnswer: 'student card', explanation: 'You need your student card.', answerTimestamp: '00:12-00:16' },
+    { questionId: 'lq2', type: 'mcq', correct: true, submitted: 'Science building 2nd floor', correctAnswer: 'Science building 2nd floor', explanation: 'Second floor of the science building.', answerTimestamp: '00:20-00:26' },
+    { questionId: 'lq3', type: 'form_completion', correct: true, submitted: 'ten', correctAnswer: 'ten', explanation: 'Open until ten at night.', answerTimestamp: '00:06-00:10' },
+  ],
 };
 
 export const MOCK_SPEAKING_SESSION: SpeakingSession = {

@@ -5,5 +5,7 @@ export * from './endpoints';
 export { authApi } from './authApi';
 export { dashboardApi } from './dashboardApi';
 export { analyticsApi } from './analyticsApi';
+export { readingApi } from './readingApi';
+export { listeningApi } from './listeningApi';
 export { speakingApi } from './speakingApi';
 export { writingApi } from './writingApi';
