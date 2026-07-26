@@ -34,6 +34,7 @@ export type RootStackParamList = {
   Main: NavigatorScreenParams<MainTabParamList>;
   SpeakingInterview: { module?: IeltsModule } | undefined;
   WritingFeedback: { attemptId: string };
+  WritingPractice: undefined;
   ReadingPractice: undefined;
 };
 

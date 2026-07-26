@@ -44,7 +44,7 @@ export const useHome = (): UseHomeResult => {
         return;
       }
       if (module === 'writing') {
-        navigation.navigate('WritingFeedback', { attemptId: 'demo' });
+        navigation.navigate('WritingPractice');
         return;
       }
       if (module === 'reading') {
