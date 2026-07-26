@@ -11,6 +11,7 @@ from ai.orchestrator import AIOrchestrator
 from controllers.history_controller import HistoryController, SpeakingHistoryPage
 from controllers.pagination import DEFAULT_LIMIT
 from controllers.speaking_controller import (
+    CueCardResponse,
     SpeakingController,
     SpeakingResultResponse,
     SpeakingSubmitRequest,
@@ -42,6 +43,15 @@ async def submit_attempt(
     orchestrator: Orchestrator,
 ) -> SpeakingResultResponse:
     return await SpeakingController.submit(session, current, orchestrator, payload)
+
+
+@router.get("/cue-cards", response_model=CueCardResponse)
+async def get_cue_card(
+    current: CurrentUser,
+    session: DbSession,
+    difficulty: Annotated[str | None, Query()] = None,
+) -> CueCardResponse:
+    return await SpeakingController.get_cue_card(session, difficulty)
 
 
 @router.get("/history", response_model=SpeakingHistoryPage)

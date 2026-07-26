@@ -62,7 +62,7 @@ export const Practice: React.FC = () => {
         <AppText variant="bodySm" color="textSecondary" style={styles.cueLabel}>
           You should say:
         </AppText>
-        {cueCard.bullets.map((bullet) => (
+        {cueCard.bulletPoints.map((bullet) => (
           <View key={bullet} style={styles.bulletRow}>
             <View style={[styles.bullet, { backgroundColor: theme.colors.primary }]} />
             <AppText variant="bodyMd" style={styles.bulletText}>
