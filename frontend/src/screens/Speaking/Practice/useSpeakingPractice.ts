@@ -10,6 +10,7 @@ import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { speakingApi } from '../../../api';
 import type {
+  CueCard,
   RootStackParamList,
   SpeakingResult,
   SpeakingPart,
@@ -19,25 +20,22 @@ type Nav = NativeStackNavigationProp<RootStackParamList>;
 
 export type SpeakingPhase = 'prep' | 'speaking' | 'scored';
 
-const PREP_SECONDS = 60;
-const SPEAK_SECONDS = 120;
 const MIN_WORDS = 20;
 
-interface CueCard {
-  topic: string;
-  prompt: string;
-  bullets: string[];
-}
-
-const CUE_CARD: CueCard = {
+/** Used until the backend cue card arrives (and if the request fails). */
+const FALLBACK_CUE_CARD: CueCard = {
+  id: 'fallback',
   topic: 'A memorable place',
   prompt: 'Describe a place you visited that made a lasting impression.',
-  bullets: [
+  bulletPoints: [
     'where it was',
     'when you went there',
     'what you did there',
     'and explain why it made a lasting impression',
   ],
+  difficulty: 'medium',
+  prepSeconds: 60,
+  speakSeconds: 120,
 };
 
 interface UseSpeakingPracticeResult {
@@ -72,8 +70,11 @@ const format = (total: number): string => {
 
 export const useSpeakingPractice = (): UseSpeakingPracticeResult => {
   const navigation = useNavigation<Nav>();
+  const [cueCard, setCueCard] = useState<CueCard>(FALLBACK_CUE_CARD);
   const [phase, setPhase] = useState<SpeakingPhase>('prep');
-  const [secondsLeft, setSecondsLeft] = useState<number>(PREP_SECONDS);
+  const [secondsLeft, setSecondsLeft] = useState<number>(
+    FALLBACK_CUE_CARD.prepSeconds,
+  );
   const [transcript, setTranscript] = useState<string>('');
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [result, setResult] = useState<SpeakingResult | null>(null);
@@ -81,6 +82,22 @@ export const useSpeakingPractice = (): UseSpeakingPracticeResult => {
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const wordCount = useMemo(() => countWords(transcript), [transcript]);
+
+  const loadCueCard = useCallback((): void => {
+    speakingApi
+      .getCueCard()
+      .then((card) => {
+        setCueCard(card);
+        setSecondsLeft(card.prepSeconds);
+      })
+      .catch(() => {
+        // Non-fatal: the fallback cue card keeps practice available.
+      });
+  }, []);
+
+  useEffect(() => {
+    loadCueCard();
+  }, [loadCueCard]);
 
   // Countdown for the active phase (prep or speaking).
   useEffect(() => {
@@ -99,8 +116,8 @@ export const useSpeakingPractice = (): UseSpeakingPracticeResult => {
 
   const startSpeaking = useCallback((): void => {
     setPhase('speaking');
-    setSecondsLeft(SPEAK_SECONDS);
-  }, []);
+    setSecondsLeft(cueCard.speakSeconds);
+  }, [cueCard.speakSeconds]);
 
   const submit = useCallback((): void => {
     if (wordCount < MIN_WORDS) {
@@ -113,7 +130,7 @@ export const useSpeakingPractice = (): UseSpeakingPracticeResult => {
       .submit({
         transcript,
         part: 2,
-        durationSec: SPEAK_SECONDS - secondsLeft,
+        durationSec: Math.max(0, cueCard.speakSeconds - secondsLeft),
       })
       .then((res) => {
         setResult(res);
@@ -121,22 +138,23 @@ export const useSpeakingPractice = (): UseSpeakingPracticeResult => {
       })
       .catch(() => setError('Scoring failed. Please try again.'))
       .finally(() => setIsSubmitting(false));
-  }, [transcript, wordCount, secondsLeft]);
+  }, [transcript, wordCount, secondsLeft, cueCard.speakSeconds]);
 
   const tryAnother = useCallback((): void => {
     setResult(null);
     setTranscript('');
     setError(null);
     setPhase('prep');
-    setSecondsLeft(PREP_SECONDS);
-  }, []);
+    setSecondsLeft(cueCard.prepSeconds);
+    loadCueCard();
+  }, [cueCard.prepSeconds, loadCueCard]);
 
   const onBack = useCallback((): void => {
     navigation.goBack();
   }, [navigation]);
 
   return {
-    cueCard: CUE_CARD,
+    cueCard,
     part: 2,
     phase,
     secondsLeft,

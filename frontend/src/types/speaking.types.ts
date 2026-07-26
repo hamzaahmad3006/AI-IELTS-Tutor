@@ -46,6 +46,16 @@ export interface SpeakingCriteriaScore {
   pronunciation: Band;
 }
 
+export interface CueCard {
+  id: string;
+  topic: string;
+  prompt: string;
+  bulletPoints: string[];
+  difficulty: string;
+  prepSeconds: number;
+  speakSeconds: number;
+}
+
 export interface SpeakingSubmit {
   transcript: string;
   part?: SpeakingPart;

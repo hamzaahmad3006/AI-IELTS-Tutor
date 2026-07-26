@@ -4,6 +4,7 @@ from .ai_interaction import AIInteraction
 from .attempt import WritingAttempt
 from .audit import AuditLog
 from .content import AudioClip, ListeningQuestion, Passage, Question
+from .cue_card import CueCard
 from .listening import ListeningAttempt
 from .profile import LearnerProfile
 from .reading import ReadingAttempt
@@ -28,4 +29,5 @@ __all__ = [
     "AuditLog",
     "Weakness",
     "WritingPrompt",
+    "CueCard",
 ]
