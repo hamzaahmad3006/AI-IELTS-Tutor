@@ -1,6 +1,7 @@
-# syntax=docker/dockerfile:1
-
 # ---- base ----
+# (No `# syntax=` directive: we use only standard multi-stage features, so the
+# built-in parser suffices and we avoid a Docker Hub round-trip for the frontend
+# image, which makes CI builds resilient to registry hiccups.)
 FROM python:3.12-slim AS base
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
