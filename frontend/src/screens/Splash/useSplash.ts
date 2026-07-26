@@ -22,13 +22,10 @@ export const useSplash = (): UseSplashResult => {
 
   useEffect(() => {
     const timer = setTimeout(() => {
+      // Unauthenticated users must sign in first: every API call needs a token.
       navigation.reset({
         index: 0,
-        routes: [
-          isAuthenticated
-            ? { name: 'Main' }
-            : { name: 'Onboarding' },
-        ],
+        routes: [isAuthenticated ? { name: 'Main' } : { name: 'Auth' }],
       });
     }, APP_CONFIG.splashDurationMs);
 
