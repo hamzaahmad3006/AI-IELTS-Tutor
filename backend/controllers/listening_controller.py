@@ -72,6 +72,24 @@ _SEED_TRANSCRIPT = (
 )
 
 
+_SEED_TRANSCRIPT_MUSEUM = (
+    "Welcome to the city museum. Please note that we are closed on Mondays, but "
+    "open from nine to six every other day. Guided tours depart from the main "
+    "entrance every hour, and they last approximately forty minutes. General "
+    "admission is twelve dollars, while student tickets cost eight dollars with "
+    "valid identification. The cafe on the second floor serves lunch until three."
+)
+
+_SEED_TRANSCRIPT_BOOKING = (
+    "Good morning, I'd like to book a venue for our annual conference. It runs "
+    "for three days in early September. I was hoping for the Harbour Room, but I "
+    "understand it may already be reserved. In that case the Garden Room would "
+    "work well for us, as long as it seats one hundred people. Could you confirm "
+    "the catering options as well? And finally, I believe a deposit is required "
+    "to confirm the booking, so please send the payment details."
+)
+
+
 async def _ensure_seeded(session: AsyncSession) -> None:
     count = await session.scalar(select(func.count()).select_from(AudioClip))
     if count and count > 0:
@@ -130,6 +148,108 @@ async def _ensure_seeded(session: AsyncSession) -> None:
             ),
         ]
     )
+
+    # A second medium clip so learners at the same level get variety.
+    library = AudioClip(
+        title="Museum Tour Information",
+        object_key="seed/audio/museum.mp3",
+        transcript=_SEED_TRANSCRIPT_MUSEUM,
+        duration_sec=48,
+        exam_type="academic",
+        difficulty="medium",
+        accent="American",
+        source="seed",
+    )
+    session.add(library)
+    await session.flush()
+    session.add_all(
+        [
+            ListeningQuestion(
+                audio_id=library.id,
+                order_index=1,
+                type="short_answer",
+                prompt="On which day is the museum closed?",
+                options=None,
+                correct_answer="monday",
+                explanation="The guide says the museum is closed on Mondays.",
+                answer_timestamp="00:05-00:09",
+                difficulty="medium",
+            ),
+            ListeningQuestion(
+                audio_id=library.id,
+                order_index=2,
+                type="mcq",
+                prompt="Where does the guided tour begin?",
+                options=["The gift shop", "The main entrance", "The cafe", "The east wing"],
+                correct_answer="The main entrance",
+                explanation="Tours start at the main entrance.",
+                answer_timestamp="00:18-00:24",
+                difficulty="medium",
+            ),
+            ListeningQuestion(
+                audio_id=library.id,
+                order_index=3,
+                type="form_completion",
+                prompt="Student tickets cost ____ dollars.",
+                options=None,
+                correct_answer="eight",
+                explanation="Student admission is eight dollars.",
+                answer_timestamp="00:33-00:38",
+                difficulty="medium",
+            ),
+        ]
+    )
+
+    # A harder clip for learners who progress.
+    booking = AudioClip(
+        title="Conference Booking Call",
+        object_key="seed/audio/booking.mp3",
+        transcript=_SEED_TRANSCRIPT_BOOKING,
+        duration_sec=52,
+        exam_type="academic",
+        difficulty="hard",
+        accent="Australian",
+        source="seed",
+    )
+    session.add(booking)
+    await session.flush()
+    session.add_all(
+        [
+            ListeningQuestion(
+                audio_id=booking.id,
+                order_index=1,
+                type="form_completion",
+                prompt="The conference runs for ____ days.",
+                options=None,
+                correct_answer="three",
+                explanation="The caller confirms a three-day conference.",
+                answer_timestamp="00:08-00:12",
+                difficulty="hard",
+            ),
+            ListeningQuestion(
+                audio_id=booking.id,
+                order_index=2,
+                type="mcq",
+                prompt="Which room did the caller finally book?",
+                options=["The Harbour Room", "The Garden Room", "The Main Hall", "The Studio"],
+                correct_answer="The Garden Room",
+                explanation="The Harbour Room was unavailable, so the Garden Room was booked.",
+                answer_timestamp="00:24-00:31",
+                difficulty="hard",
+            ),
+            ListeningQuestion(
+                audio_id=booking.id,
+                order_index=3,
+                type="short_answer",
+                prompt="What must be paid to confirm the booking?",
+                options=None,
+                correct_answer="deposit",
+                explanation="A deposit is required to confirm the reservation.",
+                answer_timestamp="00:40-00:46",
+                difficulty="hard",
+            ),
+        ]
+    )
     await session.flush()
 
 
@@ -156,17 +276,24 @@ class ListeningController:
         await _ensure_seeded(session)
         if difficulty is None or difficulty == "adaptive":
             difficulty, _, _ = await resolve_difficulty(session, user_id, "listening")
+        # Random pick so repeated practice varies the content.
         clip = await session.scalar(
             select(AudioClip)
             .where(AudioClip.exam_type == exam_type, AudioClip.difficulty == difficulty)
+            .order_by(func.random())
             .limit(1)
         )
         if clip is None:
             clip = await session.scalar(
-                select(AudioClip).where(AudioClip.exam_type == exam_type).limit(1)
+                select(AudioClip)
+                .where(AudioClip.exam_type == exam_type)
+                .order_by(func.random())
+                .limit(1)
             )
         if clip is None:
-            clip = await session.scalar(select(AudioClip).limit(1))
+            clip = await session.scalar(
+                select(AudioClip).order_by(func.random()).limit(1)
+            )
         if clip is None:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND, detail="No audio available"
