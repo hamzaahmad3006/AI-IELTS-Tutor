@@ -68,7 +68,11 @@ Everything **not yet completed** to finish the project, organized by area. Check
 - [ ] Grammar tutor (lesson list + lesson detail)
 - [ ] Full Mock Test flow (4 modules, timed, assembled, scored) + readiness report
 
-### Progress / Analytics (placeholder only)
+### Progress / Analytics (built — real data)
+- [x] Progress screen: overall band, predicted band + confidence, per-module bands, focus areas
+- [x] Coach screen: recommendations (tap-through) + adaptive level per module
+- [x] Practice hub: module launcher with adaptive difficulty badges
+> All five tabs are now real screens (no placeholders remain).
 - [ ] Band trend charts (per module, line)
 - [ ] Radar chart of 4 modules
 - [ ] Improvement velocity + predicted exam-day band with confidence
