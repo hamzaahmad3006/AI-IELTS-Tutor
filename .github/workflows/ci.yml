@@ -106,6 +106,14 @@ jobs:
       - name: TypeScript typecheck
         run: npm run typecheck
 
+      # Bundling proves every import resolves and the whole tree compiles for
+      # release — errors that a typecheck alone cannot catch.
+      - name: Bundle (Android)
+        run: npm run bundle:android
+
+      - name: Bundle (iOS)
+        run: npm run bundle:ios
+
   docker:
     name: Docker (build + health check)
     runs-on: ubuntu-latest
