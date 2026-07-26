@@ -1,0 +1,290 @@
+/** Reading practice screen (UI only). Logic in useReading. */
+
+import React from 'react';
+import { ActivityIndicator, Pressable, StyleSheet, View } from 'react-native';
+import {
+  AppText,
+  BandBadge,
+  Button,
+  Card,
+  Icon,
+  Input,
+  ScreenContainer,
+  useTheme,
+} from '../../../components';
+import { getBandColor, RADIUS, SPACING } from '../../../constants';
+import type {
+  PracticeQuestion,
+  ReadingPerQuestionResult,
+} from '../../../types';
+import { useReading } from './useReading';
+
+export const Practice: React.FC = () => {
+  const theme = useTheme();
+  const {
+    passage,
+    isLoading,
+    answers,
+    answeredCount,
+    isSubmitting,
+    result,
+    error,
+    setAnswer,
+    submit,
+    tryAnother,
+    onBack,
+  } = useReading();
+
+  if (isLoading || !passage) {
+    return (
+      <ScreenContainer>
+        <View style={styles.center}>
+          <ActivityIndicator size="large" color={theme.colors.primary} />
+        </View>
+      </ScreenContainer>
+    );
+  }
+
+  // ---- Results view ----
+  if (result) {
+    const bandColor = getBandColor(result.band);
+    return (
+      <ScreenContainer scroll>
+        <Header title="Reading Result" onBack={onBack} />
+        <Card style={styles.section}>
+          <View style={styles.resultRow}>
+            <View>
+              <AppText variant="labelMd" color="textSecondary">
+                Estimated Band
+              </AppText>
+              <AppText variant="displayLg" style={{ color: bandColor }}>
+                {result.band.toFixed(1)}
+              </AppText>
+              <AppText variant="bodyMd" color="textSecondary">
+                {result.rawScore} / {result.totalQuestions} correct
+              </AppText>
+            </View>
+            <BandBadge band={result.band} />
+          </View>
+        </Card>
+
+        {result.perQuestion.map((pq, index) => (
+          <ResultRow key={pq.questionId} index={index} pq={pq} />
+        ))}
+
+        <Button title="Try another passage" onPress={tryAnother} style={styles.section} />
+      </ScreenContainer>
+    );
+  }
+
+  // ---- Practice view ----
+  return (
+    <ScreenContainer scroll>
+      <Header title="Reading Practice" onBack={onBack} />
+
+      <Card style={styles.section} backgroundToken="cardAlt">
+        <AppText variant="titleLg">{passage.title}</AppText>
+        <AppText variant="bodyLg" color="textSecondary" style={styles.body}>
+          {passage.body}
+        </AppText>
+      </Card>
+
+      <AppText variant="headlineMd" style={styles.section}>
+        Questions
+      </AppText>
+
+      {passage.questions.map((q, index) => (
+        <QuestionCard
+          key={q.id}
+          index={index}
+          question={q}
+          value={answers[q.id]}
+          onChange={(value) => setAnswer(q.id, value)}
+        />
+      ))}
+
+      {error ? (
+        <AppText variant="labelMd" color="error" style={styles.section}>
+          {error}
+        </AppText>
+      ) : null}
+
+      <Button
+        title={`Submit (${answeredCount}/${passage.questions.length})`}
+        onPress={submit}
+        loading={isSubmitting}
+        disabled={answeredCount === 0}
+        style={styles.section}
+      />
+    </ScreenContainer>
+  );
+};
+
+const Header: React.FC<{ title: string; onBack: () => void }> = ({
+  title,
+  onBack,
+}) => (
+  <View style={styles.header}>
+    <Pressable onPress={onBack} hitSlop={8}>
+      <Icon name="back" size={24} color="primary" />
+    </Pressable>
+    <AppText variant="titleLg" color="primary">
+      {title}
+    </AppText>
+    <View style={styles.headerSpacer} />
+  </View>
+);
+
+const QuestionCard: React.FC<{
+  index: number;
+  question: PracticeQuestion;
+  value: string | string[] | undefined;
+  onChange: (value: string) => void;
+}> = ({ index, question, value, onChange }) => {
+  const theme = useTheme();
+  return (
+    <Card style={styles.qCard}>
+      <AppText variant="bodyMd" style={styles.qPrompt}>
+        {index + 1}. {question.prompt}
+      </AppText>
+      {question.options ? (
+        question.options.map((option) => {
+          const selected = value === option;
+          return (
+            <Pressable
+              key={option}
+              onPress={() => onChange(option)}
+              style={[
+                styles.option,
+                {
+                  borderColor: selected
+                    ? theme.colors.primary
+                    : theme.colors.border,
+                  backgroundColor: selected
+                    ? theme.colors.primaryContainer
+                    : theme.colors.card,
+                },
+              ]}
+            >
+              <View
+                style={[
+                  styles.radio,
+                  { borderColor: selected ? theme.colors.primary : theme.colors.outline },
+                ]}
+              >
+                {selected ? (
+                  <View style={[styles.radioDot, { backgroundColor: theme.colors.primary }]} />
+                ) : null}
+              </View>
+              <AppText variant="bodyMd" style={styles.optionLabel}>
+                {option}
+              </AppText>
+            </Pressable>
+          );
+        })
+      ) : (
+        <Input
+          label=""
+          value={typeof value === 'string' ? value : ''}
+          onChangeText={onChange}
+          placeholder="Type your answer"
+          autoCapitalize="none"
+        />
+      )}
+    </Card>
+  );
+};
+
+const ResultRow: React.FC<{ index: number; pq: ReadingPerQuestionResult }> = ({
+  index,
+  pq,
+}) => {
+  const theme = useTheme();
+  return (
+    <Card style={styles.qCard}>
+      <View style={styles.resultHead}>
+        <View
+          style={[
+            styles.resultIcon,
+            {
+              backgroundColor: pq.correct
+                ? theme.colors.suggestionHighlight
+                : theme.colors.errorHighlight,
+            },
+          ]}
+        >
+          <Icon
+            name={pq.correct ? 'check' : 'info'}
+            size={16}
+            color={pq.correct ? 'success' : 'error'}
+          />
+        </View>
+        <AppText variant="labelMd" color={pq.correct ? 'success' : 'error'}>
+          {pq.correct ? 'Correct' : 'Incorrect'}
+        </AppText>
+      </View>
+      <AppText variant="bodySm" color="textSecondary" style={styles.resultLine}>
+        Your answer: {String(pq.submitted ?? '—')}
+      </AppText>
+      {!pq.correct ? (
+        <AppText variant="bodySm" color="textSecondary">
+          Correct answer: {String(pq.correctAnswer)}
+        </AppText>
+      ) : null}
+      {pq.explanation ? (
+        <AppText variant="bodySm" color="textMuted" style={styles.resultLine}>
+          {pq.explanation}
+        </AppText>
+      ) : null}
+    </Card>
+  );
+};
+
+const styles = StyleSheet.create({
+  center: { flex: 1, alignItems: 'center', justifyContent: 'center' },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingVertical: SPACING.md,
+  },
+  headerSpacer: { width: 24 },
+  section: { marginTop: SPACING.lg },
+  body: { marginTop: SPACING.sm },
+  qCard: { marginTop: SPACING.md },
+  qPrompt: { marginBottom: SPACING.sm },
+  option: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderWidth: 1.5,
+    borderRadius: RADIUS.input,
+    padding: SPACING.sm,
+    marginBottom: SPACING.xs,
+  },
+  radio: {
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    borderWidth: 2,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: SPACING.sm,
+  },
+  radioDot: { width: 10, height: 10, borderRadius: 5 },
+  optionLabel: { flex: 1 },
+  resultRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  resultHead: { flexDirection: 'row', alignItems: 'center', marginBottom: SPACING.xs },
+  resultIcon: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: SPACING.xs,
+  },
+  resultLine: { marginTop: SPACING.xxs },
+});

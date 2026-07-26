@@ -51,9 +51,9 @@ Everything **not yet completed** to finish the project, organized by area. Check
 
 ### Reading (not started)
 - [ ] Difficulty selection
-- [ ] Passage + question runner (MCQ, True/False/Not Given, Matching Headings)
+- [x] Passage + question runner (MCQ / True-False-Not-Given / short answer) — wired to live-verified readingApi — [ ] matching-headings drag UI
 - [ ] Question navigator + timer
-- [ ] Result screen: raw score → band, per-question AI explanations
+- [x] Result screen: raw score → band + per-question correctness & explanations
 
 ### Listening (not started)
 - [ ] Difficulty selection

@@ -5,6 +5,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { Splash } from '../screens/Splash/Splash';
 import { Interview } from '../screens/Speaking/Interview/Interview';
 import { Feedback } from '../screens/Writing/Feedback/Feedback';
+import { Practice as ReadingPractice } from '../screens/Reading/Practice/Practice';
 import { AuthNavigator } from './AuthNavigator';
 import { OnboardingNavigator } from './OnboardingNavigator';
 import { MainTabNavigator } from './MainTabNavigator';
@@ -27,5 +28,6 @@ export const RootNavigator: React.FC = () => (
       options={{ presentation: 'fullScreenModal' }}
     />
     <Stack.Screen name="WritingFeedback" component={Feedback} />
+    <Stack.Screen name="ReadingPractice" component={ReadingPractice} />
   </Stack.Navigator>
 );
