@@ -34,6 +34,7 @@ export const ENDPOINTS = {
     history: '/speaking/history',
   },
   writing: {
+    prompts: '/writing/prompts',
     attempts: '/writing/attempts',
     attempt: (id: string): string => `/writing/attempts/${id}`,
     history: '/writing/history',

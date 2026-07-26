@@ -9,6 +9,17 @@ export interface WritingCriteriaScore {
   grammaticalRange: Band;
 }
 
+export interface WritingPrompt {
+  id: string;
+  examType: string;
+  taskNumber: number;
+  prompt: string;
+  topic: string | null;
+  assetRef: string | null;
+  difficulty: string;
+  minWords: number;
+}
+
 // ---- Backend-accurate scoring shapes (POST/GET /writing/attempts) ----
 export interface WritingSubmit {
   essayText: string;

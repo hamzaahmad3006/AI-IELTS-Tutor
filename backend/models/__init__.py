@@ -10,6 +10,7 @@ from .reading import ReadingAttempt
 from .speaking import SpeakingAttempt
 from .user import RefreshToken, User
 from .weakness import Weakness
+from .writing_prompt import WritingPrompt
 
 __all__ = [
     "User",
@@ -26,4 +27,5 @@ __all__ = [
     "AIInteraction",
     "AuditLog",
     "Weakness",
+    "WritingPrompt",
 ]
