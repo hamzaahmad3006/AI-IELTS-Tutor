@@ -33,6 +33,7 @@ frontend/ios/build/
 frontend/ios/Pods/
 frontend/ios/*.xcworkspace/xcuserdata/
 *.jsbundle
+frontend/.bundle-check/
 
 # ---------- Python (backend) ----------
 *.db

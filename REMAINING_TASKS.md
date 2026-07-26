@@ -13,6 +13,8 @@ Everything **not yet completed** to finish the project, organized by area. Check
 
 - [x] `npm install` in `frontend/` (lockfile committed; `npm ci` reproducible in CI)
 - [x] `tsc --noEmit` clean (0 errors) and enforced by the CI frontend job
+- [x] **App bundles for release on both platforms** (`npm run bundle:android` / `bundle:ios`, ~1.79 MB each) — proves every import resolves; enforced in CI
+- [x] Platform-aware API base URL (Android `10.0.2.2`, iOS `localhost`) with a single documented override point
 - [ ] iOS: `cd ios && pod install`
 - [ ] Add Plus Jakarta Sans + Inter `.ttf` files to `src/assets/fonts` and run `npx react-native-asset`
 - [ ] Configure ESLint + Prettier scripts and run a clean lint pass
@@ -279,7 +281,7 @@ Everything **not yet completed** to finish the project, organized by area. Check
 6. **Production**: deploy (Docker image is CI-built), Postgres/Supabase config, observability, secrets.
 
 ### Known gaps worth stating plainly
-- The app has **never been run on a device or emulator** in this environment; verification is `tsc` + live API contract checks + an E2E journey against the real backend.
+- The app has **never been run on a device or emulator** in this environment. Verification is: `tsc`, a **release bundle build for Android + iOS** (all imports resolve), live API contract checks, and an E2E journey against the real backend. Rendering and native behaviour remain unverified.
 - Listening has **no real audio playback** yet — questions are answerable, the clip does not play.
 - Speaking is **transcript-based**, not live voice.
 - AI scoring runs through the **offline mock provider** unless `GROQ_API_KEY` is set.
