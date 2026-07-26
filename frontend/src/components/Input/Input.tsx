@@ -22,6 +22,7 @@ export const Input: React.FC<InputProps> = ({
   style,
   onFocus,
   onBlur,
+  multiline,
   ...rest
 }) => {
   const theme = useTheme();
@@ -35,13 +36,18 @@ export const Input: React.FC<InputProps> = ({
 
   return (
     <View style={styles.wrap}>
-      <AppText variant="labelMd" color="textSecondary" style={styles.label}>
-        {label}
-      </AppText>
+      {label ? (
+        <AppText variant="labelMd" color="textSecondary" style={styles.label}>
+          {label}
+        </AppText>
+      ) : null}
       <TextInput
+        multiline={multiline}
+        textAlignVertical={multiline ? 'top' : 'center'}
         placeholderTextColor={theme.colors.textMuted}
         style={[
           styles.input,
+          multiline ? styles.multiline : null,
           {
             borderColor,
             color: theme.colors.textPrimary,
@@ -77,6 +83,12 @@ const styles = StyleSheet.create({
     borderRadius: RADIUS.input,
     paddingHorizontal: SPACING.md,
     fontSize: 16,
+  },
+  multiline: {
+    height: undefined,
+    minHeight: 180,
+    paddingTop: SPACING.sm,
+    paddingBottom: SPACING.sm,
   },
   error: { marginTop: SPACING.xxs },
 });

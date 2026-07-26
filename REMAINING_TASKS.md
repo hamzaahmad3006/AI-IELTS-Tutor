@@ -45,8 +45,8 @@ Everything **not yet completed** to finish the project, organized by area. Check
 ### Writing (only Feedback screen exists)
 - [ ] Task selection (Task 1 / Task 2, Academic vs General)
 - [ ] Prompt display (with chart/image asset for Task 1 Academic)
-- [ ] Essay editor (rich text, live word count, timer, submit)
-- [ ] Submission → scoring pending/loading state
+- [x] Essay editor (multiline, live word count, submit) + AI-scored result (band, 4 criteria, feedback, improved essay) — wired to live-verified writingApi — [ ] timer, Task 1 assets
+- [x] Submission → scoring pending/loading state
 - [ ] Writing history with band trend + diffs
 
 ### Reading (not started)
