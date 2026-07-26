@@ -2,18 +2,21 @@
 
 Everything **not yet completed** to finish the project, organized by area. Checked = done, unchecked = remaining. Use this as the living backlog.
 
-> Current overall completion ≈ **10–12%**. Built so far: frontend design system, navigation, Redux, mock API, and 5 UI screens (Splash, Onboarding Target-Band, Home, Speaking UI, Writing Feedback) + Auth + tab placeholders, plus a backend scaffold.
+> **Status as of PR #40** — **69 of 174 checklist items done (~40%)**; weighted by effort the product is roughly **45%**, since the backend and data layer are largely complete while the remaining items skew toward large features (voice, deployment).
+> **Working end-to-end:** register → onboarding → dashboard → all four practice modules (Reading, Listening, Writing, Speaking) → progress → coach → profile → logout, against the real backend.
+> **Verified by:** 15 backend smoke suites, a 13-step E2E user-journey check, frontend `tsc`, and a Docker image build — all four gates run in CI on every push.
+> **Biggest remaining:** the live voice (LiveKit) pipeline, on-device validation, AI content generation, and production deployment.
 
 ---
 
-## 0. Project Setup & Tooling (blocking)
+## 0. Project Setup & Tooling
 
-- [ ] Run `npm install` in `frontend/` (deps are declared but not installed)
+- [x] `npm install` in `frontend/` (lockfile committed; `npm ci` reproducible in CI)
+- [x] `tsc --noEmit` clean (0 errors) and enforced by the CI frontend job
 - [ ] iOS: `cd ios && pod install`
 - [ ] Add Plus Jakarta Sans + Inter `.ttf` files to `src/assets/fonts` and run `npx react-native-asset`
-- [ ] Run `tsc --noEmit` and fix any type errors surfaced after install
 - [ ] Configure ESLint + Prettier scripts and run a clean lint pass
-- [ ] Verify the app boots on Android emulator and iOS simulator
+- [ ] **Verify the app boots on an Android emulator / iOS simulator** ← main outstanding validation
 - [ ] Add `react-native-config` (or equivalent) so `.env` is actually read by the app
 - [ ] Set up absolute imports / path aliases (`@components`, `@constants`, …) in `tsconfig` + Babel
 
@@ -21,49 +24,53 @@ Everything **not yet completed** to finish the project, organized by area. Check
 
 ## 1. Frontend — Screens (UI + `use*` hook per screen)
 
-### Onboarding (only Target-Band step exists)
+### Onboarding (flow complete, submits to the real backend)
+- [x] Target-band step (slider, band labels, AI recommendation)
+- [x] Exam type selection (Academic / General)
+- [x] Current level selection (Beginner / Intermediate / Advanced)
+- [x] Daily study-time selection
+- [x] Consent (AI processing required, voice optional)
+- [x] Submits the full draft to `POST /onboarding`, then enters the app shell
+- [x] Wired into navigation (Splash → Auth → Register → Onboarding → Main)
 - [ ] Welcome / value-proposition carousel
-- [ ] Sign-up entry step
-- [ ] Exam type selection (Academic / General)
-- [ ] Current level selection (Beginner / Intermediate / Advanced)
-- [ ] Exam date picker
-- [ ] Daily study-time selection
-- [ ] Consent screen (voice recording + AI processing)
+- [ ] Exam date picker (currently carried in the draft, not user-set in the UI)
 - [ ] Adaptive placement diagnostic runner (all 4 modules)
 - [ ] Baseline results + CEFR + "generating plan" screen
-- [ ] Wire full onboarding flow into navigation (multi-step stack)
 
 ### Speaking (AI-scored practice built; live voice pipeline pending)
-- [x] Part 2 cue-card practice: prep/speak timers, response capture, AI scoring (4 criteria + feedback)
+- [x] Part 2 cue-card practice: real cue card from the backend bank, prep → speak timers driven by the card, response capture
+- [x] AI scoring result (band + 4 criteria bars + examiner feedback)
 - [ ] Session start screen (full interview vs single part, mic permission)
-- [ ] Part 1 real flow
-- [ ] Part 2 cue-card screen (60s prep + ≤120s speak timers)
-- [ ] Part 3 discussion flow
-- [ ] Feedback screen (band + 4 criteria + highlighted transcript + replay)
-- [ ] Speaking history list
-- [ ] Recording replay with jump-to-issue markers
+- [ ] Part 1 and Part 3 flows
+- [ ] Highlighted transcript + recording replay with jump-to-issue markers
+- [ ] Speaking history list screen (API ready, screen pending)
 
-### Writing (only Feedback screen exists)
-- [ ] Task selection (Task 1 / Task 2, Academic vs General)
-- [ ] Prompt display (with chart/image asset for Task 1 Academic)
-- [x] Essay editor (multiline, live word count, submit) + AI-scored result (band, 4 criteria, feedback, improved essay) — wired to live-verified writingApi — [ ] timer, Task 1 assets
+### Writing (practice + feedback built)
+- [x] Prompt delivered from the backend prompt bank (random within difficulty)
+- [x] Essay editor (multiline, live word count, submit) + AI-scored result (band, 4 criteria, feedback, improved essay)
 - [x] Submission → scoring pending/loading state
-- [ ] Writing history with band trend + diffs
+- [ ] Task selection UI (Task 1 vs Task 2, Academic vs General)
+- [ ] Task 1 chart/image assets
+- [ ] Writing timer
+- [ ] Writing history screen with band trend + diffs (API ready, screen pending)
 
-### Reading (not started)
-- [ ] Difficulty selection
-- [x] Passage + question runner (MCQ / True-False-Not-Given / short answer) — wired to live-verified readingApi — [ ] matching-headings drag UI
-- [ ] Question navigator + timer
+### Reading (built)
+- [x] Passage + question runner (MCQ / True-False-Not-Given / short answer)
 - [x] Result screen: raw score → band + per-question correctness & explanations
+- [x] Adaptive difficulty (server-resolved) + randomized passage selection
+- [ ] Explicit difficulty selection UI
+- [ ] Question navigator + timer
+- [ ] Matching-headings drag UI
 
-### Listening (not started)
-- [ ] Difficulty selection
-- [ ] Audio player (single-play / replay policy) + question runner
-- [ ] Instant feedback with answer timestamps
-- [ ] Result screen: raw score → band
+### Listening (built)
+- [x] Clip delivery + question runner with answer capture
+- [x] Result screen: raw score → band + per-question feedback with **audio timestamps**
+- [x] Adaptive difficulty + randomized clip selection
+- [ ] **Real audio playback** (player UI + state exist; native media playback pending)
+- [ ] Explicit difficulty selection UI + single-play/replay policy enforcement
 
-### AI Tutor / Learning (not started)
-- [ ] Daily Coach feed (message + recommendations)
+### AI Tutor / Learning
+- [x] Daily Coach feed (message + weakness-driven recommendations that tap through to practice)
 - [ ] Vocabulary builder (spaced-repetition flashcards)
 - [ ] Grammar tutor (lesson list + lesson detail)
 - [ ] Full Mock Test flow (4 modules, timed, assembled, scored) + readiness report
@@ -79,10 +86,13 @@ Everything **not yet completed** to finish the project, organized by area. Check
 - [ ] Consistency / streak / time-on-task
 - [ ] Learning insights (strengths/weaknesses) cards
 
-### Profile / Settings (basic version only)
-- [ ] Editable goals / target band / exam date / daily minutes (triggers replan)
+### Profile / Settings (real profile data)
+- [x] Loads the real profile; editable **target band** and **daily study time** (PATCHed to the backend)
+- [x] Shows exam type / exam date / CEFR + per-module starting levels (baselines)
+- [x] Theme toggle + server-side logout (refresh token revoked)
+- [ ] Exam-date editing + replan trigger
 - [ ] Notification & reminder scheduling
-- [ ] Consent management
+- [ ] Consent management screen
 - [ ] Data export + delete account (privacy)
 - [ ] Offline mode banner + sync status UI
 
@@ -94,10 +104,10 @@ Everything **not yet completed** to finish the project, organized by area. Check
 - [ ] Radar chart (4-module) component
 - [ ] Waveform recorder / live audio visualizer
 - [ ] Audio player with scrubber + speed control
-- [ ] Question components (MCQ, True/False/Not-Given segmented, Matching Headings drag-connect)
+- [x] Question rendering (MCQ / True-False-Not-Given radio options + short-answer input) — [ ] Matching Headings drag-connect
+- [x] Cue-card rendering (topic, prompt, bullet points)
+- [x] Countdown / timer (Speaking prep + speak phases)
 - [ ] Flashcard (flip) component
-- [ ] Cue-card component
-- [ ] Countdown / timer component
 - [ ] Toast / Snackbar
 - [ ] Bottom sheet / modal
 - [ ] Consent modal
@@ -154,8 +164,8 @@ Everything **not yet completed** to finish the project, organized by area. Check
 
 - [x] Onboarding submit + profile GET/PATCH — [ ] adaptive diagnostic + baseline computation
 - [ ] Planner: generate/adapt study plans + tasks
-- [x] Speaking: transcript AI scoring (4 criteria, rubric-as-code) + history — [ ] session creation (LiveKit token), finish
-- [x] Writing: submission, AI scoring, improved essay (POST/GET attempts) + history — [ ] prompt delivery
+- [x] Speaking: transcript AI scoring (4 criteria, rubric-as-code) + history + **cue-card bank** (`GET /speaking/cue-cards`) — [ ] session creation (LiveKit token), finish
+- [x] Writing: submission, AI scoring, improved essay (POST/GET attempts) + history + **prompt bank** (`GET /writing/prompts`)
 - [x] Reading (backend): passage/question delivery (no answer leak), auto-grading, raw→band mapping, per-question explanations — [ ] AI question generation
 - [x] Listening (backend): clip/question delivery (no answer leak), auto-grading, band mapping, per-question feedback with audio timestamps — [ ] AI question generation, signed audio URLs
 - [x] Analytics: progress + band prediction + **real dashboard overview** (greeting, streak, prediction, module levels, recommendations) — [ ] insights
@@ -225,6 +235,8 @@ Everything **not yet completed** to finish the project, organized by area. Check
 - [ ] Frontend E2E — Detox
 - [ ] Backend unit tests (services, repos, validators) — pytest
 - [x] Backend integration smoke suites (TestClient + SQLite) for all verticals, run in isolated processes via `tests/run_smoke.py` — [ ] broaden to pytest unit tests + Postgres/testcontainers
+- [x] **E2E user-journey check** (`tests/journey/journey_check.js`) — 13 steps in the app's screen order, content-agnostic, run in CI
+- [x] Frontend typecheck gate (`tsc --noEmit`) in CI
 - [ ] AI evaluation suite (rubric MAE vs gold set)
 - [ ] Voice pipeline tests (latency budget, FSM, barge-in)
 - [ ] Load tests (k6/Locust) against SLOs
@@ -258,6 +270,16 @@ Everything **not yet completed** to finish the project, organized by area. Check
 ---
 
 ### Suggested next milestone (highest impact)
-1. Backend foundation: Settings + Supabase Postgres + SQLAlchemy + Alembic + real JWT auth.
-2. One full vertical end-to-end — **Writing**: editor → submit → Groq scoring (rubric-as-code) → feedback — to prove the AI + provider-abstraction architecture.
-3. Then replicate the pattern for Reading/Listening, and build out Speaking voice.
+
+1. **Run the app on a device/emulator** (`cd frontend && npm install && npm run android`) and fix whatever surfaces. Everything is typecheck- and contract-verified, but **nothing has been rendered on a device yet** — this is the single biggest unknown.
+2. **Flip `API_CONFIG.useMock` to `false`** (point `baseUrl` at the running backend) so the app uses live data by default.
+3. **Real audio playback** for Listening (the player UI/state exist; native media playback is missing).
+4. **Remaining screens**: Writing/Speaking history, Vocabulary, Grammar, Mock Test.
+5. **Voice pipeline** (LiveKit + STT/TTS) — the largest single remaining feature.
+6. **Production**: deploy (Docker image is CI-built), Postgres/Supabase config, observability, secrets.
+
+### Known gaps worth stating plainly
+- The app has **never been run on a device or emulator** in this environment; verification is `tsc` + live API contract checks + an E2E journey against the real backend.
+- Listening has **no real audio playback** yet — questions are answerable, the clip does not play.
+- Speaking is **transcript-based**, not live voice.
+- AI scoring runs through the **offline mock provider** unless `GROQ_API_KEY` is set.
