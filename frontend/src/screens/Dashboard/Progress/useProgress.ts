@@ -1,12 +1,17 @@
 /** Progress screen logic: real per-module progress, prediction and weaknesses. */
 
 import { useCallback, useEffect, useState } from 'react';
+import { useNavigation } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { analyticsApi, meApi } from '../../../api';
 import type {
   PredictionResponse,
   ProgressResponse,
+  RootStackParamList,
   WeaknessItem,
 } from '../../../types';
+
+type Nav = NativeStackNavigationProp<RootStackParamList>;
 
 interface UseProgressResult {
   progress: ProgressResponse | null;
@@ -15,9 +20,11 @@ interface UseProgressResult {
   isLoading: boolean;
   error: string | null;
   reload: () => void;
+  openHistory: () => void;
 }
 
 export const useProgress = (): UseProgressResult => {
+  const navigation = useNavigation<Nav>();
   const [progress, setProgress] = useState<ProgressResponse | null>(null);
   const [prediction, setPrediction] = useState<PredictionResponse | null>(null);
   const [weaknesses, setWeaknesses] = useState<WeaknessItem[]>([]);
@@ -47,6 +54,10 @@ export const useProgress = (): UseProgressResult => {
     void load();
   }, [load]);
 
+  const openHistory = useCallback((): void => {
+    navigation.navigate('History');
+  }, [navigation]);
+
   return {
     progress,
     prediction,
@@ -56,5 +67,6 @@ export const useProgress = (): UseProgressResult => {
     reload: () => {
       void load();
     },
+    openHistory,
   };
 };
