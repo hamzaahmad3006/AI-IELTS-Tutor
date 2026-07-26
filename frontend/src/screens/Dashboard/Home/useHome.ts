@@ -51,6 +51,10 @@ export const useHome = (): UseHomeResult => {
         navigation.navigate('ReadingPractice');
         return;
       }
+      if (module === 'listening') {
+        navigation.navigate('ListeningPractice');
+        return;
+      }
       navigation.navigate('Main', { screen: 'Practice' });
     },
     [navigation],

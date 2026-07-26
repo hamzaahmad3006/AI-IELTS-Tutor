@@ -36,6 +36,7 @@ export type RootStackParamList = {
   WritingFeedback: { attemptId: string };
   WritingPractice: undefined;
   ReadingPractice: undefined;
+  ListeningPractice: undefined;
 };
 
 // Convenience screen-props helpers
