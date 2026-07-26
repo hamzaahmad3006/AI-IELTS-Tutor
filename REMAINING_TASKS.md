@@ -45,7 +45,7 @@ Everything **not yet completed** to finish the project, organized by area. Check
 - [ ] Session start screen (full interview vs single part, mic permission)
 - [ ] Part 1 and Part 3 flows
 - [ ] Highlighted transcript + recording replay with jump-to-issue markers
-- [ ] Speaking history list screen (API ready, screen pending)
+- [x] Speaking history (shown in the unified History screen)
 
 ### Writing (practice + feedback built)
 - [x] Prompt delivered from the backend prompt bank (random within difficulty)
@@ -54,7 +54,7 @@ Everything **not yet completed** to finish the project, organized by area. Check
 - [ ] Task selection UI (Task 1 vs Task 2, Academic vs General)
 - [ ] Task 1 chart/image assets
 - [ ] Writing timer
-- [ ] Writing history screen with band trend + diffs (API ready, screen pending)
+- [x] Writing history (unified History screen) — [ ] band-trend chart + essay diffs
 
 ### Reading (built)
 - [x] Passage + question runner (MCQ / True-False-Not-Given / short answer)

@@ -32,8 +32,15 @@ const prettyTag = (tag: string): string =>
 
 export const Progress: React.FC = () => {
   const theme = useTheme();
-  const { progress, prediction, weaknesses, isLoading, error, reload } =
-    useProgress();
+  const {
+    progress,
+    prediction,
+    weaknesses,
+    isLoading,
+    error,
+    reload,
+    openHistory,
+  } = useProgress();
 
   if (isLoading) {
     return (
@@ -110,6 +117,14 @@ export const Progress: React.FC = () => {
       {progress.modules.map((module) => (
         <ModuleRow key={module.module} stat={module} />
       ))}
+
+      <Button
+        title="View attempt history"
+        variant="secondary"
+        icon="arrow-right"
+        onPress={openHistory}
+        style={styles.section}
+      />
 
       {/* Weaknesses */}
       {weaknesses.length > 0 ? (

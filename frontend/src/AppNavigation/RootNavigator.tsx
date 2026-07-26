@@ -9,6 +9,7 @@ import { Practice as ReadingPractice } from '../screens/Reading/Practice/Practic
 import { Practice as WritingPractice } from '../screens/Writing/Practice/Practice';
 import { Practice as ListeningPractice } from '../screens/Listening/Practice/Practice';
 import { Practice as SpeakingPractice } from '../screens/Speaking/Practice/Practice';
+import { History } from '../screens/History/History';
 import { AuthNavigator } from './AuthNavigator';
 import { OnboardingNavigator } from './OnboardingNavigator';
 import { MainTabNavigator } from './MainTabNavigator';
@@ -35,5 +36,6 @@ export const RootNavigator: React.FC = () => (
     <Stack.Screen name="ReadingPractice" component={ReadingPractice} />
     <Stack.Screen name="ListeningPractice" component={ListeningPractice} />
     <Stack.Screen name="SpeakingPractice" component={SpeakingPractice} />
+    <Stack.Screen name="History" component={History} />
   </Stack.Navigator>
 );
