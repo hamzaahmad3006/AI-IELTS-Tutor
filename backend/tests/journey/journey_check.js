@@ -95,34 +95,42 @@ async function main() {
   assert(res.data.modules.length === 4, 'adaptive levels for 4 modules');
   step(4, 'Practice hub -> adaptive levels');
 
-  // 5. Reading practice
+  // 5. Reading practice.
+  // Content is served at random, so this asserts the grading *flow* and shape
+  // rather than specific correct answers (accuracy is covered by unit tests).
   const passage = (await call('GET', '/reading/passages', { token })).data;
-  const rIds = passage.questions.map((q) => q.id);
+  assert(passage.questions.length > 0, 'passage has questions');
+  const readingAnswers = {};
+  passage.questions.forEach((q) => {
+    readingAnswers[q.id] = q.options ? q.options[0] : 'answer';
+  });
   res = await call('POST', '/reading/attempts', {
     token,
-    body: {
-      passageId: passage.id,
-      answers: { [rIds[0]]: 'China', [rIds[1]]: 'true', [rIds[2]]: 'black' },
-    },
+    body: { passageId: passage.id, answers: readingAnswers },
   });
-  assert(res.data.band > 0, 'reading graded');
+  assert(typeof res.data.band === 'number', 'reading returns a band');
+  assert(
+    res.data.perQuestion.length === res.data.totalQuestions,
+    'reading grades every question',
+  );
   step(5, `Reading: ${res.data.rawScore}/${res.data.totalQuestions} -> band ${res.data.band}`);
 
-  // 6. Listening practice
+  // 6. Listening practice (content also served at random).
   const clip = (await call('GET', '/listening/clips', { token })).data;
-  const lIds = clip.questions.map((q) => q.id);
+  assert(clip.questions.length > 0, 'clip has questions');
+  const listeningAnswers = {};
+  clip.questions.forEach((q) => {
+    listeningAnswers[q.id] = q.options ? q.options[0] : 'answer';
+  });
   res = await call('POST', '/listening/attempts', {
     token,
-    body: {
-      audioId: clip.id,
-      answers: {
-        [lIds[0]]: 'student card',
-        [lIds[1]]: clip.questions[1].options[1],
-        [lIds[2]]: 'ten',
-      },
-    },
+    body: { audioId: clip.id, answers: listeningAnswers },
   });
-  assert(res.data.band > 0, 'listening graded');
+  assert(typeof res.data.band === 'number', 'listening returns a band');
+  assert(
+    res.data.perQuestion.length === res.data.totalQuestions,
+    'listening grades every question',
+  );
   step(6, `Listening: ${res.data.rawScore}/${res.data.totalQuestions} -> band ${res.data.band}`);
 
   // 7. Writing practice (AI scored)

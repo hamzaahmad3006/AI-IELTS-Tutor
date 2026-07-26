@@ -127,9 +127,12 @@ class SpeakingController:
         query = select(CueCard)
         if difficulty and difficulty != "adaptive":
             query = query.where(CueCard.difficulty == difficulty)
-        card = await session.scalar(query.limit(1))
+        # Random pick so repeated practice varies the cue card.
+        card = await session.scalar(query.order_by(func.random()).limit(1))
         if card is None:
-            card = await session.scalar(select(CueCard).limit(1))
+            card = await session.scalar(
+                select(CueCard).order_by(func.random()).limit(1)
+            )
         if card is None:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND, detail="No cue card available"

@@ -53,6 +53,18 @@ _SEED_PROMPTS: list[dict[str, object]] = [
     {
         "exam_type": "academic",
         "task_number": 2,
+        "topic": "education",
+        "difficulty": "medium",
+        "min_words": 250,
+        "prompt": (
+            "Some people think children should begin formal education as early as "
+            "possible, while others believe they should start later. Discuss both "
+            "views and give your own opinion."
+        ),
+    },
+    {
+        "exam_type": "academic",
+        "task_number": 2,
         "topic": "environment",
         "difficulty": "hard",
         "min_words": 250,
@@ -143,11 +155,13 @@ class WritingController:
         )
         if difficulty and difficulty != "adaptive":
             query = query.where(WritingPrompt.difficulty == difficulty)
-        prompt = await session.scalar(query.limit(1))
+        # Random pick so repeated practice varies the prompt.
+        prompt = await session.scalar(query.order_by(func.random()).limit(1))
         if prompt is None:
             prompt = await session.scalar(
                 select(WritingPrompt)
                 .where(WritingPrompt.task_number == task_number)
+                .order_by(func.random())
                 .limit(1)
             )
         if prompt is None:
