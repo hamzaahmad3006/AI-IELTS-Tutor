@@ -6,12 +6,13 @@ import re
 
 from fastapi import HTTPException, status
 from pydantic import Field
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from ai.orchestrator import AIOrchestrator, ScoringError
 from models.attempt import WritingAttempt
 from models.user import User
+from models.writing_prompt import WritingPrompt
 
 from .ai_usage_controller import record_ai_interaction
 from .base import CamelModel
@@ -22,6 +23,66 @@ class WritingSubmitRequest(CamelModel):
     essay_text: str = Field(min_length=1, max_length=8000)
     task_type: int = Field(default=2, ge=1, le=2)
     prompt_text: str | None = None
+
+
+class WritingPromptResponse(CamelModel):
+    id: str
+    exam_type: str
+    task_number: int
+    prompt: str
+    topic: str | None
+    asset_ref: str | None
+    difficulty: str
+    min_words: int
+
+
+# ---------- Prompt bank seeding (dev/demo content) ----------
+_SEED_PROMPTS: list[dict[str, object]] = [
+    {
+        "exam_type": "academic",
+        "task_number": 2,
+        "topic": "technology",
+        "difficulty": "medium",
+        "min_words": 250,
+        "prompt": (
+            "Some people believe technology has made our lives more complex, "
+            "while others think it has simplified them. Discuss both views and "
+            "give your own opinion."
+        ),
+    },
+    {
+        "exam_type": "academic",
+        "task_number": 2,
+        "topic": "environment",
+        "difficulty": "hard",
+        "min_words": 250,
+        "prompt": (
+            "Many governments prioritise economic growth over environmental "
+            "protection. To what extent do you agree or disagree?"
+        ),
+    },
+    {
+        "exam_type": "general",
+        "task_number": 1,
+        "topic": "letter",
+        "difficulty": "easy",
+        "min_words": 150,
+        "prompt": (
+            "You recently stayed at a hotel and were unhappy with the service. "
+            "Write a letter to the manager. In your letter: explain why you "
+            "stayed there, describe the problems, and say what action you want."
+        ),
+    },
+]
+
+
+async def _ensure_prompts_seeded(session: AsyncSession) -> None:
+    count = await session.scalar(select(func.count()).select_from(WritingPrompt))
+    if count and count > 0:
+        return
+    for row in _SEED_PROMPTS:
+        session.add(WritingPrompt(**row, source="seed"))
+    await session.flush()
 
 
 class WritingCriteria(CamelModel):
@@ -68,6 +129,42 @@ def _to_response(attempt: WritingAttempt) -> WritingResultResponse:
 
 
 class WritingController:
+    @staticmethod
+    async def get_prompt(
+        session: AsyncSession,
+        exam_type: str,
+        task_number: int,
+        difficulty: str | None,
+    ) -> WritingPromptResponse:
+        await _ensure_prompts_seeded(session)
+        query = select(WritingPrompt).where(
+            WritingPrompt.exam_type == exam_type,
+            WritingPrompt.task_number == task_number,
+        )
+        if difficulty and difficulty != "adaptive":
+            query = query.where(WritingPrompt.difficulty == difficulty)
+        prompt = await session.scalar(query.limit(1))
+        if prompt is None:
+            prompt = await session.scalar(
+                select(WritingPrompt)
+                .where(WritingPrompt.task_number == task_number)
+                .limit(1)
+            )
+        if prompt is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail="No prompt available"
+            )
+        return WritingPromptResponse(
+            id=prompt.id,
+            exam_type=prompt.exam_type,
+            task_number=prompt.task_number,
+            prompt=prompt.prompt,
+            topic=prompt.topic,
+            asset_ref=prompt.asset_ref,
+            difficulty=prompt.difficulty,
+            min_words=prompt.min_words,
+        )
+
     @staticmethod
     async def submit(
         session: AsyncSession,

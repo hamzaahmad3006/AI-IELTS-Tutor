@@ -7,6 +7,7 @@ import { MOCK_WRITING_FEEDBACK, MOCK_WRITING_RESULT } from './mock/fixtures';
 import type {
   WritingFeedback,
   WritingHistoryPage,
+  WritingPrompt,
   WritingResult,
   WritingSubmit,
 } from '../types';
@@ -14,7 +15,37 @@ import type {
 const delay = (ms: number): Promise<void> =>
   new Promise((resolve) => setTimeout(resolve, ms));
 
+const MOCK_PROMPT: WritingPrompt = {
+  id: 'wp_mock_1',
+  examType: 'academic',
+  taskNumber: 2,
+  prompt:
+    'Some people believe technology has made our lives more complex, while ' +
+    'others think it has simplified them. Discuss both views and give your own opinion.',
+  topic: 'technology',
+  assetRef: null,
+  difficulty: 'medium',
+  minWords: 250,
+};
+
 export const writingApi = {
+  /** Fetch a Task 1/2 prompt from the backend prompt bank. */
+  async getPrompt(taskNumber = 2): Promise<WritingPrompt> {
+    if (API_CONFIG.useMock) {
+      await delay(300);
+      return MOCK_PROMPT;
+    }
+    try {
+      const { data } = await apiClient.get<WritingPrompt>(
+        ENDPOINTS.writing.prompts,
+        { params: { taskNumber } },
+      );
+      return data;
+    } catch (error) {
+      throw toApiProblem(error);
+    }
+  },
+
   /** Submit an essay for AI scoring. */
   async submit(payload: WritingSubmit): Promise<WritingResult> {
     if (API_CONFIG.useMock) {

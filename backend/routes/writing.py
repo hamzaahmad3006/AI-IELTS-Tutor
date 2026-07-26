@@ -12,6 +12,7 @@ from controllers.history_controller import HistoryController, WritingHistoryPage
 from controllers.pagination import DEFAULT_LIMIT
 from controllers.writing_controller import (
     WritingController,
+    WritingPromptResponse,
     WritingResultResponse,
     WritingSubmitRequest,
 )
@@ -42,6 +43,19 @@ async def submit_attempt(
     orchestrator: Orchestrator,
 ) -> WritingResultResponse:
     return await WritingController.submit(session, current, orchestrator, payload)
+
+
+@router.get("/prompts", response_model=WritingPromptResponse)
+async def get_prompt(
+    current: CurrentUser,
+    session: DbSession,
+    exam_type: Annotated[str, Query(alias="examType")] = "academic",
+    task_number: Annotated[int, Query(alias="taskNumber", ge=1, le=2)] = 2,
+    difficulty: Annotated[str | None, Query()] = None,
+) -> WritingPromptResponse:
+    return await WritingController.get_prompt(
+        session, exam_type, task_number, difficulty
+    )
 
 
 @router.get("/history", response_model=WritingHistoryPage)
