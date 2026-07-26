@@ -33,7 +33,8 @@ Everything **not yet completed** to finish the project, organized by area. Check
 - [ ] Baseline results + CEFR + "generating plan" screen
 - [ ] Wire full onboarding flow into navigation (multi-step stack)
 
-### Speaking (only mock UI exists)
+### Speaking (AI-scored practice built; live voice pipeline pending)
+- [x] Part 2 cue-card practice: prep/speak timers, response capture, AI scoring (4 criteria + feedback)
 - [ ] Session start screen (full interview vs single part, mic permission)
 - [ ] Part 1 real flow
 - [ ] Part 2 cue-card screen (60s prep + ≤120s speak timers)

@@ -40,7 +40,9 @@ export const useHome = (): UseHomeResult => {
   const onSelectModule = useCallback(
     (module: IeltsModule): void => {
       if (module === 'speaking') {
-        navigation.navigate('SpeakingInterview', { module });
+        // AI-scored practice; the live voice interview (SpeakingInterview)
+        // becomes the default once the LiveKit pipeline lands.
+        navigation.navigate('SpeakingPractice');
         return;
       }
       if (module === 'writing') {
