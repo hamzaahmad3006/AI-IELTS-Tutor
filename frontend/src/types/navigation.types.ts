@@ -37,6 +37,7 @@ export type RootStackParamList = {
   WritingPractice: undefined;
   ReadingPractice: undefined;
   ListeningPractice: undefined;
+  SpeakingPractice: undefined;
 };
 
 // Convenience screen-props helpers
