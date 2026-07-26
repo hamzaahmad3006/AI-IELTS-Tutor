@@ -59,8 +59,7 @@ export const useTargetBand = (): UseTargetBandResult => {
 
   const onNext = useCallback((): void => {
     dispatch(nextStep());
-    // For the current milestone we route straight into the app shell.
-    navigation.reset({ index: 0, routes: [{ name: 'Main' }] });
+    navigation.navigate('Onboarding', { screen: 'ExamSetup' });
   }, [dispatch, navigation]);
 
   const onSkip = useCallback((): void => {

@@ -12,10 +12,8 @@ export type AuthStackParamList = {
 };
 
 export type OnboardingStackParamList = {
-  ExamType: undefined;
   TargetBand: undefined;
-  ExamDate: undefined;
-  StudyTime: undefined;
+  ExamSetup: undefined;
   Diagnostic: undefined;
 };
 
