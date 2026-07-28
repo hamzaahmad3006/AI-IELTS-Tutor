@@ -21,6 +21,7 @@ from db.session import init_models, seed_admin
 from middleware import CorrelationIdMiddleware, register_exception_handlers
 from routes import api_router
 from routes.health import router as health_router
+from routes.media import router as media_router
 
 API_V1_PREFIX = "/v1"
 
@@ -55,6 +56,7 @@ app.add_middleware(CorrelationIdMiddleware)
 register_exception_handlers(app)
 
 app.include_router(health_router)  # root-level probes: /health, /ready
+app.include_router(media_router)  # /media/... audio for the listening module
 app.include_router(api_router, prefix=API_V1_PREFIX)
 
 

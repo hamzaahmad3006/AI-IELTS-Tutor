@@ -33,7 +33,8 @@ def run() -> None:
         r = client.get("/v1/listening/clips", headers=headers)
         assert r.status_code == 200, r.text
         clip = r.json()
-        assert clip["audioUrl"].endswith(".mp3")
+        # Served from the media route; format is an implementation detail.
+        assert clip["audioUrl"].startswith("/media/"), clip["audioUrl"]
         total = len(clip["questions"])
         assert total > 0
         for q in clip["questions"]:
