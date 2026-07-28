@@ -14,6 +14,7 @@ from . import (
     profile,
     reading,
     speaking,
+    vocabulary,
     writing,
 )
 
@@ -28,6 +29,7 @@ api_router.include_router(writing.router)
 api_router.include_router(reading.router)
 api_router.include_router(listening.router)
 api_router.include_router(speaking.router)
+api_router.include_router(vocabulary.router)
 api_router.include_router(analytics.router)
 api_router.include_router(admin.router)
 api_router.include_router(admin_content.router)

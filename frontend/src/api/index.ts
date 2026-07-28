@@ -7,6 +7,7 @@ export { profileApi } from './profileApi';
 export { meApi } from './meApi';
 export { dashboardApi } from './dashboardApi';
 export { analyticsApi } from './analyticsApi';
+export { vocabularyApi } from './vocabularyApi';
 export { readingApi } from './readingApi';
 export { listeningApi } from './listeningApi';
 export { speakingApi } from './speakingApi';

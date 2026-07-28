@@ -75,7 +75,7 @@ Everything **not yet completed** to finish the project, organized by area. Check
 
 ### AI Tutor / Learning
 - [x] Daily Coach feed (message + weakness-driven recommendations that tap through to practice)
-- [ ] Vocabulary builder (spaced-repetition flashcards)
+- [x] **Vocabulary builder** — SM-2 spaced-repetition flashcards (reveal → grade → reschedule), session summary + stats, reachable from Coach
 - [ ] Grammar tutor (lesson list + lesson detail)
 - [ ] Full Mock Test flow (4 modules, timed, assembled, scored) + readiness report
 
@@ -111,7 +111,7 @@ Everything **not yet completed** to finish the project, organized by area. Check
 - [x] Question rendering (MCQ / True-False-Not-Given radio options + short-answer input) — [ ] Matching Headings drag-connect
 - [x] Cue-card rendering (topic, prompt, bullet points)
 - [x] Countdown / timer (Speaking prep + speak phases)
-- [ ] Flashcard (flip) component
+- [x] Flashcard (reveal/grade) component — [ ] flip animation
 - [ ] Toast / Snackbar
 - [ ] Bottom sheet / modal
 - [ ] Consent modal
@@ -175,7 +175,7 @@ Everything **not yet completed** to finish the project, organized by area. Check
 - [x] Reading (backend): passage/question delivery (no answer leak), auto-grading, raw→band mapping, per-question explanations — [ ] AI question generation
 - [x] Listening (backend): clip/question delivery (no answer leak), auto-grading, band mapping, per-question feedback with audio timestamps — [ ] AI question generation, signed audio URLs
 - [x] Analytics: progress + band prediction + **real dashboard overview** (greeting, streak, prediction, module levels, recommendations) — [ ] insights
-- [ ] Vocabulary (SRS) + grammar lesson endpoints
+- [x] Vocabulary SRS endpoints (`/vocabulary/review`, `/grade`, `/stats`) with an SM-2 scheduler — [ ] grammar lesson endpoints
 - [ ] Mock test assembly + scoring
 - [ ] Notifications / reminders
 

@@ -52,6 +52,11 @@ export const ENDPOINTS = {
     attempt: (id: string): string => `/listening/attempts/${id}`,
     history: '/listening/history',
   },
+  vocabulary: {
+    review: '/vocabulary/review',
+    grade: '/vocabulary/grade',
+    stats: '/vocabulary/stats',
+  },
   analytics: {
     overview: '/analytics/overview',
     progress: '/analytics/progress',
