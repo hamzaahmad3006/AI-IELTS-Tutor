@@ -68,7 +68,9 @@ Everything **not yet completed** to finish the project, organized by area. Check
 - [x] Clip delivery + question runner with answer capture
 - [x] Result screen: raw score → band + per-question feedback with **audio timestamps**
 - [x] Adaptive difficulty + randomized clip selection
-- [ ] **Real audio playback** (player UI + state exist; native media playback pending)
+- [x] **Audio is now actually served** — `/media/...` route (the advertised `audioUrl` used to 404), path-traversal guarded, covered by a smoke test
+- [ ] **Native audio playback in the app** — needs a player library (`react-native-video`/`sound`) that requires native linking; cannot be verified without a device build
+- [ ] **Replace silent placeholder audio with real recordings** — clips are valid WAVs of the right duration but contain silence (`scripts/generate_placeholder_audio.py`)
 - [ ] Explicit difficulty selection UI + single-play/replay policy enforcement
 
 ### AI Tutor / Learning

@@ -96,7 +96,7 @@ async def _ensure_seeded(session: AsyncSession) -> None:
         return
     clip = AudioClip(
         title="University Orientation",
-        object_key="seed/audio/orientation.mp3",
+        object_key="seed/audio/orientation.wav",
         transcript=_SEED_TRANSCRIPT,
         duration_sec=45,
         exam_type="academic",
@@ -152,7 +152,7 @@ async def _ensure_seeded(session: AsyncSession) -> None:
     # A second medium clip so learners at the same level get variety.
     library = AudioClip(
         title="Museum Tour Information",
-        object_key="seed/audio/museum.mp3",
+        object_key="seed/audio/museum.wav",
         transcript=_SEED_TRANSCRIPT_MUSEUM,
         duration_sec=48,
         exam_type="academic",
@@ -203,7 +203,7 @@ async def _ensure_seeded(session: AsyncSession) -> None:
     # A harder clip for learners who progress.
     booking = AudioClip(
         title="Conference Booking Call",
-        object_key="seed/audio/booking.mp3",
+        object_key="seed/audio/booking.wav",
         transcript=_SEED_TRANSCRIPT_BOOKING,
         duration_sec=52,
         exam_type="academic",
