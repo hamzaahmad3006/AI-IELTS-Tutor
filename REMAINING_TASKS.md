@@ -175,7 +175,7 @@ Everything **not yet completed** to finish the project, organized by area. Check
 - [x] Reading (backend): passage/question delivery (no answer leak), auto-grading, raw→band mapping, per-question explanations — [ ] AI question generation
 - [x] Listening (backend): clip/question delivery (no answer leak), auto-grading, band mapping, per-question feedback with audio timestamps — [ ] AI question generation, signed audio URLs
 - [x] Analytics: progress + band prediction + **real dashboard overview** (greeting, streak, prediction, module levels, recommendations) — [ ] insights
-- [ ] Vocabulary (SRS) + grammar lesson endpoints
+- [x] Vocabulary SRS endpoints (`/vocabulary/review`, `/grade`, `/stats`) with an SM-2 scheduler — [ ] grammar lesson endpoints
 - [ ] Mock test assembly + scoring
 - [ ] Notifications / reminders
 
