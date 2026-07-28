@@ -123,7 +123,9 @@ Everything **not yet completed** to finish the project, organized by area. Check
 
 - [ ] Redux slices for: speaking, writing, reading, listening, planner, analytics, vocabulary, coach, offline
 - [ ] RTK Query (or thunks) for all real endpoints
-- [x] **Full API layer live-verified** against the backend — auth, onboarding/profile, `/me`, dashboard, analytics, and all four modules (reading, listening, writing, speaking) — mock switch retained — [ ] flip default off mock + wire screens/slices to the real APIs
+- [x] **Full API layer live-verified** against the backend — auth, onboarding/profile, `/me`, dashboard, analytics, and all four modules
+- [x] **Mock data can never reach a release build** (`useMock` is gated on `__DEV__`, guarded by a test). Dev still defaults to fixtures via `USE_MOCK_IN_DEV` — [ ] set it to false once a backend is routinely running
+- [ ] Tree-shake fixture data out of release bundles (currently ~11.5 KB / 0.66% of the bundle ships unused but is never served)
 - [x] Token refresh flow (single-flight 401 → refresh → retry; server logout via `logoutThunk`) — verified against a live backend — [ ] wire remaining screens off mock
 - [ ] Secure token storage (Keychain/Keystore) instead of plain AsyncStorage
 - [ ] Offline queue + deferred sync + conflict resolution

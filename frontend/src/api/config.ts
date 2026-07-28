@@ -30,13 +30,22 @@ const API_BASE_URL: string | null = null;
 
 /**
  * Serve typed local fixtures instead of calling the backend.
- * Set to false to run against the real API (see backend/README.md to start it).
+ *
+ * Set to false to develop against the real API (see backend/README.md to start
+ * it). This only applies in development — see `useMock` below.
  */
-const USE_MOCK = true;
+const USE_MOCK_IN_DEV = true;
+
+/**
+ * Mock data must never reach a release build: shipping fixtures would show
+ * every user the same invented bands and feedback. `__DEV__` is false in
+ * release bundles, so mocks are impossible there regardless of the flag above.
+ */
+const useMock = __DEV__ && USE_MOCK_IN_DEV;
 
 export const API_CONFIG = {
   baseUrl: API_BASE_URL ?? `http://${DEV_HOST}:${DEV_PORT}/v1`,
   timeoutMs: 30000,
   version: 'v1',
-  useMock: USE_MOCK,
+  useMock,
 } as const;
