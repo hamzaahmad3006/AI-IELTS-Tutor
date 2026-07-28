@@ -49,6 +49,7 @@ export const Coach: React.FC = () => {
     error,
     reload,
     openModule,
+    openVocabulary,
   } = useCoach();
 
   if (isLoading) {
@@ -114,6 +115,14 @@ export const Coach: React.FC = () => {
           </AppText>
         </Card>
       )}
+
+      <Button
+        title="Review vocabulary"
+        variant="secondary"
+        icon="arrow-right"
+        onPress={openVocabulary}
+        style={styles.section}
+      />
 
       {/* Adaptive difficulty */}
       <AppText variant="titleLg" style={styles.sectionTitle}>
