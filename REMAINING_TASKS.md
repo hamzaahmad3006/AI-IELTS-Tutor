@@ -232,8 +232,8 @@ Everything **not yet completed** to finish the project, organized by area. Check
 
 ## 11. Testing
 
-- [x] Frontend unit tests — Jest runs in CI (22 tests: band-scale logic, auth slice, onboarding slice, app render). `npm test` was broken (missing `@react-native/jest-preset`) and is now fixed — [ ] broaden to hooks/selectors/utils
-- [x] App renders in test (template `App.test.tsx` mounts the full tree) — [ ] per-screen component tests with React Native Testing Library
+- [x] Frontend unit tests — Jest in CI (band-scale logic, auth slice, onboarding slice). `npm test` was broken (missing `@react-native/jest-preset`) and is now fixed — [ ] broaden to hooks/selectors/utils
+- [x] **Every screen has a render test** (React Native Testing Library): auth (3, incl. validation interactions), all 4 practice screens, all 5 dashboard tabs + History, plus the full app tree — 38 tests / 7 suites in CI
 - [ ] Frontend E2E — Detox
 - [ ] Backend unit tests (services, repos, validators) — pytest
 - [x] Backend integration smoke suites (TestClient + SQLite) for all verticals, run in isolated processes via `tests/run_smoke.py` — [ ] broaden to pytest unit tests + Postgres/testcontainers
