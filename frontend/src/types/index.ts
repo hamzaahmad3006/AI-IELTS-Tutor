@@ -11,6 +11,7 @@ export * from './listening.types';
 export * from './speaking.types';
 export * from './writing.types';
 export * from './vocabulary.types';
+export * from './grammar.types';
 export * from './analytics.types';
 export * from './navigation.types';
 export * from './api.types';

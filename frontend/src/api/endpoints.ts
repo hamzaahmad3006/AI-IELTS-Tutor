@@ -57,6 +57,10 @@ export const ENDPOINTS = {
     grade: '/vocabulary/grade',
     stats: '/vocabulary/stats',
   },
+  grammar: {
+    lessons: '/grammar/lessons',
+    lesson: (id: string): string => `/grammar/lessons/${id}`,
+  },
   analytics: {
     overview: '/analytics/overview',
     progress: '/analytics/progress',

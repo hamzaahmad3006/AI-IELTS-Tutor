@@ -22,6 +22,7 @@ interface UseCoachResult {
   reload: () => void;
   openModule: (module: IeltsModule) => void;
   openVocabulary: () => void;
+  openGrammar: () => void;
 }
 
 export const useCoach = (): UseCoachResult => {
@@ -78,6 +79,10 @@ export const useCoach = (): UseCoachResult => {
     navigation.navigate('VocabularyReview');
   }, [navigation]);
 
+  const openGrammar = useCallback((): void => {
+    navigation.navigate('GrammarLessons');
+  }, [navigation]);
+
   return {
     recommendations,
     message,
@@ -89,5 +94,6 @@ export const useCoach = (): UseCoachResult => {
     },
     openModule,
     openVocabulary,
+    openGrammar,
   };
 };
