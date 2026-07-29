@@ -50,6 +50,7 @@ export const Coach: React.FC = () => {
     reload,
     openModule,
     openVocabulary,
+    openGrammar,
   } = useCoach();
 
   if (isLoading) {
@@ -121,6 +122,14 @@ export const Coach: React.FC = () => {
         variant="secondary"
         icon="arrow-right"
         onPress={openVocabulary}
+        style={styles.section}
+      />
+
+      <Button
+        title="Grammar lessons"
+        variant="secondary"
+        icon="arrow-right"
+        onPress={openGrammar}
         style={styles.section}
       />
 

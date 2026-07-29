@@ -8,6 +8,7 @@ export { meApi } from './meApi';
 export { dashboardApi } from './dashboardApi';
 export { analyticsApi } from './analyticsApi';
 export { vocabularyApi } from './vocabularyApi';
+export { grammarApi } from './grammarApi';
 export { readingApi } from './readingApi';
 export { listeningApi } from './listeningApi';
 export { speakingApi } from './speakingApi';

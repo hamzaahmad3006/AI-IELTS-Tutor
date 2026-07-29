@@ -5,6 +5,7 @@ from .attempt import WritingAttempt
 from .audit import AuditLog
 from .content import AudioClip, ListeningQuestion, Passage, Question
 from .cue_card import CueCard
+from .grammar import GrammarLesson
 from .listening import ListeningAttempt
 from .profile import LearnerProfile
 from .reading import ReadingAttempt
@@ -31,6 +32,7 @@ __all__ = [
     "Weakness",
     "WritingPrompt",
     "CueCard",
+    "GrammarLesson",
     "VocabItem",
     "VocabReview",
 ]
