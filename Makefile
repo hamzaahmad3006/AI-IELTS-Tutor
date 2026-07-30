@@ -11,8 +11,14 @@ help:  ## List available targets
 install:  ## Install backend dependencies
 	cd backend && pip install -r requirements.txt
 
-run:  ## Run the backend with autoreload on :8000
+run:  ## Run the backend with autoreload on :8000 (localhost only)
 	cd backend && uvicorn main:app --reload --port 8000
+
+run-lan:  ## Run the backend reachable from a phone on the same Wi-Fi
+	cd backend && uvicorn main:app --reload --host 0.0.0.0 --port 8000
+
+android:  ## Build and install the debug app on a connected Android device
+	cd frontend && npx react-native run-android
 
 test:  ## Run all backend smoke suites
 	cd backend && $(PY) tests/run_smoke.py

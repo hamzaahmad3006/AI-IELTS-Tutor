@@ -67,6 +67,38 @@ docker compose up --build
 
 Common tasks are wrapped in the root `Makefile` (`make help`, `make test`, `make run`, `make migrate`, `make docker-up`). The Android emulator reaches the host backend at `http://10.0.2.2:8000/v1` (set in `frontend/src/api/config.ts`).
 
+## Run on a physical Android phone
+
+The app derives the API host from the Metro dev-server URL, so the same build
+works on an emulator and on a real phone with no code changes.
+
+1. Put the phone and the PC on the **same Wi-Fi network**.
+2. Start the backend so the phone can reach it (not just localhost):
+
+```bash
+make run-lan
+```
+
+3. Enable **USB debugging** on the phone, connect it, and confirm it is seen:
+
+```bash
+adb devices
+```
+
+4. Build and install:
+
+```bash
+make android
+```
+
+Notes:
+- Debug builds allow plain HTTP (React Native's Gradle plugin sets
+  `usesCleartextTraffic` for debug only), so `http://<pc-ip>:8000` works.
+- If the phone cannot reach the backend, the PC firewall is usually blocking
+  port 8000 on the private network.
+- To point the app at a deployed API instead, set `API_BASE_URL` in
+  `frontend/src/api/config.ts`.
+
 ## Status
 
 **Backend** — substantially built and covered by CI (compile → migrations → smoke suites → Docker build/health):
