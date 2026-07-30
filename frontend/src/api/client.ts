@@ -18,10 +18,13 @@ type TokenProvider = () => string | null;
 type RefreshHandler = () => Promise<string | null>;
 /** Called when the session is definitively unrecoverable. */
 type AuthFailureHandler = () => void;
+/** Reports a request failure to the user (wired to the toast queue). */
+type ErrorReporter = (message: string) => void;
 
 let getAccessToken: TokenProvider = () => null;
 let refreshHandler: RefreshHandler | null = null;
 let authFailureHandler: AuthFailureHandler | null = null;
+let errorReporter: ErrorReporter | null = null;
 let refreshInFlight: Promise<string | null> | null = null;
 
 export const setAuthTokenProvider = (provider: TokenProvider): void => {
@@ -44,6 +47,18 @@ export const setRefreshHandler = (handler: RefreshHandler): void => {
  */
 export const setAuthFailureHandler = (handler: AuthFailureHandler): void => {
   authFailureHandler = handler;
+};
+
+/**
+ * Wire connectivity reporting (set from the app root).
+ *
+ * Only fires when the request never reached the server — no response at all.
+ * HTTP errors are deliberately left to the calling screen, which knows whether
+ * a 404 or a 422 is worth interrupting the user over; a blanket toast on every
+ * non-2xx would double up on inline validation messages.
+ */
+export const setErrorReporter = (reporter: ErrorReporter): void => {
+  errorReporter = reporter;
 };
 
 interface RetryableConfig extends InternalAxiosRequestConfig {
@@ -93,6 +108,15 @@ apiClient.interceptors.response.use(
       // Refresh failed: the session cannot be recovered. Clear it so the app
       // returns to the sign-in screen instead of stranding the user.
       authFailureHandler?.();
+    }
+
+    // No response object means the request never landed: airplane mode, wrong
+    // API host, backend down, DNS failure. The user cannot fix that from the
+    // screen they are on, so it is surfaced globally.
+    if (!error.response) {
+      errorReporter?.(
+        'No connection to the server. Check your network and try again.',
+      );
     }
     return Promise.reject(error);
   },

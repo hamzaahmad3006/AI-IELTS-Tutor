@@ -10,12 +10,14 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { NavigationContainer } from '@react-navigation/native';
 import { Provider } from 'react-redux';
 import { PersistGate } from 'redux-persist/integration/react';
-import { store, persistor, refreshThunk, logout } from './src/redux';
+import { store, persistor, refreshThunk, logout, showToast } from './src/redux';
 import {
   setAuthTokenProvider,
   setAuthFailureHandler,
+  setErrorReporter,
   setRefreshHandler,
 } from './src/api';
+import { ErrorBoundary, ToastHost } from './src/components';
 import { RootNavigator } from './src/AppNavigation';
 import { PALETTE } from './src/constants';
 
@@ -41,7 +43,16 @@ setRefreshHandler(async () => {
 setAuthFailureHandler(() => {
   if (store.getState().auth.tokens !== null) {
     store.dispatch(logout());
+    store.dispatch(
+      showToast({ message: 'Your session expired. Please sign in again.', tone: 'info' }),
+    );
   }
+});
+
+// Requests that never reached the server surface as a toast; HTTP errors stay
+// with the screen that made the call.
+setErrorReporter((message) => {
+  store.dispatch(showToast({ message, tone: 'error' }));
 });
 
 const Loading: React.FC = () => (
@@ -55,9 +66,13 @@ const App: React.FC = () => (
     <Provider store={store}>
       <PersistGate loading={<Loading />} persistor={persistor}>
         <SafeAreaProvider>
-          <NavigationContainer>
-            <RootNavigator />
-          </NavigationContainer>
+          <ErrorBoundary>
+            <NavigationContainer>
+              <RootNavigator />
+            </NavigationContainer>
+          </ErrorBoundary>
+          {/* Outside the navigator so a toast survives screen changes. */}
+          <ToastHost />
         </SafeAreaProvider>
       </PersistGate>
     </Provider>

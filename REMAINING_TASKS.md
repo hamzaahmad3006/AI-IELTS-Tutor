@@ -101,7 +101,9 @@ Everything **not yet completed** to finish the project, organized by area. Check
 - [ ] Notification & reminder scheduling
 - [ ] Consent management screen
 - [ ] Data export + delete account (privacy)
-- [ ] Offline mode banner + sync status UI
+- [ ] Offline mode banner + sync status UI — `EmptyState variant="offline"` and the
+      network-error toast exist, but true connectivity *detection* needs
+      `@react-native-community/netinfo` (native module + rebuild)
 
 ---
 
@@ -115,11 +117,13 @@ Everything **not yet completed** to finish the project, organized by area. Check
 - [x] Cue-card rendering (topic, prompt, bullet points)
 - [x] Countdown / timer (Speaking prep + speak phases)
 - [x] Flashcard (reveal/grade) component — [ ] flip animation
-- [ ] Toast / Snackbar
+- [x] Toast / Snackbar (`ToastHost` + `toastSlice`; queue in Redux so the axios
+      interceptor can raise one without a provider in scope, duplicates collapsed)
 - [ ] Bottom sheet / modal
 - [ ] Consent modal
-- [ ] Empty / error / offline state components
-- [ ] Skeleton loaders
+- [x] Empty / error / offline state components (`EmptyState`, three variants — a new
+      account must not be told "something went wrong")
+- [x] Skeleton loaders (`Skeleton` + `SkeletonCard`, shared pulse; adopted on Progress)
 - [ ] Streak flame (animated) + progress ring (SVG)
 
 ---
@@ -135,7 +139,8 @@ Everything **not yet completed** to finish the project, organized by area. Check
 - [ ] Secure token storage (Keychain/Keystore) instead of plain AsyncStorage
 - [ ] Offline queue + deferred sync + conflict resolution
 - [ ] Push notifications / reminders integration
-- [ ] Error boundary + global error/toast handling
+- [x] Error boundary + global error handling (`ErrorBoundary` at the root; requests
+      that never reach the server raise a toast, HTTP errors stay with the screen)
 - [ ] Accessibility pass (labels, dynamic type, contrast) + localization (i18n) setup
 
 ---
@@ -313,6 +318,14 @@ physically connected Android phone:
   (`com.ieltsmaster.app`).
 - Only the **Android debug** build has been run on hardware; release signing and iOS
   remain unverified (no Mac available).
+
+### Known test-hygiene issue
+- Any Jest suite that **renders a component** leaves a handle open, so the run ends
+  with "Jest did not exit one second after the test run has completed". Pure unit
+  suites (e.g. `src/constants/__tests__/colors.test.ts`) exit cleanly, and the leak
+  reproduces on suites that predate the current work, so it is in the shared render
+  setup rather than any one test. Harmless today — CI passes — but it should be
+  tracked down before it turns into flaky runs.
 
 ### Infrastructure notes learned the hard way
 - **Renaming the Android package requires clearing `android/build/generated/autolinking`.**

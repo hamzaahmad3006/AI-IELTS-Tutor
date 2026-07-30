@@ -1,14 +1,16 @@
 /** Progress & analytics screen (UI only). Logic in useProgress. */
 
 import React from 'react';
-import { ActivityIndicator, StyleSheet, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import {
   AppText,
   BandBadge,
   Button,
   Card,
+  EmptyState,
   Icon,
   LineChart,
+  SkeletonCard,
   ProgressBar,
   RadarChart,
   ScreenContainer,
@@ -36,7 +38,6 @@ const prettyTag = (tag: string): string =>
   tag.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
 
 export const Progress: React.FC = () => {
-  const theme = useTheme();
   const {
     progress,
     prediction,
@@ -49,11 +50,16 @@ export const Progress: React.FC = () => {
   } = useProgress();
 
   if (isLoading) {
+    // Skeletons rather than a spinner: the screen's shape is known, so this
+    // shows what is coming and the layout does not jump when data lands.
     return (
-      <ScreenContainer>
-        <View style={styles.center}>
-          <ActivityIndicator size="large" color={theme.colors.primary} />
-        </View>
+      <ScreenContainer scroll>
+        <AppText variant="headlineMobile" style={styles.title}>
+          Your Progress
+        </AppText>
+        <SkeletonCard lines={2} />
+        <SkeletonCard lines={4} />
+        <SkeletonCard lines={3} />
       </ScreenContainer>
     );
   }
@@ -61,13 +67,13 @@ export const Progress: React.FC = () => {
   if (error || !progress) {
     return (
       <ScreenContainer>
-        <View style={styles.center}>
-          <Icon name="info" size={40} color="error" />
-          <AppText variant="bodyMd" color="textSecondary" align="center" style={styles.errorText}>
-            {error ?? 'No progress data yet.'}
-          </AppText>
-          <Button title="Retry" onPress={reload} fullWidth={false} />
-        </View>
+        <EmptyState
+          variant="error"
+          title="Could not load your progress"
+          message={error ?? 'No progress data yet.'}
+          actionLabel="Retry"
+          onAction={reload}
+        />
       </ScreenContainer>
     );
   }
@@ -283,8 +289,6 @@ const WeaknessRow: React.FC<{ weakness: WeaknessItem }> = ({ weakness }) => {
 };
 
 const styles = StyleSheet.create({
-  center: { flex: 1, alignItems: 'center', justifyContent: 'center' },
-  errorText: { marginVertical: SPACING.md },
   title: { marginVertical: SPACING.md },
   section: { marginTop: SPACING.md },
   sectionTitle: { marginTop: SPACING.lg },
