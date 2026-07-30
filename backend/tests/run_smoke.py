@@ -37,6 +37,14 @@ def main() -> int:
         env["PYTHONPATH"] = str(BACKEND_DIR)
         env.setdefault("PYTHONWARNINGS", "ignore::DeprecationWarning")
 
+        # Pin the runtime the suites see. Child processes load backend/.env, so
+        # without these a developer's real config leaks in: AI_PROVIDER=groq made
+        # the suites issue real (billed, non-deterministic) API calls, and
+        # RATE_LIMIT_ENABLED=true made request-heavy suites 429 at random.
+        env["AI_PROVIDER"] = "mock"
+        env["RATE_LIMIT_ENABLED"] = "false"
+        env["JWT_SECRET"] = "smoke-test-secret-not-used-outside-tests"
+
         result = subprocess.run(
             [sys.executable, str(script)],
             cwd=str(BACKEND_DIR),

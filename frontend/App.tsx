@@ -10,8 +10,12 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { NavigationContainer } from '@react-navigation/native';
 import { Provider } from 'react-redux';
 import { PersistGate } from 'redux-persist/integration/react';
-import { store, persistor, refreshThunk } from './src/redux';
-import { setAuthTokenProvider, setRefreshHandler } from './src/api';
+import { store, persistor, refreshThunk, logout } from './src/redux';
+import {
+  setAuthTokenProvider,
+  setAuthFailureHandler,
+  setRefreshHandler,
+} from './src/api';
 import { RootNavigator } from './src/AppNavigation';
 import { PALETTE } from './src/constants';
 
@@ -29,6 +33,14 @@ setRefreshHandler(async () => {
     return result.tokens.accessToken;
   } catch {
     return null;
+  }
+});
+
+// Refresh failed too: drop the dead session so RootNavigator shows sign-in
+// again rather than an authenticated screen that can never load.
+setAuthFailureHandler(() => {
+  if (store.getState().auth.tokens !== null) {
+    store.dispatch(logout());
   }
 });
 

@@ -285,8 +285,37 @@ Everything **not yet completed** to finish the project, organized by area. Check
 5. **Voice pipeline** (LiveKit + STT/TTS) — the largest single remaining feature.
 6. **Production**: deploy (Docker image is CI-built), Postgres/Supabase config, observability, secrets.
 
+### Verified on real infrastructure (2026-07-30)
+
+Running against **live Supabase PostgreSQL 17.6** and the **real Groq API**, on a
+physically connected Android phone:
+
+- [x] All 12 Alembic migrations applied to Supabase — 20 tables in `public`
+- [x] Real AI scoring, and it discriminates: a weak 45-word essay scored **band 1.5**,
+      a strong 260-word essay scored **band 9.0**, with per-criterion breakdowns
+- [x] `ai_interactions` rows confirm `provider=groq`, `model=llama-3.3-70b-versatile`
+      with genuine token counts and latencies — not the mock
+- [x] Full 13-step E2E journey passes end-to-end against Supabase + Groq
+- [x] On-device: register → onboarding → Home → logout → login, all against the live
+      backend. Profile persisted (target 7.0, academic, intermediate, 30 min,
+      `consent_ai=true`), refresh token correctly rotated and the old one revoked
+
 ### Known gaps worth stating plainly
-- The app has **never been run on a device or emulator** in this environment. Verification is: `tsc`, a **release bundle build for Android + iOS** (all imports resolve), live API contract checks, and an E2E journey against the real backend. Rendering and native behaviour remain unverified.
 - Listening has **no real audio playback** yet — questions are answerable, the clip does not play.
 - Speaking is **transcript-based**, not live voice.
-- AI scoring runs through the **offline mock provider** unless `GROQ_API_KEY` is set.
+- AI scoring falls back to the **offline mock provider** when `GROQ_API_KEY` is unset.
+- The Android `applicationId` is still the RN default **`com.frontend`** — it must be
+  renamed (e.g. `com.aiieltstutor.app`) before any store submission, and that change
+  forces a fresh install.
+- Only the **Android debug** build has been run on hardware; release signing and iOS
+  remain unverified (no Mac available).
+
+### Infrastructure notes learned the hard way
+- **Use the Supabase connection pooler, not the direct endpoint.**
+  `db.<ref>.supabase.co` resolves to **IPv6 only**; on an IPv4-only network every
+  connection fails with the opaque `[WinError 121] The semaphore timeout period has
+  expired`. Use `aws-<n>-<region>.pooler.supabase.com` with user
+  `postgres.<project-ref>`. See `backend/.env.example`.
+- The engine sets `pool_recycle=300`: managed Postgres behind NAT silently drops idle
+  TCP, and a dead pooled connection surfaces as a bare `OSError` that asyncpg does not
+  classify as a disconnect, so `pool_pre_ping` alone cannot recover it.

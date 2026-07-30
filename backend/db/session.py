@@ -14,6 +14,29 @@ from core.config import get_settings
 
 _settings = get_settings()
 
+_IS_POSTGRES = _settings.database_url.startswith("postgresql")
+
+# Managed Postgres (Supabase) sits behind NAT that silently drops idle TCP
+# connections. A pooled connection that outlives the idle timeout is dead on
+# reuse, and asyncpg surfaces that as a bare OSError ("[WinError 121] The
+# semaphore timeout period has expired") which the dialect does not classify as
+# a disconnect - so pool_pre_ping alone cannot recover it and the request 500s.
+# Recycling connections well inside the idle timeout keeps them from ever
+# reaching that state; pre-ping remains as the backstop.
+_POSTGRES_OPTIONS: dict[str, object] = {
+    "pool_recycle": 300,
+    "pool_size": 5,
+    "max_overflow": 10,
+    "connect_args": {
+        # Fail fast on an unreachable host instead of hanging the request.
+        "timeout": 10,
+        "command_timeout": 30,
+        # Server-side statement names break under transaction-mode poolers
+        # (Supavisor/pgbouncer); harmless on a direct connection.
+        "statement_cache_size": 0,
+    },
+}
+
 # create_async_engine does not open a connection until first use, so importing
 # this module is safe even without a reachable database.
 engine = create_async_engine(
@@ -21,6 +44,7 @@ engine = create_async_engine(
     echo=False,
     future=True,
     pool_pre_ping=True,
+    **(_POSTGRES_OPTIONS if _IS_POSTGRES else {}),
 )
 
 SessionLocal = async_sessionmaker(
