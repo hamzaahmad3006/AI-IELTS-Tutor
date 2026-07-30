@@ -6,3 +6,4 @@ export * from './slices/authSlice';
 export * from './slices/onboardingSlice';
 export * from './slices/dashboardSlice';
 export * from './slices/themeSlice';
+export * from './slices/toastSlice';

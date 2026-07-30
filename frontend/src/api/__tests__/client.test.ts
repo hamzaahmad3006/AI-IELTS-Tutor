@@ -8,6 +8,7 @@ import {
   apiClient,
   setAuthFailureHandler,
   setAuthTokenProvider,
+  setErrorReporter,
   setRefreshHandler,
 } from '../client';
 
@@ -54,6 +55,7 @@ describe('apiClient response interceptor', () => {
     setAuthTokenProvider(() => null);
     setRefreshHandler(async () => null);
     setAuthFailureHandler(() => undefined);
+    setErrorReporter(() => undefined);
   });
 
   it('retries the request once with the refreshed token', async () => {
@@ -85,6 +87,33 @@ describe('apiClient response interceptor', () => {
 
     // Without this the user is stranded on an authenticated screen that 401s.
     expect(onAuthFailure).toHaveBeenCalledTimes(1);
+  });
+
+  it('reports a request that never reached the server', async () => {
+    // No `response` on the error: airplane mode, wrong host, backend down.
+    apiClient.defaults.adapter = () =>
+      Promise.reject(
+        new AxiosError('Network Error', AxiosError.ERR_NETWORK, undefined),
+      );
+    const report = jest.fn();
+    setErrorReporter(report);
+
+    await expect(apiClient.get('/analytics/overview')).rejects.toBeDefined();
+
+    expect(report).toHaveBeenCalledTimes(1);
+    expect(report.mock.calls[0][0]).toMatch(/No connection/);
+  });
+
+  it('does not report HTTP errors, which the calling screen handles', async () => {
+    // A 422 belongs inline next to the field, not in a global toast.
+    const { adapter } = adapterReplying([422]);
+    apiClient.defaults.adapter = adapter;
+    const report = jest.fn();
+    setErrorReporter(report);
+
+    await expect(apiClient.post('/writing/attempts')).rejects.toBeDefined();
+
+    expect(report).not.toHaveBeenCalled();
   });
 
   it('does not attempt a refresh for the login endpoint', async () => {

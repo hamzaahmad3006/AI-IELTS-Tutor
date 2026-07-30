@@ -16,12 +16,14 @@ import { authReducer } from './slices/authSlice';
 import { onboardingReducer } from './slices/onboardingSlice';
 import { dashboardReducer } from './slices/dashboardSlice';
 import { themeReducer } from './slices/themeSlice';
+import { toastReducer } from './slices/toastSlice';
 
 const rootReducer = combineReducers({
   auth: authReducer,
   onboarding: onboardingReducer,
   dashboard: dashboardReducer,
   theme: themeReducer,
+  toast: toastReducer,
 });
 
 const persistConfig = {
