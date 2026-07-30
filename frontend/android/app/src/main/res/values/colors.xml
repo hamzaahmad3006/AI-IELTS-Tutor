@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Brand indigo — PALETTE.indigo in src/constants/colors.ts. Keep in sync. -->
+    <color name="ic_launcher_background">#4F46E5</color>
+</resources>

@@ -304,13 +304,21 @@ physically connected Android phone:
 - Listening has **no real audio playback** yet — questions are answerable, the clip does not play.
 - Speaking is **transcript-based**, not live voice.
 - AI scoring falls back to the **offline mock provider** when `GROQ_API_KEY` is unset.
-- The Android `applicationId` is still the RN default **`com.frontend`** — it must be
-  renamed (e.g. `com.aiieltstutor.app`) before any store submission, and that change
-  forces a fresh install.
+- **iOS still carries the `frontend` Xcode target and bundle id.** Renaming a
+  `.pbxproj` target is invasive and there is no Mac here to verify the result, so it
+  was deliberately left alone rather than shipped unverified. Android is done
+  (`com.ieltsmaster.app`).
 - Only the **Android debug** build has been run on hardware; release signing and iOS
   remain unverified (no Mac available).
 
 ### Infrastructure notes learned the hard way
+- **Renaming the Android package requires clearing `android/build/generated/autolinking`.**
+  React Native's `GenerateEntryPointTask` reads `project.android.packageName` from that
+  cached `autolinking.json`, and it lives in the *root* `android/build` directory, which
+  `:app:clean` does not touch. Until it is deleted the build keeps emitting
+  `ReactNativeApplicationEntryPoint.java` against the old package and fails with
+  `error: package com.frontend does not exist`, even after a full clean and
+  `--rerun-tasks`.
 - **Use the Supabase connection pooler, not the direct endpoint.**
   `db.<ref>.supabase.co` resolves to **IPv6 only**; on an IPv4-only network every
   connection fails with the opaque `[WinError 121] The semaphore timeout period has
