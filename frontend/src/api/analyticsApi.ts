@@ -1,10 +1,14 @@
-/** Analytics API module (progress + band prediction). */
+/** Analytics API module (progress, band trend + prediction). */
 
 import { apiClient, toApiProblem } from './client';
 import { API_CONFIG } from './config';
 import { ENDPOINTS } from './endpoints';
-import { MOCK_PREDICTION, MOCK_PROGRESS } from './mock/fixtures';
-import type { PredictionResponse, ProgressResponse } from '../types';
+import { MOCK_PREDICTION, MOCK_PROGRESS, MOCK_TREND } from './mock/fixtures';
+import type {
+  PredictionResponse,
+  ProgressResponse,
+  TrendResponse,
+} from '../types';
 
 const delay = (ms: number): Promise<void> =>
   new Promise((resolve) => setTimeout(resolve, ms));
@@ -18,6 +22,21 @@ export const analyticsApi = {
     try {
       const { data } = await apiClient.get<ProgressResponse>(
         ENDPOINTS.analytics.progress,
+      );
+      return data;
+    } catch (error) {
+      throw toApiProblem(error);
+    }
+  },
+
+  async getTrend(): Promise<TrendResponse> {
+    if (API_CONFIG.useMock) {
+      await delay(400);
+      return MOCK_TREND;
+    }
+    try {
+      const { data } = await apiClient.get<TrendResponse>(
+        ENDPOINTS.analytics.trend,
       );
       return data;
     } catch (error) {

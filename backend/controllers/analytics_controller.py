@@ -42,6 +42,25 @@ class ProgressResponse(CamelModel):
     total_attempts: int
 
 
+class TrendPoint(CamelModel):
+    at: datetime
+    band: float
+
+
+class ModuleTrend(CamelModel):
+    module: str
+    points: list[TrendPoint]
+
+
+class TrendResponse(CamelModel):
+    modules: list[ModuleTrend]
+    # Running overall band after each attempt: the mean of the latest band in
+    # every module that has one, recomputed at each point in time. This is what
+    # a learner watches move, so it is derived server-side rather than leaving
+    # each client to reinvent it.
+    overall: list[TrendPoint]
+
+
 class PredictionModules(CamelModel):
     speaking: float | None
     writing: float | None
@@ -101,6 +120,35 @@ class AnalyticsController:
         return ProgressResponse(
             modules=modules, overall_band=overall, total_attempts=total
         )
+
+    @staticmethod
+    async def trend(session: AsyncSession, user: User) -> TrendResponse:
+        """Per-module band series plus the running overall, oldest first."""
+        module_trends: list[ModuleTrend] = []
+        # (timestamp, module, band) across every module, to replay in order.
+        merged: list[tuple[datetime, str, float]] = []
+
+        for module in MODULES:
+            points = await _module_points(session, user.id, module)
+            module_trends.append(
+                ModuleTrend(
+                    module=module,
+                    points=[TrendPoint(at=ts, band=band) for ts, band in points],
+                )
+            )
+            merged.extend((ts, module, band) for ts, band in points)
+
+        merged.sort(key=lambda row: row[0])
+
+        overall: list[TrendPoint] = []
+        latest: dict[str, float] = {}
+        for ts, module, band in merged:
+            latest[module] = band
+            overall.append(
+                TrendPoint(at=ts, band=round_half(sum(latest.values()) / len(latest)))
+            )
+
+        return TrendResponse(modules=module_trends, overall=overall)
 
     @staticmethod
     async def prediction(session: AsyncSession, user: User) -> PredictionResponse:

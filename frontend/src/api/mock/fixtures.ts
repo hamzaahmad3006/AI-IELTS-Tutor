@@ -18,6 +18,8 @@ import type {
   RecommendationsResponse,
   SpeakingResult,
   SpeakingSession,
+  TrendPoint,
+  TrendResponse,
   WeaknessList,
   WritingFeedback,
   WritingResult,
@@ -97,6 +99,23 @@ export const MOCK_PROGRESS: ProgressResponse = {
   ],
   overallBand: 7.0,
   totalAttempts: 14,
+};
+
+/** Deliberately non-monotonic, so the charts are exercised on a dip too. */
+const trendPoints = (bands: number[], startDay: number): TrendPoint[] =>
+  bands.map((band, i) => ({
+    at: new Date(Date.UTC(2026, 5, startDay + i * 3)).toISOString(),
+    band,
+  }));
+
+export const MOCK_TREND: TrendResponse = {
+  modules: [
+    { module: 'speaking', points: trendPoints([6.0, 6.5, 7.0, 7.5], 1) },
+    { module: 'writing', points: trendPoints([5.5, 6.0, 6.5], 2) },
+    { module: 'reading', points: trendPoints([6.0, 6.5, 6.0, 6.5, 7.0], 1) },
+    { module: 'listening', points: trendPoints([7.0, 7.5], 4) },
+  ],
+  overall: trendPoints([6.0, 6.0, 6.5, 6.5, 6.5, 7.0, 7.0], 1),
 };
 
 export const MOCK_PREDICTION: PredictionResponse = {

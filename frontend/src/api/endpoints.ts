@@ -65,5 +65,6 @@ export const ENDPOINTS = {
     overview: '/analytics/overview',
     progress: '/analytics/progress',
     prediction: '/analytics/prediction',
+    trend: '/analytics/trend',
   },
 } as const;

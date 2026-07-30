@@ -45,6 +45,16 @@ describe('Progress tab', () => {
     expect(screen.getByText('By module')).toBeTruthy();
     expect(screen.getByText('View attempt history')).toBeTruthy();
   });
+
+  it('renders the band trend and module balance charts', async () => {
+    renderWithProviders(<Progress />);
+    await waitFor(() => {
+      expect(screen.getByText('BAND TREND')).toBeTruthy();
+    });
+    expect(screen.getByTestId('band-trend-chart')).toBeTruthy();
+    expect(screen.getByText('MODULE BALANCE')).toBeTruthy();
+    expect(screen.getByTestId('module-balance-chart')).toBeTruthy();
+  });
 });
 
 describe('Coach tab', () => {

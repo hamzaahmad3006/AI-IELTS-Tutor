@@ -84,8 +84,11 @@ Everything **not yet completed** to finish the project, organized by area. Check
 - [x] Coach screen: recommendations (tap-through) + adaptive level per module
 - [x] Practice hub: module launcher with adaptive difficulty badges
 > All five tabs are now real screens (no placeholders remain).
-- [ ] Band trend charts (per module, line)
-- [ ] Radar chart of 4 modules
+- [x] Band trend chart — `GET /analytics/trend` serves per-module *and* running-overall
+      series; the Progress screen plots the overall line (four lines on a phone-width
+      chart is unreadable, and per-module current bands are in the radar below it)
+- [x] Radar chart of 4 modules (current band per module, unmeasured axes collapse
+      to the centre rather than reading as 0)
 - [ ] Improvement velocity + predicted exam-day band with confidence
 - [ ] Consistency / streak / time-on-task
 - [ ] Learning insights (strengths/weaknesses) cards
@@ -104,8 +107,8 @@ Everything **not yet completed** to finish the project, organized by area. Check
 
 ## 2. Frontend — Components (remaining)
 
-- [ ] Line chart / trend chart component
-- [ ] Radar chart (4-module) component
+- [x] Line chart / trend chart component (`LineChart`, SVG, fixed 0-9 band axis)
+- [x] Radar chart component (`RadarChart`, SVG, n-axis)
 - [ ] Waveform recorder / live audio visualizer
 - [ ] Audio player with scrubber + speed control
 - [x] Question rendering (MCQ / True-False-Not-Given radio options + short-answer input) — [ ] Matching Headings drag-connect

@@ -15,6 +15,23 @@ export interface ProgressResponse {
   totalAttempts: number;
 }
 
+/** One scored attempt on the band timeline. `at` is an ISO-8601 timestamp. */
+export interface TrendPoint {
+  at: string;
+  band: Band;
+}
+
+export interface ModuleTrend {
+  module: IeltsModule;
+  points: TrendPoint[];
+}
+
+export interface TrendResponse {
+  modules: ModuleTrend[];
+  /** Running overall band recomputed after each attempt, oldest first. */
+  overall: TrendPoint[];
+}
+
 export interface PredictionModules {
   speaking: Band | null;
   writing: Band | null;
