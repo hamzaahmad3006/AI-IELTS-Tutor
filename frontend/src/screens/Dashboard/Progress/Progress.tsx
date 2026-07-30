@@ -8,14 +8,19 @@ import {
   Button,
   Card,
   Icon,
+  LineChart,
   ProgressBar,
+  RadarChart,
   ScreenContainer,
   useTheme,
+  type LineSeries,
+  type RadarAxis,
 } from '../../../components';
 import { getBandColor, RADIUS, SPACING } from '../../../constants';
 import type {
   ModuleProgressStat,
   PredictionResponse,
+  TrendResponse,
   WeaknessItem,
 } from '../../../types';
 import { useProgress } from './useProgress';
@@ -35,6 +40,7 @@ export const Progress: React.FC = () => {
   const {
     progress,
     prediction,
+    trend,
     weaknesses,
     isLoading,
     error,
@@ -107,6 +113,10 @@ export const Progress: React.FC = () => {
         </View>
       </Card>
 
+      {/* Band trend + module balance */}
+      {trend ? <TrendCard trend={trend} /> : null}
+      <BalanceCard modules={progress.modules} />
+
       {/* Prediction */}
       {prediction ? <PredictionCard prediction={prediction} /> : null}
 
@@ -138,6 +148,49 @@ export const Progress: React.FC = () => {
         </>
       ) : null}
     </ScreenContainer>
+  );
+};
+
+const TrendCard: React.FC<{ trend: TrendResponse }> = ({ trend }) => {
+  const theme = useTheme();
+
+  // Overall only: four module lines on a phone-width chart is unreadable, and
+  // the per-module breakdown already lives in the radar and the rows below.
+  const series: LineSeries[] = [
+    {
+      label: 'Overall band',
+      color: theme.colors.primary,
+      values: trend.overall.map((point) => point.band),
+    },
+  ];
+
+  return (
+    <Card style={styles.section}>
+      <AppText variant="labelMd" color="textSecondary">
+        BAND TREND
+      </AppText>
+      <LineChart series={series} testID="band-trend-chart" />
+    </Card>
+  );
+};
+
+const BalanceCard: React.FC<{ modules: ModuleProgressStat[] }> = ({
+  modules,
+}) => {
+  const axes: RadarAxis[] = modules.map((stat) => ({
+    label: MODULE_LABELS[stat.module] ?? stat.module,
+    value: stat.currentBand,
+  }));
+
+  return (
+    <Card style={styles.section}>
+      <AppText variant="labelMd" color="textSecondary">
+        MODULE BALANCE
+      </AppText>
+      <View style={styles.radarWrap}>
+        <RadarChart axes={axes} testID="module-balance-chart" />
+      </View>
+    </Card>
   );
 };
 
@@ -254,6 +307,7 @@ const styles = StyleSheet.create({
   horizon: { marginTop: SPACING.xs },
   disclaimer: { marginTop: SPACING.xs },
   moduleCard: { marginTop: SPACING.sm },
+  radarWrap: { alignItems: 'center', marginTop: SPACING.sm },
   moduleHead: {
     flexDirection: 'row',
     justifyContent: 'space-between',

@@ -8,6 +8,7 @@ import type {
   PredictionResponse,
   ProgressResponse,
   RootStackParamList,
+  TrendResponse,
   WeaknessItem,
 } from '../../../types';
 
@@ -16,6 +17,7 @@ type Nav = NativeStackNavigationProp<RootStackParamList>;
 interface UseProgressResult {
   progress: ProgressResponse | null;
   prediction: PredictionResponse | null;
+  trend: TrendResponse | null;
   weaknesses: WeaknessItem[];
   isLoading: boolean;
   error: string | null;
@@ -27,6 +29,7 @@ export const useProgress = (): UseProgressResult => {
   const navigation = useNavigation<Nav>();
   const [progress, setProgress] = useState<ProgressResponse | null>(null);
   const [prediction, setPrediction] = useState<PredictionResponse | null>(null);
+  const [trend, setTrend] = useState<TrendResponse | null>(null);
   const [weaknesses, setWeaknesses] = useState<WeaknessItem[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -35,13 +38,16 @@ export const useProgress = (): UseProgressResult => {
     setIsLoading(true);
     setError(null);
     try {
-      const [progressData, predictionData, weaknessData] = await Promise.all([
-        analyticsApi.getProgress(),
-        analyticsApi.getPrediction(),
-        meApi.getWeaknesses(),
-      ]);
+      const [progressData, predictionData, trendData, weaknessData] =
+        await Promise.all([
+          analyticsApi.getProgress(),
+          analyticsApi.getPrediction(),
+          analyticsApi.getTrend(),
+          meApi.getWeaknesses(),
+        ]);
       setProgress(progressData);
       setPrediction(predictionData);
+      setTrend(trendData);
       setWeaknesses(weaknessData.items);
     } catch {
       setError('Could not load your progress. Pull to retry.');
@@ -61,6 +67,7 @@ export const useProgress = (): UseProgressResult => {
   return {
     progress,
     prediction,
+    trend,
     weaknesses,
     isLoading,
     error,

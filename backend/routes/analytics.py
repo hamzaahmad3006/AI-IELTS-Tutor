@@ -11,6 +11,7 @@ from controllers.analytics_controller import (
     AnalyticsController,
     PredictionResponse,
     ProgressResponse,
+    TrendResponse,
 )
 from db.session import get_db
 from dependencies import get_current_user
@@ -25,6 +26,11 @@ CurrentUser = Annotated[User, Depends(get_current_user)]
 @router.get("/progress", response_model=ProgressResponse)
 async def progress(current: CurrentUser, session: DbSession) -> ProgressResponse:
     return await AnalyticsController.progress(session, current)
+
+
+@router.get("/trend", response_model=TrendResponse)
+async def trend(current: CurrentUser, session: DbSession) -> TrendResponse:
+    return await AnalyticsController.trend(session, current)
 
 
 @router.get("/prediction", response_model=PredictionResponse)
