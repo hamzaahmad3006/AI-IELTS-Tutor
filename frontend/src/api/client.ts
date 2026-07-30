@@ -16,9 +16,12 @@ import type { ApiProblem } from '../types';
 type TokenProvider = () => string | null;
 /** Performs a token refresh and resolves the new access token (or null). */
 type RefreshHandler = () => Promise<string | null>;
+/** Called when the session is definitively unrecoverable. */
+type AuthFailureHandler = () => void;
 
 let getAccessToken: TokenProvider = () => null;
 let refreshHandler: RefreshHandler | null = null;
+let authFailureHandler: AuthFailureHandler | null = null;
 let refreshInFlight: Promise<string | null> | null = null;
 
 export const setAuthTokenProvider = (provider: TokenProvider): void => {
@@ -28,6 +31,19 @@ export const setAuthTokenProvider = (provider: TokenProvider): void => {
 /** Wire the refresh flow (set from the app root, backed by Redux). */
 export const setRefreshHandler = (handler: RefreshHandler): void => {
   refreshHandler = handler;
+};
+
+/**
+ * Wire the terminal auth-failure path (set from the app root).
+ *
+ * Without this, a persisted session whose refresh token is *also* rejected
+ * leaves the user inside the authenticated navigator with every request 401ing:
+ * a blank screen, no error, and no route back to sign-in. That is not an edge
+ * case - it happens on refresh-token expiry, a password change, an admin
+ * revoking sessions, or the API being repointed at a different database.
+ */
+export const setAuthFailureHandler = (handler: AuthFailureHandler): void => {
+  authFailureHandler = handler;
 };
 
 interface RetryableConfig extends InternalAxiosRequestConfig {
@@ -74,6 +90,9 @@ apiClient.interceptors.response.use(
         original.headers.set('Authorization', `Bearer ${newToken}`);
         return apiClient(original);
       }
+      // Refresh failed: the session cannot be recovered. Clear it so the app
+      // returns to the sign-in screen instead of stranding the user.
+      authFailureHandler?.();
     }
     return Promise.reject(error);
   },
