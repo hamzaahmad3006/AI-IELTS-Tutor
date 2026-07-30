@@ -1,4 +1,4 @@
-package com.frontend
+package com.ieltsmaster.app
 
 import android.app.Application
 import com.facebook.react.PackageList
