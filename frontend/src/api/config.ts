@@ -1,30 +1,71 @@
 /**
  * API configuration.
  *
- * Defaults are chosen so `npm run android` / `npm run ios` reach a backend
- * running on the development machine without editing code:
- *   - Android emulator reaches the host via 10.0.2.2
- *   - iOS simulator shares the host network, so localhost works
+ * In development the API host is derived from the Metro dev-server URL, so the
+ * same build works on an emulator and on a physical phone with no code edits:
+ *   - emulator   -> Metro is 10.0.2.2 (Android) / localhost (iOS)
+ *   - real phone -> Metro is the development machine's LAN IP (192.168.x.x)
  *
- * To point at a physical device, staging or production, set API_BASE_URL below
- * (or wire it to an env loader such as react-native-config).
+ * The phone must be on the same Wi-Fi network as the machine running the
+ * backend, and the backend must listen on all interfaces:
+ *     uvicorn main:app --host 0.0.0.0 --port 8000
  */
 
-import { Platform } from 'react-native';
+import { NativeModules, Platform } from 'react-native';
 
-/** Host that reaches the developer machine from each platform's emulator. */
-const DEV_HOST = Platform.select({
-  android: '10.0.2.2',
+const DEV_PORT = 8000;
+
+/** Fallback host per platform when the Metro URL cannot be read. */
+const FALLBACK_HOST = Platform.select({
+  android: '10.0.2.2', // Android emulator's alias for the host machine
   ios: 'localhost',
   default: 'localhost',
 });
 
-const DEV_PORT = 8000;
+const hostFromUrl = (url: string | undefined): string | null => {
+  if (typeof url !== 'string') {
+    return null;
+  }
+  // e.g. http://192.168.18.61:8081/index.bundle?platform=android -> 192.168.18.61
+  const match = url.match(/^https?:\/\/([^/:]+)(?::\d+)?/);
+  return match ? match[1] : null;
+};
 
 /**
- * Override to target a real device or a deployed environment, e.g.
- *   const API_BASE_URL = 'http://192.168.1.42:8000/v1';   // physical device
- *   const API_BASE_URL = 'https://api.aitutor.app/v1';     // production
+ * Host of the Metro dev server (i.e. the development machine) — exactly the
+ * address the device has already proven it can reach.
+ *
+ * `getDevServer()` is used first because `NativeModules.SourceCode` is not
+ * exposed under the New Architecture (Fabric); relying on it alone silently
+ * fell back to the emulator alias and broke physical devices.
+ */
+const metroHost = (): string | null => {
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    const getDevServer = require('react-native/Libraries/Core/Devtools/getDevServer') as
+      | (() => { url?: string })
+      | { default?: () => { url?: string } };
+    const fn =
+      typeof getDevServer === 'function' ? getDevServer : getDevServer.default;
+    const host = hostFromUrl(fn?.().url);
+    if (host) {
+      return host;
+    }
+  } catch {
+    // Not available (e.g. release build or test runner) - fall through.
+  }
+  return hostFromUrl(
+    (NativeModules as { SourceCode?: { scriptURL?: string } }).SourceCode
+      ?.scriptURL,
+  );
+};
+
+const devHost = (): string => metroHost() ?? FALLBACK_HOST;
+
+/**
+ * Set this to target a deployed environment, e.g.
+ *   const API_BASE_URL = 'https://api.aitutor.app/v1';
+ * Leave null in development to use the auto-detected host above.
  */
 const API_BASE_URL: string | null = null;
 
@@ -34,18 +75,35 @@ const API_BASE_URL: string | null = null;
  * Set to false to develop against the real API (see backend/README.md to start
  * it). This only applies in development — see `useMock` below.
  */
-const USE_MOCK_IN_DEV = true;
+const USE_MOCK_IN_DEV = false;
+
+/**
+ * Unit tests always use fixtures - there is no backend in the test runner.
+ * `process` is provided by Jest/Node but is not in React Native's type set,
+ * so it is read defensively rather than pulling in @types/node.
+ */
+const isTest =
+  (globalThis as { process?: { env?: { NODE_ENV?: string } } }).process?.env
+    ?.NODE_ENV === 'test';
 
 /**
  * Mock data must never reach a release build: shipping fixtures would show
  * every user the same invented bands and feedback. `__DEV__` is false in
- * release bundles, so mocks are impossible there regardless of the flag above.
+ * release bundles, so mocks are impossible there regardless of the flags above.
  */
-const useMock = __DEV__ && USE_MOCK_IN_DEV;
+const useMock = __DEV__ && (USE_MOCK_IN_DEV || isTest);
 
 export const API_CONFIG = {
-  baseUrl: API_BASE_URL ?? `http://${DEV_HOST}:${DEV_PORT}/v1`,
+  baseUrl: API_BASE_URL ?? `http://${devHost()}:${DEV_PORT}/v1`,
   timeoutMs: 30000,
   version: 'v1',
   useMock,
 } as const;
+
+if (__DEV__ && !isTest) {
+  // Surfaces the resolved backend address in Metro/logcat, which is the first
+  // thing to check when a device reports "Network Error".
+  console.log(
+    `[api] baseUrl=${API_CONFIG.baseUrl} useMock=${API_CONFIG.useMock}`,
+  );
+}
