@@ -60,9 +60,14 @@ Everything **not yet completed** to finish the project, organized by area. Check
 - [x] Prompt delivered from the backend prompt bank (random within difficulty)
 - [x] Essay editor (multiline, live word count, submit) + AI-scored result (band, 4 criteria, feedback, improved essay)
 - [x] Submission → scoring pending/loading state
-- [ ] Task selection UI (Task 1 vs Task 2, Academic vs General)
-- [ ] Task 1 chart/image assets
-- [ ] Writing timer
+- [x] Task selection UI — Academic/General x Task 1/Task 2, with the Task 1 label
+      following the paper (Report vs Letter) and the word target switching with it
+- [ ] Task 1 chart/image assets — Task 1 prompts currently state their data as text
+      (a table and a process list), so they are fully answerable; real chart images
+      would be an upgrade rather than a fix
+- [x] Writing timer — real IELTS allowances (20 min Task 1, 40 min Task 2), amber
+      under 5 minutes, start/pause/restart. Expiry never discards or force-submits
+      the essay; it only stops claiming there is time left
 - [x] Writing history (unified History screen) — [ ] band-trend chart + essay diffs
 
 ### Reading (built)
