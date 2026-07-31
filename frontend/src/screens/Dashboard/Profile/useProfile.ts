@@ -3,8 +3,10 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { profileApi } from '../../../api';
+import { Share } from 'react-native';
+import { meApi, profileApi } from '../../../api';
 import {
+  logout,
   logoutThunk,
   showToast,
   toggleTheme,
@@ -39,6 +41,13 @@ interface UseProfileResult {
   openDateSheet: () => void;
   closeDateSheet: () => void;
   onChangeExamDate: (isoDate: string | null) => void;
+  isExporting: boolean;
+  onExportData: () => void;
+  deleteSheetOpen: boolean;
+  openDeleteSheet: () => void;
+  closeDeleteSheet: () => void;
+  isDeleting: boolean;
+  onDeleteAccount: () => void;
   onToggleTheme: () => void;
   onLogout: () => void;
 }
@@ -58,6 +67,9 @@ export const useProfile = (): UseProfileResult => {
   const [error, setError] = useState<string | null>(null);
   const [consentSheetOpen, setConsentSheetOpen] = useState<boolean>(false);
   const [dateSheetOpen, setDateSheetOpen] = useState<boolean>(false);
+  const [deleteSheetOpen, setDeleteSheetOpen] = useState<boolean>(false);
+  const [isExporting, setIsExporting] = useState<boolean>(false);
+  const [isDeleting, setIsDeleting] = useState<boolean>(false);
 
   useEffect(() => {
     let mounted = true;
@@ -142,6 +154,49 @@ export const useProfile = (): UseProfileResult => {
     [patch],
   );
 
+  const onExportData = useCallback((): void => {
+    setIsExporting(true);
+    meApi
+      .exportData()
+      .then((data) =>
+        // Share is part of React Native itself, so the export needs no
+        // filesystem permission or native module: the learner picks where it
+        // goes (mail, Drive, notes) and the app never touches storage.
+        Share.share({
+          title: 'My IELTS Master data export',
+          message: JSON.stringify(data, null, 2),
+        }),
+      )
+      .catch(() =>
+        dispatch(
+          showToast({ message: 'Could not export your data.', tone: 'error' }),
+        ),
+      )
+      .finally(() => setIsExporting(false));
+  }, [dispatch]);
+
+  const onDeleteAccount = useCallback((): void => {
+    setIsDeleting(true);
+    meApi
+      .deleteAccount()
+      .then(() => {
+        setDeleteSheetOpen(false);
+        // The session is already dead server-side; clear it locally and send
+        // the user back to the start rather than into a 401 loop.
+        dispatch(logout());
+        navigation.reset({ index: 0, routes: [{ name: 'Splash' }] });
+      })
+      .catch(() =>
+        dispatch(
+          showToast({
+            message: 'Could not delete your account. Please try again.',
+            tone: 'error',
+          }),
+        ),
+      )
+      .finally(() => setIsDeleting(false));
+  }, [dispatch, navigation]);
+
   const onToggleTheme = useCallback((): void => {
     dispatch(toggleTheme());
   }, [dispatch]);
@@ -169,6 +224,13 @@ export const useProfile = (): UseProfileResult => {
     openDateSheet: () => setDateSheetOpen(true),
     closeDateSheet: () => setDateSheetOpen(false),
     onChangeExamDate,
+    isExporting,
+    onExportData,
+    deleteSheetOpen,
+    openDeleteSheet: () => setDeleteSheetOpen(true),
+    closeDeleteSheet: () => setDeleteSheetOpen(false),
+    isDeleting,
+    onDeleteAccount,
     onToggleTheme,
     onLogout,
   };

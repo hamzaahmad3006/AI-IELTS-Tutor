@@ -9,6 +9,7 @@ import {
   Card,
   ConsentSheet,
   DatePickerSheet,
+  DeleteAccountSheet,
   Icon,
   ScreenContainer,
   useTheme,
@@ -39,6 +40,13 @@ export const Profile: React.FC = () => {
     openDateSheet,
     closeDateSheet,
     onChangeExamDate,
+    isExporting,
+    onExportData,
+    deleteSheetOpen,
+    openDeleteSheet,
+    closeDeleteSheet,
+    isDeleting,
+    onDeleteAccount,
   } = useProfile();
 
   if (isLoading) {
@@ -56,6 +64,13 @@ export const Profile: React.FC = () => {
         onClose={closeConsentSheet}
         onSave={onSaveConsent}
         isSaving={isSaving}
+      />
+
+      <DeleteAccountSheet
+        visible={deleteSheetOpen}
+        onClose={closeDeleteSheet}
+        onConfirm={onDeleteAccount}
+        isDeleting={isDeleting}
       />
 
       <DatePickerSheet
@@ -213,6 +228,29 @@ export const Profile: React.FC = () => {
         </View>
       </Card>
 
+      {/* Your data */}
+      <Card style={styles.card}>
+        <AppText variant="bodyMd">Your data</AppText>
+        <AppText variant="labelSm" color="textSecondary" style={styles.dataHint}>
+          Export everything we hold about you, or erase it for good.
+        </AppText>
+        <Button
+          title={isExporting ? 'Preparing…' : 'Export my data'}
+          variant="secondary"
+          onPress={onExportData}
+          disabled={isExporting}
+          style={styles.dataAction}
+          testID="export-data-button"
+        />
+        <Button
+          title="Delete my account"
+          variant="secondary"
+          onPress={openDeleteSheet}
+          style={styles.dataAction}
+          testID="open-delete-sheet"
+        />
+      </Card>
+
       {/* Appearance */}
       <Card style={styles.card}>
         <View style={styles.rowBetween}>
@@ -272,5 +310,7 @@ const styles = StyleSheet.create({
   baselineLabel: { flex: 1 },
   saving: { marginBottom: SPACING.sm },
   consentSummary: { flex: 1, paddingRight: SPACING.sm },
+  dataHint: { marginTop: 2 },
+  dataAction: { marginTop: SPACING.sm },
   logout: { marginTop: SPACING.xs },
 });

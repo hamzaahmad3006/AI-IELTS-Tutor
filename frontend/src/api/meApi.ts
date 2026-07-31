@@ -5,11 +5,14 @@ import { API_CONFIG } from './config';
 import { ENDPOINTS } from './endpoints';
 import {
   MOCK_ADAPTIVE_DIFFICULTY,
+  MOCK_DATA_EXPORT,
   MOCK_RECOMMENDATIONS,
   MOCK_WEAKNESSES,
 } from './mock/fixtures';
 import type {
   AdaptiveDifficultyResponse,
+  DataExport,
+  DeleteAccountResponse,
   RecommendationsResponse,
   WeaknessList,
 } from '../types';
@@ -57,6 +60,33 @@ export const meApi = {
     try {
       const { data } = await apiClient.get<RecommendationsResponse>(
         ENDPOINTS.me.recommendations,
+      );
+      return data;
+    } catch (error) {
+      throw toApiProblem(error);
+    }
+  },
+  async exportData(): Promise<DataExport> {
+    if (API_CONFIG.useMock) {
+      await delay(300);
+      return MOCK_DATA_EXPORT;
+    }
+    try {
+      const { data } = await apiClient.get<DataExport>(ENDPOINTS.me.export);
+      return data;
+    } catch (error) {
+      throw toApiProblem(error);
+    }
+  },
+
+  async deleteAccount(): Promise<DeleteAccountResponse> {
+    if (API_CONFIG.useMock) {
+      await delay(300);
+      return { deleted: true, removed: { account: 1 } };
+    }
+    try {
+      const { data } = await apiClient.delete<DeleteAccountResponse>(
+        ENDPOINTS.me.deleteAccount,
       );
       return data;
     } catch (error) {

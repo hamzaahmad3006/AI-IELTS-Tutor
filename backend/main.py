@@ -17,6 +17,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from core.config import get_settings
+from core.logging import configure_logging
 from db.session import init_models, seed_admin
 from middleware import CorrelationIdMiddleware, register_exception_handlers
 from routes import api_router
@@ -28,6 +29,10 @@ API_V1_PREFIX = "/v1"
 
 @asynccontextmanager
 async def lifespan(_: FastAPI) -> AsyncIterator[None]:
+    # Installed here rather than at import time so uvicorn has already set up
+    # its own handlers and ours replace them cleanly.
+    configure_logging(get_settings().log_level)
+
     # Dev convenience: auto-create tables + seed an admin when running on SQLite.
     # Production (PostgreSQL) uses Alembic migrations + a provisioned admin.
     if get_settings().is_sqlite:

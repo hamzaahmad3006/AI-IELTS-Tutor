@@ -16,6 +16,7 @@ import type {
   ReadingPassage,
   ReadingResult,
   RecommendationsResponse,
+  DataExport,
   SpeakingResult,
   SpeakingSession,
   TrendPoint,
@@ -347,4 +348,23 @@ export const MOCK_WRITING_FEEDBACK: WritingFeedback = {
         'Replace generic words like "bad" and "problem" with topic-specific vocabulary like "detrimental" and "ecological crisis."',
     },
   ],
+};
+
+export const MOCK_DATA_EXPORT: DataExport = {
+  exportedAt: '2026-06-01T10:00:00Z',
+  account: {
+    id: 'usr_mock_1',
+    email: 'sarah@example.com',
+    fullName: 'Sarah Ahmed',
+    role: 'learner',
+    emailVerified: true,
+    createdAt: '2026-05-01T09:00:00Z',
+  },
+  profile: { target_band: 7.5, exam_type: 'academic' },
+  writingAttempts: [{ overall_band: 6.5 }],
+  speakingAttempts: [{ overall_band: 7.0 }],
+  readingAttempts: [{ band: 7.0 }],
+  listeningAttempts: [{ band: 7.5 }],
+  weaknesses: [{ tag: 'article_use', severity: 0.4 }],
+  vocabReviews: [],
 };

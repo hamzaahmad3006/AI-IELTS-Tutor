@@ -114,7 +114,13 @@ Everything **not yet completed** to finish the project, organized by area. Check
 - [ ] Notification & reminder scheduling
 - [x] Consent management — reachable any time from Profile, both consents
       withdrawable, and withdrawing AI states what stops working
-- [ ] Data export + delete account (privacy)
+- [x] Data export — `GET /me/export` returns every table the learner owns as JSON,
+      shared from the app via RN's built-in `Share` (no filesystem permission or
+      native module). Credential hashes are never included
+- [x] Delete account — `DELETE /me` erases all owned rows and revokes sessions,
+      behind a type-DELETE confirmation. AI usage rows are anonymised rather than
+      deleted so historical cost reporting stays honest, and the audit row outlives
+      the account
 - [ ] Offline mode banner + sync status UI — `EmptyState variant="offline"` and the
       network-error toast exist, but true connectivity *detection* needs
       `@react-native-community/netinfo` (native module + rebuild)
@@ -168,7 +174,10 @@ Everything **not yet completed** to finish the project, organized by area. Check
 - [ ] Repository layer (base + per-aggregate repos)
 - [x] Service/use-case logic + dependency injection (auth) — extend to other domains
 - [x] Unit-of-Work / transaction handling (request-scoped commit/rollback)
-- [ ] Structured logging + correlation propagation (extend middleware)
+- [x] Structured logging + correlation propagation — single-line JSON logs, the
+      correlation id carried in a ContextVar so any code reached during a request
+      gets it without threading it through call signatures; it is the same id the
+      client saw in `X-Correlation-Id`
 - [x] Rate limiting (in-memory fixed-window on auth + AI endpoints, 429 problem+json + Retry-After) — [ ] Redis backing for multi-instance
 - [ ] Redis integration (cache + queue)
 - [ ] Background job runner (Celery/arq) + task definitions
