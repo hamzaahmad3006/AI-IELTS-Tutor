@@ -19,6 +19,8 @@ export const ENDPOINTS = {
     weaknesses: '/me/weaknesses',
     adaptiveDifficulty: '/me/adaptive-difficulty',
     recommendations: '/me/recommendations',
+    export: '/me/export',
+    deleteAccount: '/me',
   },
   planner: {
     generate: '/plans/generate',

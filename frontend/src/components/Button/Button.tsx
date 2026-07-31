@@ -25,11 +25,13 @@ interface ButtonProps {
   icon?: IconName;
   fullWidth?: boolean;
   style?: ViewStyle;
+  testID?: string;
 }
 
 export const Button: React.FC<ButtonProps> = ({
   title,
   onPress,
+  testID,
   variant = 'primary',
   loading = false,
   disabled = false,
@@ -81,7 +83,12 @@ export const Button: React.FC<ButtonProps> = ({
 
   if (variant === 'primary') {
     return (
-      <Pressable onPress={onPress} disabled={isDisabled} style={style}>
+      <Pressable
+        onPress={onPress}
+        disabled={isDisabled}
+        style={style}
+        testID={testID}
+      >
         <LinearGradient
           colors={[theme.colors.accentGradientStart, theme.colors.accentGradientEnd]}
           start={{ x: 0, y: 0 }}
@@ -103,6 +110,7 @@ export const Button: React.FC<ButtonProps> = ({
     <Pressable
       onPress={onPress}
       disabled={isDisabled}
+      testID={testID}
       style={[base, variantStyle, style]}
     >
       {content}

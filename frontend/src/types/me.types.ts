@@ -40,3 +40,43 @@ export interface RecommendationsResponse {
   items: Recommendation[];
   message: string;
 }
+
+/**
+ * Recursive JSON type. The data export contains whole database rows whose
+ * shapes are the backend's business, so this models "arbitrary JSON" precisely
+ * rather than reaching for `any`/`unknown`.
+ */
+export type JsonValue =
+  | string
+  | number
+  | boolean
+  | null
+  | JsonValue[]
+  | { [key: string]: JsonValue };
+
+export interface DataExportAccount {
+  id: string;
+  email: string;
+  fullName: string;
+  role: string;
+  emailVerified: boolean;
+  createdAt: string;
+}
+
+export interface DataExport {
+  exportedAt: string;
+  account: DataExportAccount;
+  profile: JsonValue;
+  writingAttempts: JsonValue[];
+  speakingAttempts: JsonValue[];
+  readingAttempts: JsonValue[];
+  listeningAttempts: JsonValue[];
+  weaknesses: JsonValue[];
+  vocabReviews: JsonValue[];
+}
+
+export interface DeleteAccountResponse {
+  deleted: boolean;
+  /** Rows removed per table, so deletion is verifiable rather than asserted. */
+  removed: Record<string, number>;
+}

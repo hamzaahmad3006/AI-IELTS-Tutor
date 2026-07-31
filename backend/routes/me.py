@@ -12,6 +12,10 @@ from controllers.adaptive_controller import (
     DifficultyResponse,
     RecommendationsResponse,
 )
+from controllers.privacy_controller import (
+    DeleteAccountResponse,
+    PrivacyController,
+)
 from controllers.weakness_controller import WeaknessListResponse, WeaknessService
 from db.session import get_db
 from dependencies import get_current_user
@@ -44,3 +48,19 @@ async def recommendations(
     current: CurrentUser, session: DbSession
 ) -> RecommendationsResponse:
     return await AdaptiveController.recommendations(session, current)
+
+
+@router.get("/export")
+async def export_data(
+    current: CurrentUser, session: DbSession
+) -> dict[str, object]:
+    """Everything held about the signed-in learner, as JSON."""
+    return await PrivacyController.export(session, current)
+
+
+@router.delete("", response_model=DeleteAccountResponse)
+async def delete_account(
+    current: CurrentUser, session: DbSession
+) -> DeleteAccountResponse:
+    """Irreversibly erase the signed-in learner and all their data."""
+    return await PrivacyController.delete_account(session, current)

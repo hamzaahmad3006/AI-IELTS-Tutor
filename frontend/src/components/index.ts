@@ -23,6 +23,7 @@ export {
   buildMonthGrid,
   toIsoDate,
 } from './DatePickerSheet/DatePickerSheet';
+export { DeleteAccountSheet } from './DeleteAccountSheet/DeleteAccountSheet';
 export {
   EmptyState,
   type EmptyStateVariant,
