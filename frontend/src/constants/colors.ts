@@ -119,6 +119,8 @@ export const LIGHT_COLORS = {
 
   // Shadow
   shadow: 'rgba(79, 70, 229, 0.15)',
+  // Dimming layer behind modals and bottom sheets.
+  scrim: 'rgba(19, 27, 46, 0.45)',
 } as const;
 
 /** Dark theme semantic colors. */
@@ -167,6 +169,7 @@ export const DARK_COLORS = {
   strongHighlight: '#2A2470',
 
   shadow: 'rgba(0, 0, 0, 0.5)',
+  scrim: 'rgba(0, 0, 0, 0.6)',
 } as const;
 
 /**

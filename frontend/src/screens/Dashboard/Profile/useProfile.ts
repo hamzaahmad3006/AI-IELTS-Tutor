@@ -6,10 +6,12 @@ import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { profileApi } from '../../../api';
 import {
   logoutThunk,
+  showToast,
   toggleTheme,
   useAppDispatch,
   useAppSelector,
 } from '../../../redux';
+import type { ConsentValues } from '../../../components';
 import type {
   AuthenticatedUser,
   Band,
@@ -29,6 +31,14 @@ interface UseProfileResult {
   themeMode: ThemeMode;
   onChangeTargetBand: (band: Band) => void;
   onChangeDailyMinutes: (minutes: number) => void;
+  consentSheetOpen: boolean;
+  openConsentSheet: () => void;
+  closeConsentSheet: () => void;
+  onSaveConsent: (next: ConsentValues) => void;
+  dateSheetOpen: boolean;
+  openDateSheet: () => void;
+  closeDateSheet: () => void;
+  onChangeExamDate: (isoDate: string | null) => void;
   onToggleTheme: () => void;
   onLogout: () => void;
 }
@@ -46,6 +56,8 @@ export const useProfile = (): UseProfileResult => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [isSaving, setIsSaving] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+  const [consentSheetOpen, setConsentSheetOpen] = useState<boolean>(false);
+  const [dateSheetOpen, setDateSheetOpen] = useState<boolean>(false);
 
   useEffect(() => {
     let mounted = true;
@@ -70,16 +82,30 @@ export const useProfile = (): UseProfileResult => {
   }, []);
 
   const patch = useCallback(
-    (changes: { targetBand?: Band; dailyMinutes?: number }): void => {
+    (
+      changes: {
+        targetBand?: Band;
+        dailyMinutes?: number;
+        examDate?: string | null;
+        consentAi?: boolean;
+        consentVoice?: boolean;
+      },
+      successMessage?: string,
+    ): Promise<void> => {
       setIsSaving(true);
       setError(null);
-      profileApi
+      return profileApi
         .updateProfile(changes)
-        .then((updated) => setProfile(updated))
+        .then((updated) => {
+          setProfile(updated);
+          if (successMessage) {
+            dispatch(showToast({ message: successMessage, tone: 'success' }));
+          }
+        })
         .catch(() => setError('Could not save your changes.'))
         .finally(() => setIsSaving(false));
     },
-    [],
+    [dispatch],
   );
 
   const onChangeTargetBand = useCallback(
@@ -92,6 +118,26 @@ export const useProfile = (): UseProfileResult => {
   const onChangeDailyMinutes = useCallback(
     (minutes: number): void => {
       patch({ dailyMinutes: minutes });
+    },
+    [patch],
+  );
+
+  const onSaveConsent = useCallback(
+    (next: ConsentValues): void => {
+      void patch(
+        { consentAi: next.consentAi, consentVoice: next.consentVoice },
+        'Consent preferences saved.',
+      ).then(() => setConsentSheetOpen(false));
+    },
+    [patch],
+  );
+
+  const onChangeExamDate = useCallback(
+    (isoDate: string | null): void => {
+      void patch(
+        { examDate: isoDate },
+        isoDate ? 'Exam date updated.' : 'Exam date cleared.',
+      ).then(() => setDateSheetOpen(false));
     },
     [patch],
   );
@@ -115,6 +161,14 @@ export const useProfile = (): UseProfileResult => {
     themeMode,
     onChangeTargetBand,
     onChangeDailyMinutes,
+    consentSheetOpen,
+    openConsentSheet: () => setConsentSheetOpen(true),
+    closeConsentSheet: () => setConsentSheetOpen(false),
+    onSaveConsent,
+    dateSheetOpen,
+    openDateSheet: () => setDateSheetOpen(true),
+    closeDateSheet: () => setDateSheetOpen(false),
+    onChangeExamDate,
     onToggleTheme,
     onLogout,
   };
