@@ -5,6 +5,7 @@ import { API_CONFIG } from './config';
 import { ENDPOINTS } from './endpoints';
 import { MOCK_WRITING_FEEDBACK, MOCK_WRITING_RESULT } from './mock/fixtures';
 import type {
+  ExamType,
   WritingFeedback,
   WritingHistoryPage,
   WritingPrompt,
@@ -30,15 +31,24 @@ const MOCK_PROMPT: WritingPrompt = {
 
 export const writingApi = {
   /** Fetch a Task 1/2 prompt from the backend prompt bank. */
-  async getPrompt(taskNumber = 2): Promise<WritingPrompt> {
+  async getPrompt(
+    taskNumber = 2,
+    examType: ExamType = 'academic',
+  ): Promise<WritingPrompt> {
     if (API_CONFIG.useMock) {
       await delay(300);
-      return MOCK_PROMPT;
+      // Reflect the requested paper so the selector is demonstrable offline.
+      return {
+        ...MOCK_PROMPT,
+        taskNumber,
+        examType,
+        minWords: taskNumber === 1 ? 150 : 250,
+      };
     }
     try {
       const { data } = await apiClient.get<WritingPrompt>(
         ENDPOINTS.writing.prompts,
-        { params: { taskNumber } },
+        { params: { taskNumber, examType } },
       );
       return data;
     } catch (error) {

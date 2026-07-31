@@ -7,7 +7,7 @@
  */
 
 import React from 'react';
-import { screen, waitFor } from '@testing-library/react-native';
+import { act, fireEvent, screen, waitFor } from '@testing-library/react-native';
 import { Practice as ReadingPractice } from '../Reading/Practice/Practice';
 import { Practice as ListeningPractice } from '../Listening/Practice/Practice';
 import { Practice as WritingPractice } from '../Writing/Practice/Practice';
@@ -46,8 +46,63 @@ describe('Writing practice screen', () => {
     });
     expect(screen.getByPlaceholderText('Write your essay here…')).toBeTruthy();
     expect(screen.getByText('Submit for AI scoring')).toBeTruthy();
-    // Word count starts at zero.
-    expect(screen.getByText('0 words')).toBeTruthy();
+    // Word count starts at zero and shows the target for the selected task.
+    expect(screen.getByText('0 / 250 words')).toBeTruthy();
+  });
+
+  it('lets the learner pick the paper and task', async () => {
+    renderWithProviders(<WritingPractice />);
+    await waitFor(() => {
+      expect(screen.getByTestId('task-selector')).toBeTruthy();
+    });
+    expect(screen.getByTestId('exam-academic')).toBeTruthy();
+    expect(screen.getByTestId('exam-general')).toBeTruthy();
+
+    // Task 1 is a report in Academic and a letter in General, so the label
+    // has to follow the selected paper rather than being fixed.
+    expect(screen.getByText('Task 1 · Report')).toBeTruthy();
+    fireEvent.press(screen.getByTestId('exam-general'));
+    await waitFor(() => {
+      expect(screen.getByText('Task 1 · Letter')).toBeTruthy();
+    });
+  });
+
+  it('switches the word target with the task', async () => {
+    renderWithProviders(<WritingPractice />);
+    await waitFor(() => {
+      expect(screen.getByText('0 / 250 words')).toBeTruthy();
+    });
+    fireEvent.press(screen.getByTestId('task-1'));
+    await waitFor(() => {
+      expect(screen.getByText('0 / 150 words')).toBeTruthy();
+    });
+  });
+
+  it('counts the task allowance down and can be paused', async () => {
+    jest.useFakeTimers();
+    try {
+      renderWithProviders(<WritingPractice />);
+      await waitFor(() => {
+        expect(screen.getByTestId('writing-timer')).toBeTruthy();
+      });
+      // Task 2 allows 40 minutes.
+      expect(screen.getByTestId('timer-clock')).toHaveTextContent('40:00');
+
+      fireEvent.press(screen.getByTestId('timer-toggle'));
+      act(() => {
+        jest.advanceTimersByTime(65_000);
+      });
+      expect(screen.getByTestId('timer-clock')).toHaveTextContent('38:55');
+
+      fireEvent.press(screen.getByTestId('timer-toggle'));
+      act(() => {
+        jest.advanceTimersByTime(30_000);
+      });
+      // Paused means paused.
+      expect(screen.getByTestId('timer-clock')).toHaveTextContent('38:55');
+    } finally {
+      jest.useRealTimers();
+    }
   });
 });
 

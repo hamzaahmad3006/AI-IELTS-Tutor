@@ -85,16 +85,95 @@ _SEED_PROMPTS: list[dict[str, object]] = [
             "stayed there, describe the problems, and say what action you want."
         ),
     },
+    {
+        "exam_type": "academic",
+        "task_number": 1,
+        "topic": "chart",
+        "difficulty": "medium",
+        "min_words": 150,
+        # The data is stated in the prompt rather than shown as a chart image,
+        # so the task is fully answerable before Task 1 visual assets exist.
+        "prompt": (
+            "The table below shows the percentage of households owning selected "
+            "devices in one country.\n\n"
+            "Device         2005    2015    2025\n"
+            "Desktop PC      61%     48%     22%\n"
+            "Smartphone       9%     71%     94%\n"
+            "Smart speaker    0%      4%     57%\n"
+            "Tablet           0%     33%     41%\n\n"
+            "Summarise the information by selecting and reporting the main "
+            "features, and make comparisons where relevant."
+        ),
+    },
+    {
+        "exam_type": "academic",
+        "task_number": 1,
+        "topic": "process",
+        "difficulty": "hard",
+        "min_words": 150,
+        "prompt": (
+            "The stages below describe how glass bottles are recycled.\n\n"
+            "1. Used bottles are collected from household bins.\n"
+            "2. Bottles are sorted by colour and washed.\n"
+            "3. Sorted glass is crushed into small pieces called cullet.\n"
+            "4. Cullet is melted in a furnace at about 1500 degrees Celsius.\n"
+            "5. Molten glass is poured into moulds to form new bottles.\n"
+            "6. New bottles are cooled, inspected and shipped to bottlers.\n\n"
+            "Summarise the information by selecting and reporting the main "
+            "features of the process."
+        ),
+    },
+    {
+        "exam_type": "general",
+        "task_number": 2,
+        "topic": "work",
+        "difficulty": "medium",
+        "min_words": 250,
+        "prompt": (
+            "In many countries people are working longer hours than in the past. "
+            "What are the causes of this, and what effects does it have on "
+            "family life?"
+        ),
+    },
+    {
+        "exam_type": "general",
+        "task_number": 1,
+        "topic": "letter",
+        "difficulty": "medium",
+        "min_words": 150,
+        "prompt": (
+            "A friend is moving to your town and has asked for advice. Write a "
+            "letter to your friend. In your letter: recommend an area to live "
+            "in, explain how they can find work, and suggest one thing to do in "
+            "their first week."
+        ),
+    },
 ]
 
 
 async def _ensure_prompts_seeded(session: AsyncSession) -> None:
-    count = await session.scalar(select(func.count()).select_from(WritingPrompt))
-    if count and count > 0:
-        return
+    """Seed any (exam_type, task_number) pairing that has no prompts yet.
+
+    Checked per pairing rather than "is the table empty": an all-or-nothing
+    guard means a database seeded from an earlier, smaller bank never receives
+    newly added task types, and the learner silently gets the wrong paper.
+    """
+    existing = {
+        (exam_type, task_number)
+        for exam_type, task_number in (
+            await session.execute(
+                select(WritingPrompt.exam_type, WritingPrompt.task_number).distinct()
+            )
+        ).all()
+    }
+    added = False
     for row in _SEED_PROMPTS:
+        if (row["exam_type"], row["task_number"]) in existing:
+            continue
         session.add(WritingPrompt(**row, source="seed"))
-    await session.flush()
+        added = True
+    if added:
+        await session.flush()
 
 
 class WritingCriteria(CamelModel):
@@ -158,9 +237,15 @@ class WritingController:
         # Random pick so repeated practice varies the prompt.
         prompt = await session.scalar(query.order_by(func.random()).limit(1))
         if prompt is None:
+            # Relax the difficulty filter, but never the exam type: answering an
+            # Academic Task 1 request with a General Training letter hands the
+            # learner a different paper, assessed against different criteria.
             prompt = await session.scalar(
                 select(WritingPrompt)
-                .where(WritingPrompt.task_number == task_number)
+                .where(
+                    WritingPrompt.exam_type == exam_type,
+                    WritingPrompt.task_number == task_number,
+                )
                 .order_by(func.random())
                 .limit(1)
             )
