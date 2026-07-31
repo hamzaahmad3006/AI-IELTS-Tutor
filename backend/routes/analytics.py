@@ -13,6 +13,7 @@ from controllers.analytics_controller import (
     ProgressResponse,
     TrendResponse,
 )
+from controllers.insights_controller import InsightsController, InsightsResponse
 from db.session import get_db
 from dependencies import get_current_user
 from models.user import User
@@ -31,6 +32,11 @@ async def progress(current: CurrentUser, session: DbSession) -> ProgressResponse
 @router.get("/trend", response_model=TrendResponse)
 async def trend(current: CurrentUser, session: DbSession) -> TrendResponse:
     return await AnalyticsController.trend(session, current)
+
+
+@router.get("/insights", response_model=InsightsResponse)
+async def insights(current: CurrentUser, session: DbSession) -> InsightsResponse:
+    return await InsightsController.insights(session, current)
 
 
 @router.get("/prediction", response_model=PredictionResponse)

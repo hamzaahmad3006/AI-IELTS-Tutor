@@ -99,8 +99,12 @@ Everything **not yet completed** to finish the project, organized by area. Check
 - [x] Radar chart of 4 modules (current band per module, unmeasured axes collapse
       to the centre rather than reading as 0)
 - [ ] Improvement velocity + predicted exam-day band with confidence
-- [ ] Consistency / streak / time-on-task
-- [ ] Learning insights (strengths/weaknesses) cards
+- [x] Consistency — current and longest streak, active days in the last 30, and an
+      8-week activity histogram (`GET /analytics/insights`). Time-on-task reports
+      **only** measured speaking minutes and says so; the other modules record no
+      elapsed time, and a fabricated "hours studied" would be worse than none
+- [x] Learning insights cards — strengths ranked against the learner's own overall
+      band, recorded weakness tags worst-first, and a plain-language summary
 
 ### Profile / Settings (real profile data)
 - [x] Loads the real profile; editable **target band** and **daily study time** (PATCHed to the backend)
@@ -112,6 +116,8 @@ Everything **not yet completed** to finish the project, organized by area. Check
       rebuild that cannot be verified on iOS here
 - [ ] Replan trigger on exam-date change — blocked on the planner endpoints
 - [ ] Notification & reminder scheduling
+- [ ] Real time-on-task across all four modules — needs the client to submit
+      elapsed time per attempt (schema + API change); only Speaking records it today
 - [x] Consent management — reachable any time from Profile, both consents
       withdrawable, and withdrawing AI states what stops working
 - [x] Data export — `GET /me/export` returns every table the learner owns as JSON,

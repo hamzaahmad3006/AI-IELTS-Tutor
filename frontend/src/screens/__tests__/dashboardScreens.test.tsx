@@ -55,6 +55,23 @@ describe('Progress tab', () => {
     expect(screen.getByText('MODULE BALANCE')).toBeTruthy();
     expect(screen.getByTestId('module-balance-chart')).toBeTruthy();
   });
+
+  it('renders learning insights and consistency stats', async () => {
+    renderWithProviders(<Progress />);
+    await waitFor(() => {
+      expect(screen.getByTestId('insights-card')).toBeTruthy();
+    });
+    expect(screen.getByText('WHAT THIS MEANS')).toBeTruthy();
+    expect(screen.getByText('STRENGTHS')).toBeTruthy();
+    expect(screen.getByText('FOCUS NEXT')).toBeTruthy();
+
+    expect(screen.getByTestId('consistency-card')).toBeTruthy();
+    expect(screen.getByText('Current streak')).toBeTruthy();
+    expect(screen.getByText('Best streak')).toBeTruthy();
+    // Time is attributed to the module that actually measures it, never
+    // presented as total study time.
+    expect(screen.getByText(/covers Speaking only/)).toBeTruthy();
+  });
 });
 
 describe('Coach tab', () => {

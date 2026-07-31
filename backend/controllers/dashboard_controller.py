@@ -5,7 +5,7 @@ Matches the DashboardData shape the React Native Home screen already expects
 
 from __future__ import annotations
 
-from datetime import date, datetime, timezone
+from datetime import date, datetime, timedelta, timezone
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -84,19 +84,40 @@ async def _activity_dates(session: AsyncSession, user_id: str) -> set[date]:
 
 
 def _streak(dates: set[date]) -> int:
+    """Consecutive active days, anchored on today or yesterday.
+
+    Anchoring on today alone would report 0 for someone with a 30-day run who
+    simply has not practised yet today - at 00:01 their streak would appear
+    broken. A streak is only lost once a full day has been missed.
+    """
     if not dates:
         return 0
     today = datetime.now(timezone.utc).date()
-    cursor = today if today in dates else None
-    if cursor is None:
+    yesterday = today - timedelta(days=1)
+    if today in dates:
+        cursor = today
+    elif yesterday in dates:
+        cursor = yesterday
+    else:
         return 0
-    streak = 0
-    from datetime import timedelta
 
+    streak = 0
     while cursor in dates:
         streak += 1
-        cursor = cursor - timedelta(days=1)
+        cursor -= timedelta(days=1)
     return streak
+
+
+def _longest_streak(dates: set[date]) -> int:
+    """Longest consecutive run ever recorded, for a personal best."""
+    if not dates:
+        return 0
+    best = run = 1
+    ordered = sorted(dates)
+    for previous, current in zip(ordered, ordered[1:]):
+        run = run + 1 if (current - previous).days == 1 else 1
+        best = max(best, run)
+    return best
 
 
 class DashboardController:

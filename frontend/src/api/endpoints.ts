@@ -68,5 +68,6 @@ export const ENDPOINTS = {
     progress: '/analytics/progress',
     prediction: '/analytics/prediction',
     trend: '/analytics/trend',
+    insights: '/analytics/insights',
   },
 } as const;

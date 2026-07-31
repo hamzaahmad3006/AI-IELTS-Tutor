@@ -47,3 +47,45 @@ export interface PredictionResponse {
   velocityPerWeek: PredictionModules;
   note: string;
 }
+
+export interface StrengthCard {
+  module: IeltsModule;
+  label: string;
+  band: Band;
+  detail: string;
+}
+
+export interface WeaknessCard {
+  module: IeltsModule;
+  label: string;
+  tag: string;
+  tagLabel: string;
+  severity: number;
+  occurrences: number;
+  detail: string;
+}
+
+export interface WeekActivity {
+  /** Monday of the week, ISO date. */
+  weekStart: string;
+  attempts: number;
+  activeDays: number;
+}
+
+export interface ConsistencyStats {
+  currentStreak: number;
+  longestStreak: number;
+  activeDaysLast30: number;
+  totalAttempts: number;
+  weeks: WeekActivity[];
+  /** Null when nothing timed has been recorded. Speaking is the only timed module. */
+  measuredSpeakingMinutes: number | null;
+  timeNote: string;
+}
+
+export interface InsightsResponse {
+  strengths: StrengthCard[];
+  weaknesses: WeaknessCard[];
+  consistency: ConsistencyStats;
+  summary: string;
+}
