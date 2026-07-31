@@ -2,10 +2,18 @@
 
 Everything **not yet completed** to finish the project, organized by area. Checked = done, unchecked = remaining. Use this as the living backlog.
 
-> **Status as of PR #40** — **69 of 174 checklist items done (~40%)**; weighted by effort the product is roughly **45%**, since the backend and data layer are largely complete while the remaining items skew toward large features (voice, deployment).
-> **Working end-to-end:** register → onboarding → dashboard → all four practice modules (Reading, Listening, Writing, Speaking) → progress → coach → profile → logout, against the real backend.
-> **Verified by:** 15 backend smoke suites, a 13-step E2E user-journey check, frontend `tsc`, and a Docker image build — all four gates run in CI on every push.
-> **Biggest remaining:** the live voice (LiveKit) pipeline, on-device validation, AI content generation, and production deployment.
+> **Status as of PR #55** — **99 of 187 checklist items done (~53%)**. Weighted by
+> effort it is further along than that, since the backend and data layer are largely
+> complete while most remaining items are large features (live voice, deployment) or
+> are blocked on native modules.
+> **Running on real infrastructure:** live Supabase PostgreSQL 17.6 and the real Groq
+> API, verified on a physical Android phone — register → onboarding → dashboard → all
+> four practice modules → progress → coach → profile → logout.
+> **Verified by:** 19 backend smoke suites, a 13-step E2E user-journey check, 89
+> frontend tests, `tsc --noEmit`, and a Docker image build — all four gates run in CI
+> on every push.
+> **Biggest remaining:** the live voice (LiveKit) pipeline, production deployment,
+> mock tests, and the planner.
 
 ---
 
@@ -35,7 +43,8 @@ Everything **not yet completed** to finish the project, organized by area. Check
 - [x] Submits the full draft to `POST /onboarding`, then enters the app shell
 - [x] Wired into navigation (Splash → Auth → Register → Onboarding → Main)
 - [ ] Welcome / value-proposition carousel
-- [ ] Exam date picker (currently carried in the draft, not user-set in the UI)
+- [ ] Exam date picker in onboarding — carried in the draft but not user-set here;
+      the `DatePickerSheet` component now exists, so this is a wiring job
 - [ ] Adaptive placement diagnostic runner (all 4 modules)
 - [ ] Baseline results + CEFR + "generating plan" screen
 
@@ -97,9 +106,14 @@ Everything **not yet completed** to finish the project, organized by area. Check
 - [x] Loads the real profile; editable **target band** and **daily study time** (PATCHed to the backend)
 - [x] Shows exam type / exam date / CEFR + per-module starting levels (baselines)
 - [x] Theme toggle + server-side logout (refresh token revoked)
-- [ ] Exam-date editing + replan trigger
+- [x] Exam-date editing (`DatePickerSheet`, month grid, past days disabled; feeds
+      the prediction horizon). Built without
+      `@react-native-community/datetimepicker` to avoid a native module and a
+      rebuild that cannot be verified on iOS here
+- [ ] Replan trigger on exam-date change — blocked on the planner endpoints
 - [ ] Notification & reminder scheduling
-- [ ] Consent management screen
+- [x] Consent management — reachable any time from Profile, both consents
+      withdrawable, and withdrawing AI states what stops working
 - [ ] Data export + delete account (privacy)
 - [ ] Offline mode banner + sync status UI — `EmptyState variant="offline"` and the
       network-error toast exist, but true connectivity *detection* needs
@@ -119,8 +133,9 @@ Everything **not yet completed** to finish the project, organized by area. Check
 - [x] Flashcard (reveal/grade) component — [ ] flip animation
 - [x] Toast / Snackbar (`ToastHost` + `toastSlice`; queue in Redux so the axios
       interceptor can raise one without a provider in scope, duplicates collapsed)
-- [ ] Bottom sheet / modal
-- [ ] Consent modal
+- [x] Bottom sheet / modal (`BottomSheet` on RN `Modal`, so it sits above the
+      navigator and the hardware back button dismisses it)
+- [x] Consent modal (`ConsentSheet`)
 - [x] Empty / error / offline state components (`EmptyState`, three variants — a new
       account must not be told "something went wrong")
 - [x] Skeleton loaders (`Skeleton` + `SkeletonCard`, shared pulse; adopted on Progress)

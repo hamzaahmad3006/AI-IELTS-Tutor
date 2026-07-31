@@ -13,6 +13,16 @@ export { LineChart, type LineSeries } from './LineChart/LineChart';
 export { RadarChart, type RadarAxis } from './RadarChart/RadarChart';
 export { ComingSoon } from './ComingSoon/ComingSoon';
 export { ToastHost } from './Toast/ToastHost';
+export { BottomSheet } from './BottomSheet/BottomSheet';
+export {
+  ConsentSheet,
+  type ConsentValues,
+} from './ConsentSheet/ConsentSheet';
+export {
+  DatePickerSheet,
+  buildMonthGrid,
+  toIsoDate,
+} from './DatePickerSheet/DatePickerSheet';
 export {
   EmptyState,
   type EmptyStateVariant,

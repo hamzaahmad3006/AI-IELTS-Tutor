@@ -7,6 +7,8 @@ import {
   BandSlider,
   Button,
   Card,
+  ConsentSheet,
+  DatePickerSheet,
   Icon,
   ScreenContainer,
   useTheme,
@@ -29,6 +31,14 @@ export const Profile: React.FC = () => {
     onChangeDailyMinutes,
     onToggleTheme,
     onLogout,
+    consentSheetOpen,
+    openConsentSheet,
+    closeConsentSheet,
+    onSaveConsent,
+    dateSheetOpen,
+    openDateSheet,
+    closeDateSheet,
+    onChangeExamDate,
   } = useProfile();
 
   if (isLoading) {
@@ -37,7 +47,27 @@ export const Profile: React.FC = () => {
         <View style={styles.center}>
           <ActivityIndicator size="large" color={theme.colors.primary} />
         </View>
-      </ScreenContainer>
+        <ConsentSheet
+        visible={consentSheetOpen}
+        value={{
+          consentAi: profile?.consentAi ?? false,
+          consentVoice: profile?.consentVoice ?? false,
+        }}
+        onClose={closeConsentSheet}
+        onSave={onSaveConsent}
+        isSaving={isSaving}
+      />
+
+      <DatePickerSheet
+        visible={dateSheetOpen}
+        value={profile?.examDate ?? null}
+        title="When is your exam?"
+        onClose={closeDateSheet}
+        onSelect={onChangeExamDate}
+        onClear={() => onChangeExamDate(null)}
+        isSaving={isSaving}
+      />
+    </ScreenContainer>
     );
   }
 
@@ -145,6 +175,44 @@ export const Profile: React.FC = () => {
         </AppText>
       ) : null}
 
+      {/* Exam date */}
+      <Card style={styles.card}>
+        <View style={styles.rowBetween}>
+          <View>
+            <AppText variant="bodyMd">Exam date</AppText>
+            <AppText variant="labelSm" color="textSecondary">
+              {profile?.examDate ?? 'Not set'}
+            </AppText>
+          </View>
+          <Button
+            title={profile?.examDate ? 'Change' : 'Set date'}
+            variant="secondary"
+            fullWidth={false}
+            onPress={openDateSheet}
+          />
+        </View>
+      </Card>
+
+      {/* Privacy */}
+      <Card style={styles.card}>
+        <View style={styles.rowBetween}>
+          <View style={styles.consentSummary}>
+            <AppText variant="bodyMd">Privacy & consent</AppText>
+            <AppText variant="labelSm" color="textSecondary">
+              {`AI processing ${profile?.consentAi ? 'on' : 'off'} · Voice ${
+                profile?.consentVoice ? 'on' : 'off'
+              }`}
+            </AppText>
+          </View>
+          <Button
+            title="Manage"
+            variant="secondary"
+            fullWidth={false}
+            onPress={openConsentSheet}
+          />
+        </View>
+      </Card>
+
       {/* Appearance */}
       <Card style={styles.card}>
         <View style={styles.rowBetween}>
@@ -203,5 +271,6 @@ const styles = StyleSheet.create({
   },
   baselineLabel: { flex: 1 },
   saving: { marginBottom: SPACING.sm },
+  consentSummary: { flex: 1, paddingRight: SPACING.sm },
   logout: { marginTop: SPACING.xs },
 });
