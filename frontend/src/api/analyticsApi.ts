@@ -3,8 +3,14 @@
 import { apiClient, toApiProblem } from './client';
 import { API_CONFIG } from './config';
 import { ENDPOINTS } from './endpoints';
-import { MOCK_PREDICTION, MOCK_PROGRESS, MOCK_TREND } from './mock/fixtures';
+import {
+  MOCK_INSIGHTS,
+  MOCK_PREDICTION,
+  MOCK_PROGRESS,
+  MOCK_TREND,
+} from './mock/fixtures';
 import type {
+  InsightsResponse,
   PredictionResponse,
   ProgressResponse,
   TrendResponse,
@@ -37,6 +43,21 @@ export const analyticsApi = {
     try {
       const { data } = await apiClient.get<TrendResponse>(
         ENDPOINTS.analytics.trend,
+      );
+      return data;
+    } catch (error) {
+      throw toApiProblem(error);
+    }
+  },
+
+  async getInsights(): Promise<InsightsResponse> {
+    if (API_CONFIG.useMock) {
+      await delay(400);
+      return MOCK_INSIGHTS;
+    }
+    try {
+      const { data } = await apiClient.get<InsightsResponse>(
+        ENDPOINTS.analytics.insights,
       );
       return data;
     } catch (error) {

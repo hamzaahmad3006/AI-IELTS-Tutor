@@ -5,6 +5,7 @@ import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { analyticsApi, meApi } from '../../../api';
 import type {
+  InsightsResponse,
   PredictionResponse,
   ProgressResponse,
   RootStackParamList,
@@ -18,6 +19,7 @@ interface UseProgressResult {
   progress: ProgressResponse | null;
   prediction: PredictionResponse | null;
   trend: TrendResponse | null;
+  insights: InsightsResponse | null;
   weaknesses: WeaknessItem[];
   isLoading: boolean;
   error: string | null;
@@ -30,6 +32,7 @@ export const useProgress = (): UseProgressResult => {
   const [progress, setProgress] = useState<ProgressResponse | null>(null);
   const [prediction, setPrediction] = useState<PredictionResponse | null>(null);
   const [trend, setTrend] = useState<TrendResponse | null>(null);
+  const [insights, setInsights] = useState<InsightsResponse | null>(null);
   const [weaknesses, setWeaknesses] = useState<WeaknessItem[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -38,16 +41,23 @@ export const useProgress = (): UseProgressResult => {
     setIsLoading(true);
     setError(null);
     try {
-      const [progressData, predictionData, trendData, weaknessData] =
-        await Promise.all([
-          analyticsApi.getProgress(),
-          analyticsApi.getPrediction(),
-          analyticsApi.getTrend(),
-          meApi.getWeaknesses(),
-        ]);
+      const [
+        progressData,
+        predictionData,
+        trendData,
+        insightsData,
+        weaknessData,
+      ] = await Promise.all([
+        analyticsApi.getProgress(),
+        analyticsApi.getPrediction(),
+        analyticsApi.getTrend(),
+        analyticsApi.getInsights(),
+        meApi.getWeaknesses(),
+      ]);
       setProgress(progressData);
       setPrediction(predictionData);
       setTrend(trendData);
+      setInsights(insightsData);
       setWeaknesses(weaknessData.items);
     } catch {
       setError('Could not load your progress. Pull to retry.');
@@ -68,6 +78,7 @@ export const useProgress = (): UseProgressResult => {
     progress,
     prediction,
     trend,
+    insights,
     weaknesses,
     isLoading,
     error,

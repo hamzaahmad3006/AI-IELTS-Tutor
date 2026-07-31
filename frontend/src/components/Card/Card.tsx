@@ -12,10 +12,12 @@ interface CardProps {
   shadow?: ShadowToken;
   backgroundToken?: 'card' | 'cardAlt' | 'container';
   style?: ViewStyle;
+  testID?: string;
 }
 
 export const Card: React.FC<CardProps> = ({
   children,
+  testID,
   padding = SPACING.lg,
   radius = RADIUS.card,
   shadow = 'card',
@@ -25,6 +27,7 @@ export const Card: React.FC<CardProps> = ({
   const theme = useTheme();
   return (
     <View
+      testID={testID}
       style={[
         {
           backgroundColor: theme.colors[backgroundToken],

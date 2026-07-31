@@ -17,6 +17,7 @@ import type {
   ReadingResult,
   RecommendationsResponse,
   DataExport,
+  InsightsResponse,
   SpeakingResult,
   SpeakingSession,
   TrendPoint,
@@ -367,4 +368,34 @@ export const MOCK_DATA_EXPORT: DataExport = {
   listeningAttempts: [{ band: 7.5 }],
   weaknesses: [{ tag: 'article_use', severity: 0.4 }],
   vocabReviews: [],
+};
+
+export const MOCK_INSIGHTS: InsightsResponse = {
+  strengths: [
+    { module: 'listening', label: 'Listening', band: 7.5, detail: '+0.5 above your overall band' },
+    { module: 'speaking', label: 'Speaking', band: 7.5, detail: '+0.5 above your overall band' },
+  ],
+  weaknesses: [
+    { module: 'writing', label: 'Writing', tag: 'grammatical_range', tagLabel: 'Grammatical Range', severity: 0.44, occurrences: 3, detail: 'Seen 3 times in Writing' },
+    { module: 'reading', label: 'Reading', tag: 'true_false_notgiven', tagLabel: 'True False Notgiven', severity: 0.25, occurrences: 1, detail: 'Seen 1 time in Reading' },
+  ],
+  consistency: {
+    currentStreak: 5,
+    longestStreak: 12,
+    activeDaysLast30: 18,
+    totalAttempts: 14,
+    weeks: [
+      { weekStart: '2026-04-13', attempts: 1, activeDays: 1 },
+      { weekStart: '2026-04-20', attempts: 3, activeDays: 3 },
+      { weekStart: '2026-04-27', attempts: 0, activeDays: 0 },
+      { weekStart: '2026-05-04', attempts: 2, activeDays: 2 },
+      { weekStart: '2026-05-11', attempts: 4, activeDays: 4 },
+      { weekStart: '2026-05-18', attempts: 5, activeDays: 5 },
+      { weekStart: '2026-05-25', attempts: 3, activeDays: 3 },
+      { weekStart: '2026-06-01', attempts: 5, activeDays: 5 },
+    ],
+    measuredSpeakingMinutes: 42,
+    timeNote: 'Only spoken responses are timed, so this covers Speaking only.',
+  },
+  summary: 'Listening is carrying you at band 7.5. Your biggest drag is grammatical range in writing.',
 };

@@ -20,6 +20,8 @@ import {
 } from '../../../components';
 import { getBandColor, RADIUS, SPACING } from '../../../constants';
 import type {
+  ConsistencyStats,
+  InsightsResponse,
   ModuleProgressStat,
   PredictionResponse,
   TrendResponse,
@@ -42,6 +44,7 @@ export const Progress: React.FC = () => {
     progress,
     prediction,
     trend,
+    insights,
     weaknesses,
     isLoading,
     error,
@@ -123,6 +126,10 @@ export const Progress: React.FC = () => {
       {trend ? <TrendCard trend={trend} /> : null}
       <BalanceCard modules={progress.modules} />
 
+      {/* Insights + consistency */}
+      {insights ? <InsightsCard insights={insights} /> : null}
+      {insights ? <ConsistencyCard stats={insights.consistency} /> : null}
+
       {/* Prediction */}
       {prediction ? <PredictionCard prediction={prediction} /> : null}
 
@@ -199,6 +206,116 @@ const BalanceCard: React.FC<{ modules: ModuleProgressStat[] }> = ({
     </Card>
   );
 };
+
+const InsightsCard: React.FC<{ insights: InsightsResponse }> = ({
+  insights,
+}) => {
+  const theme = useTheme();
+  return (
+    <Card style={styles.section} testID="insights-card">
+      <AppText variant="labelMd" color="textSecondary">
+        WHAT THIS MEANS
+      </AppText>
+      <AppText variant="bodyMd" style={styles.summary}>
+        {insights.summary}
+      </AppText>
+
+      {insights.strengths.length > 0 ? (
+        <View style={styles.insightGroup}>
+          <AppText variant="labelSm" color="textMuted">
+            STRENGTHS
+          </AppText>
+          {insights.strengths.map((s) => (
+            <View key={`s-${s.module}`} style={styles.insightRow}>
+              <View
+                style={[styles.dot, { backgroundColor: getBandColor(s.band) }]}
+              />
+              <AppText variant="bodySm" style={styles.insightText}>
+                {`${s.label} — band ${s.band.toFixed(1)}, ${s.detail}`}
+              </AppText>
+            </View>
+          ))}
+        </View>
+      ) : null}
+
+      {insights.weaknesses.length > 0 ? (
+        <View style={styles.insightGroup}>
+          <AppText variant="labelSm" color="textMuted">
+            FOCUS NEXT
+          </AppText>
+          {insights.weaknesses.map((w) => (
+            <View key={`w-${w.module}-${w.tag}`} style={styles.insightRow}>
+              <View
+                style={[styles.dot, { backgroundColor: theme.colors.warning }]}
+              />
+              <AppText variant="bodySm" style={styles.insightText}>
+                {`${w.tagLabel} — ${w.detail.toLowerCase()}`}
+              </AppText>
+            </View>
+          ))}
+        </View>
+      ) : null}
+    </Card>
+  );
+};
+
+const ConsistencyCard: React.FC<{ stats: ConsistencyStats }> = ({ stats }) => {
+  const theme = useTheme();
+  // Scale bars against the busiest week so a quiet history still reads.
+  const peak = Math.max(1, ...stats.weeks.map((w) => w.attempts));
+
+  return (
+    <Card style={styles.section} testID="consistency-card">
+      <AppText variant="labelMd" color="textSecondary">
+        CONSISTENCY
+      </AppText>
+
+      <View style={styles.statRow}>
+        <Stat label="Current streak" value={`${stats.currentStreak}d`} />
+        <Stat label="Best streak" value={`${stats.longestStreak}d`} />
+        <Stat label="Active (30d)" value={`${stats.activeDaysLast30}d`} />
+      </View>
+
+      <View style={styles.bars}>
+        {stats.weeks.map((w) => (
+          <View key={w.weekStart} style={styles.barSlot}>
+            <View
+              style={[
+                styles.bar,
+                {
+                  // Zero weeks keep a hairline so the gap is visibly a gap.
+                  height: Math.max(2, (w.attempts / peak) * 44),
+                  backgroundColor:
+                    w.attempts > 0
+                      ? theme.colors.primary
+                      : theme.colors.containerHighest,
+                },
+              ]}
+            />
+          </View>
+        ))}
+      </View>
+      <AppText variant="labelSm" color="textMuted">
+        Practices per week, last 8 weeks
+      </AppText>
+
+      <AppText variant="labelSm" color="textMuted" style={styles.timeNote}>
+        {stats.measuredSpeakingMinutes !== null
+          ? `${stats.measuredSpeakingMinutes} min spoken. ${stats.timeNote}`
+          : stats.timeNote}
+      </AppText>
+    </Card>
+  );
+};
+
+const Stat: React.FC<{ label: string; value: string }> = ({ label, value }) => (
+  <View style={styles.stat}>
+    <AppText variant="titleLg">{value}</AppText>
+    <AppText variant="labelSm" color="textMuted">
+      {label}
+    </AppText>
+  </View>
+);
 
 const PredictionCard: React.FC<{ prediction: PredictionResponse }> = ({
   prediction,
@@ -312,6 +429,24 @@ const styles = StyleSheet.create({
   disclaimer: { marginTop: SPACING.xs },
   moduleCard: { marginTop: SPACING.sm },
   radarWrap: { alignItems: 'center', marginTop: SPACING.sm },
+  summary: { marginTop: SPACING.xs },
+  insightGroup: { marginTop: SPACING.md, gap: 4 },
+  insightRow: { flexDirection: 'row', alignItems: 'center', gap: SPACING.sm },
+  insightText: { flex: 1 },
+  dot: { width: 8, height: 8, borderRadius: 4 },
+  statRow: { flexDirection: 'row', marginTop: SPACING.sm },
+  stat: { flex: 1 },
+  bars: {
+    flexDirection: 'row',
+    alignItems: 'flex-end',
+    gap: 6,
+    height: 48,
+    marginTop: SPACING.md,
+    marginBottom: SPACING.xs,
+  },
+  barSlot: { flex: 1, justifyContent: 'flex-end' },
+  bar: { width: '100%', borderRadius: RADIUS.sm },
+  timeNote: { marginTop: SPACING.sm },
   moduleHead: {
     flexDirection: 'row',
     justifyContent: 'space-between',
