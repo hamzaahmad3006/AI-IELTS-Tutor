@@ -147,6 +147,82 @@ describe('Difficulty selection', () => {
   });
 });
 
+describe('Reading navigator and timer', () => {
+  it('marks answered questions and reflects them in the count', async () => {
+    renderWithProviders(<ReadingPractice />);
+    await waitFor(() => {
+      expect(screen.getByTestId('question-navigator')).toBeTruthy();
+    });
+    expect(screen.getByTestId('nav-q-1')).toBeTruthy();
+    // Nothing answered yet.
+    expect(screen.getByTestId('navigator-remaining')).toHaveTextContent(/left/);
+  });
+
+  it('focuses the question a navigator number points at', async () => {
+    renderWithProviders(<ReadingPractice />);
+    await waitFor(() => {
+      expect(screen.getByTestId('nav-q-2')).toBeTruthy();
+    });
+    fireEvent.press(screen.getByTestId('nav-q-2'));
+    expect(screen.getByTestId('question-card-2')).toBeTruthy();
+  });
+
+  it('counts down the 20-minute passage allowance', async () => {
+    jest.useFakeTimers();
+    try {
+      renderWithProviders(<ReadingPractice />);
+      await waitFor(() => {
+        expect(screen.getByTestId('reading-timer')).toBeTruthy();
+      });
+      expect(screen.getByTestId('timer-clock')).toHaveTextContent('20:00');
+      fireEvent.press(screen.getByTestId('timer-toggle'));
+      act(() => {
+        jest.advanceTimersByTime(30_000);
+      });
+      expect(screen.getByTestId('timer-clock')).toHaveTextContent('19:30');
+    } finally {
+      jest.useRealTimers();
+    }
+  });
+});
+
+describe('Listening play policy', () => {
+  it('allows one play under exam rules, then refuses', async () => {
+    renderWithProviders(<ListeningPractice />);
+    await waitFor(() => {
+      expect(screen.getByTestId('play-button')).toBeTruthy();
+    });
+    expect(screen.getByText(/0\/1 play used/)).toBeTruthy();
+
+    fireEvent.press(screen.getByTestId('play-button')); // start
+    fireEvent.press(screen.getByTestId('play-button')); // stop
+
+    await waitFor(() => {
+      expect(screen.getByTestId('player-hint')).toHaveTextContent(
+        /does not replay/,
+      );
+    });
+    expect(screen.getByText(/1\/1 play used/)).toBeTruthy();
+  });
+
+  it('permits replay once practice mode is chosen', async () => {
+    // Exam fidelity is the default, but drilling a clip you failed is a
+    // legitimate way to learn.
+    renderWithProviders(<ListeningPractice />);
+    await waitFor(() => {
+      expect(screen.getByTestId('play-mode-toggle')).toBeTruthy();
+    });
+    fireEvent.press(screen.getByTestId('play-button'));
+    fireEvent.press(screen.getByTestId('play-button'));
+    fireEvent.press(screen.getByTestId('play-mode-toggle'));
+
+    await waitFor(() => {
+      expect(screen.getByText(/replay allowed/)).toBeTruthy();
+    });
+    expect(screen.getByTestId('player-hint')).toHaveTextContent(/Tap play/);
+  });
+});
+
 describe('Speaking practice screen', () => {
   it('renders the cue card and prep phase', async () => {
     renderWithProviders(<SpeakingPractice />);

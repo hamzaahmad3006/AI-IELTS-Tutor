@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { readingApi } from '../../../api';
+import { useCountdown, type TimerState } from '../../../components';
 import type {
   AnswerMap,
   AnswerValue,
@@ -25,6 +26,15 @@ interface UseReadingResult {
   error: string | null;
   difficulty: Difficulty;
   setDifficulty: (value: Difficulty) => void;
+  answeredFlags: boolean[];
+  currentIndex: number;
+  goToQuestion: (index: number) => void;
+  secondsLeft: number;
+  timerState: TimerState;
+  isWarning: boolean;
+  startTimer: () => void;
+  pauseTimer: () => void;
+  resetTimer: () => void;
   setAnswer: (questionId: string, value: AnswerValue) => void;
   submit: () => void;
   tryAnother: () => void;
@@ -35,6 +45,9 @@ export const useReading = (): UseReadingResult => {
   const navigation = useNavigation<Nav>();
   const [passage, setPassage] = useState<ReadingPassage | null>(null);
   const [difficulty, setDifficultyState] = useState<Difficulty>('adaptive');
+  const [currentIndex, setCurrentIndex] = useState<number>(0);
+  // IELTS Reading allows 60 minutes for three passages, so one passage is 20.
+  const countdown = useCountdown(20 * 60);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [answers, setAnswers] = useState<AnswerMap>({});
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
@@ -66,7 +79,9 @@ export const useReading = (): UseReadingResult => {
     setDifficultyState(value);
     setAnswers({});
     setResult(null);
-  }, []);
+    setCurrentIndex(0);
+    countdown.reset();
+  }, [countdown]);
 
   const setAnswer = useCallback(
     (questionId: string, value: AnswerValue): void => {
@@ -108,6 +123,17 @@ export const useReading = (): UseReadingResult => {
     error,
     difficulty,
     setDifficulty,
+    answeredFlags: (passage?.questions ?? []).map(
+      (question) => answers[question.id] !== undefined,
+    ),
+    currentIndex,
+    goToQuestion: setCurrentIndex,
+    secondsLeft: countdown.secondsLeft,
+    timerState: countdown.state,
+    isWarning: countdown.isWarning,
+    startTimer: countdown.start,
+    pauseTimer: countdown.pause,
+    resetTimer: countdown.reset,
     setAnswer,
     submit,
     tryAnother,

@@ -7,6 +7,7 @@ import {
   BandBadge,
   Button,
   Card,
+  TimerBar,
   Icon,
   Input,
   ProgressBar,
@@ -19,7 +20,7 @@ import type {
   WritingCriteriaScore,
   WritingResult,
 } from '../../../types';
-import { useWriting, type TimerState } from './useWriting';
+import { useWriting } from './useWriting';
 
 const CRITERIA: Array<{ key: keyof WritingCriteriaScore; label: string }> = [
   { key: 'taskResponse', label: 'Task Response' },
@@ -110,61 +111,6 @@ const Chip: React.FC<{
   );
 };
 
-export const formatClock = (totalSeconds: number): string => {
-  const safe = Math.max(0, totalSeconds);
-  const minutes = Math.floor(safe / 60);
-  const seconds = safe % 60;
-  return `${minutes}:${String(seconds).padStart(2, '0')}`;
-};
-
-const TimerBar: React.FC<{
-  secondsLeft: number;
-  state: TimerState;
-  isWarning: boolean;
-  onStart: () => void;
-  onPause: () => void;
-  onReset: () => void;
-}> = ({ secondsLeft, state, isWarning, onStart, onPause, onReset }) => {
-  const theme = useTheme();
-  const expired = state === 'expired';
-  const color = expired
-    ? theme.colors.error
-    : isWarning
-      ? theme.colors.warning
-      : theme.colors.textPrimary;
-
-  return (
-    <Card style={styles.section} testID="writing-timer">
-      <View style={styles.timerRow}>
-        <View>
-          <AppText variant="labelMd" color="textSecondary">
-            TIME REMAINING
-          </AppText>
-          <AppText variant="displayLg" style={{ color }} testID="timer-clock">
-            {formatClock(secondsLeft)}
-          </AppText>
-        </View>
-        <Button
-          title={state === 'running' ? 'Pause' : expired ? 'Restart' : 'Start'}
-          variant="secondary"
-          fullWidth={false}
-          onPress={
-            state === 'running' ? onPause : expired ? onReset : onStart
-          }
-          testID="timer-toggle"
-        />
-      </View>
-      {expired ? (
-        // Deliberately not a hard stop: the essay stays, and it can still be
-        // submitted. A practice timer must never destroy someone's work.
-        <AppText variant="labelSm" color="error">
-          Time is up. You can still finish and submit — this is practice.
-        </AppText>
-      ) : null}
-    </Card>
-  );
-};
-
 export const Practice: React.FC = () => {
   const {
     prompt,
@@ -213,6 +159,7 @@ export const Practice: React.FC = () => {
         onStart={startTimer}
         onPause={pauseTimer}
         onReset={resetTimer}
+        testID="writing-timer"
       />
 
       <Card backgroundToken="cardAlt" style={styles.section}>
