@@ -7,6 +7,7 @@ import {
   BandBadge,
   Button,
   Card,
+  HighlightedText,
   Icon,
   Input,
   ProgressBar,
@@ -14,6 +15,7 @@ import {
   useTheme,
 } from '../../../components';
 import { getBandColor, RADIUS, SPACING } from '../../../constants';
+import type { TextIssue } from '../../../components';
 import type { SpeakingCriteriaScore, SpeakingResult } from '../../../types';
 import { useSpeakingPractice } from './useSpeakingPractice';
 
@@ -187,8 +189,40 @@ const ResultView: React.FC<{
         </Card>
       ) : null}
 
+      {result.issues.length > 0 ? (
+        <TranscriptCard transcript={result.transcript} issues={result.issues} />
+      ) : null}
+
       <Button title="Practice another" onPress={onTryAnother} style={styles.section} />
     </ScreenContainer>
+  );
+};
+
+const TranscriptCard: React.FC<{
+  transcript: string;
+  issues: TextIssue[];
+}> = ({ transcript, issues }) => {
+  const [active, setActive] = React.useState<number | null>(null);
+
+  return (
+    <Card style={styles.section} testID="transcript-card">
+      <View style={styles.transcriptHead}>
+        <AppText variant="titleLg">What you said</AppText>
+        <AppText variant="labelSm" color="textMuted">
+          {`${issues.length} to review`}
+        </AppText>
+      </View>
+      <AppText variant="labelSm" color="textMuted" style={styles.transcriptHint}>
+        Tap a highlight, or a note below, to jump between them.
+      </AppText>
+      <HighlightedText
+        text={transcript}
+        issues={issues}
+        activeIndex={active}
+        onSelectIssue={setActive}
+        testID="speaking-transcript"
+      />
+    </Card>
   );
 };
 
@@ -257,6 +291,12 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
   },
+  transcriptHead: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  transcriptHint: { marginBottom: SPACING.sm },
   criteriaTitle: { marginBottom: SPACING.md },
   criteriaRow: { marginBottom: SPACING.md },
   criteriaLabelRow: {

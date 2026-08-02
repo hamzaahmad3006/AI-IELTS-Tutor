@@ -34,6 +34,30 @@ def _system_text(messages: list[Message]) -> str:
     return ""
 
 
+def _mock_issues(text: str) -> list[dict[str, str]]:
+    """Flag the two longest sentences, quoted verbatim from the input.
+
+    Deliberately trivial: the point is to exercise span resolution end to end
+    without a paid provider, not to imitate examiner judgement. Quoting verbatim
+    matters — a paraphrase would be silently discarded by the resolver and the
+    highlight path would never be tested.
+    """
+    sentences = [
+        part.strip() for part in re.split(r"(?<=[.!?])\s+", text) if part.strip()
+    ]
+    if not sentences:
+        return []
+    tags = ("grammatical_range", "lexical_resource")
+    return [
+        {
+            "quote": sentence,
+            "tag": tags[i % len(tags)],
+            "note": "Mock note: vary the structure and choose more precise wording.",
+        }
+        for i, sentence in enumerate(sorted(sentences, key=len, reverse=True)[:2])
+    ]
+
+
 class MockProvider(LLMProvider):
     name = "mock"
 
@@ -74,6 +98,7 @@ class MockProvider(LLMProvider):
                     "and use a wider range of connectives and precise vocabulary to "
                     "lift your band. (Enable a real AI provider for detailed feedback.)"
                 ),
+                "issues": _mock_issues(text),
             }
         else:
             task = _clamp_band(length_band if word_count >= 150 else length_band - 1.0)

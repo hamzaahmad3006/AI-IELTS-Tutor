@@ -2,9 +2,11 @@
 
 from __future__ import annotations
 
+from typing import Any
+
 import uuid
 
-from sqlalchemy import Float, ForeignKey, Integer, String, Text
+from sqlalchemy import JSON, Float, ForeignKey, Integer, String, Text
 from sqlalchemy.orm import Mapped, mapped_column
 
 from db.base import Base, TimestampMixin
@@ -35,6 +37,8 @@ class SpeakingAttempt(Base, TimestampMixin):
     grammatical_range: Mapped[float | None] = mapped_column(Float, nullable=True)
     pronunciation: Mapped[float | None] = mapped_column(Float, nullable=True)
     feedback_summary: Mapped[str | None] = mapped_column(Text, nullable=True)
+    #: Resolved highlight spans: [{start, end, quote, tag, note}].
+    issues: Mapped[Any | None] = mapped_column(JSON, nullable=True)
 
     ai_provider: Mapped[str | None] = mapped_column(String(32), nullable=True)
     ai_model: Mapped[str | None] = mapped_column(String(64), nullable=True)

@@ -192,6 +192,10 @@ class WritingResultResponse(CamelModel):
     criteria: WritingCriteria | None
     feedback_summary: str | None
     improved_essay: str | None
+    #: The learner's own text, so the client can diff it against the improved
+    #: version rather than storing a second copy locally and drifting.
+    essay_text: str
+    prompt_text: str | None
 
 
 def _word_count(text: str) -> int:
@@ -216,6 +220,8 @@ def _to_response(attempt: WritingAttempt) -> WritingResultResponse:
         criteria=criteria,
         feedback_summary=attempt.feedback_summary,
         improved_essay=attempt.improved_essay,
+        essay_text=attempt.essay_text,
+        prompt_text=attempt.prompt_text,
     )
 
 

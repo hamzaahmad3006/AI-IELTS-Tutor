@@ -20,6 +20,19 @@ class WritingScore(BaseModel):
     improved_essay: str
 
 
+class ScoreIssue(BaseModel):
+    """One flagged stretch of the learner's own words.
+
+    `quote` must be copied verbatim from the response; the API drops any quote
+    it cannot find, so a model that paraphrases produces no highlight rather
+    than a highlight pointing at the wrong words.
+    """
+
+    quote: str
+    tag: str
+    note: str
+
+
 class SpeakingScore(BaseModel):
     fluency_coherence: float = Field(ge=0, le=9)
     lexical_resource: float = Field(ge=0, le=9)
@@ -27,6 +40,8 @@ class SpeakingScore(BaseModel):
     pronunciation: float = Field(ge=0, le=9)
     overall_band: float = Field(ge=0, le=9)
     feedback_summary: str
+    #: Optional: older providers and stricter models may omit it entirely.
+    issues: list[ScoreIssue] = Field(default_factory=list)
 
 
 class ScoringError(Exception):

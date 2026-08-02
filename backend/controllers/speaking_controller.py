@@ -12,6 +12,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from ai.orchestrator import AIOrchestrator, ScoringError
 from models.cue_card import CueCard
+from core.highlights import resolve_highlights
 from models.speaking import SpeakingAttempt
 from models.user import User
 
@@ -90,6 +91,16 @@ class SpeakingCriteria(CamelModel):
     pronunciation: float
 
 
+class TranscriptIssue(CamelModel):
+    """A flagged stretch of the transcript, located by character offset."""
+
+    start: int
+    end: int
+    quote: str
+    tag: str
+    note: str
+
+
 class SpeakingResultResponse(CamelModel):
     attempt_id: str
     status: str
@@ -97,6 +108,9 @@ class SpeakingResultResponse(CamelModel):
     overall_band: float | None
     criteria: SpeakingCriteria | None
     feedback_summary: str | None
+    #: Returned so the client can render the transcript with the spans below.
+    transcript: str
+    issues: list[TranscriptIssue]
 
 
 def _to_response(attempt: SpeakingAttempt) -> SpeakingResultResponse:
@@ -108,6 +122,18 @@ def _to_response(attempt: SpeakingAttempt) -> SpeakingResultResponse:
             grammatical_range=attempt.grammatical_range or 0.0,
             pronunciation=attempt.pronunciation or 0.0,
         )
+    raw_issues = attempt.issues if isinstance(attempt.issues, list) else []
+    issues = [
+        TranscriptIssue(
+            start=int(item.get("start", 0)),
+            end=int(item.get("end", 0)),
+            quote=str(item.get("quote", "")),
+            tag=str(item.get("tag", "")),
+            note=str(item.get("note", "")),
+        )
+        for item in raw_issues
+        if isinstance(item, dict)
+    ]
     return SpeakingResultResponse(
         attempt_id=attempt.id,
         status=attempt.status,
@@ -115,6 +141,8 @@ def _to_response(attempt: SpeakingAttempt) -> SpeakingResultResponse:
         overall_band=attempt.overall_band,
         criteria=criteria,
         feedback_summary=attempt.feedback_summary,
+        transcript=attempt.transcript,
+        issues=issues,
     )
 
 
@@ -181,6 +209,21 @@ class SpeakingController:
         attempt.grammatical_range = score.grammatical_range
         attempt.pronunciation = score.pronunciation
         attempt.feedback_summary = score.feedback_summary
+        # Quotes are matched against the transcript here, so anything the model
+        # paraphrased is discarded rather than stored as a bogus span.
+        attempt.issues = [
+            {
+                "start": h.start,
+                "end": h.end,
+                "quote": h.quote,
+                "tag": h.tag,
+                "note": h.note,
+            }
+            for h in resolve_highlights(
+                attempt.transcript,
+                [issue.model_dump() for issue in score.issues],
+            )
+        ]
         attempt.ai_provider = usage.provider
         attempt.ai_model = usage.model
         attempt.total_tokens = usage.total_tokens

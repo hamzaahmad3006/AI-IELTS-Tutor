@@ -2,14 +2,14 @@
 
 Everything **not yet completed** to finish the project, organized by area. Checked = done, unchecked = remaining. Use this as the living backlog.
 
-> **Status as of PR #62** — **114 of 190 checklist items done (~60%)**. Weighted by
+> **Status as of PR #63** — **117 of 191 checklist items done (~61%)**. Weighted by
 > effort it is further along than that, since the backend and data layer are largely
 > complete while most remaining items are large features (live voice, deployment) or
 > are blocked on native modules.
 > **Running on real infrastructure:** live Supabase PostgreSQL 17.6 and the real Groq
 > API, verified on a physical Android phone — register → onboarding → dashboard → all
 > four practice modules → progress → coach → profile → logout.
-> **Verified by:** 22 backend smoke suites, a 13-step E2E user-journey check, 122
+> **Verified by:** 23 backend smoke suites, a 13-step E2E user-journey check, 132
 > frontend tests, `tsc --noEmit`, and a Docker image build — all four gates run in CI
 > on every push.
 > **Biggest remaining:** the live voice (LiveKit) pipeline, production deployment,
@@ -61,7 +61,10 @@ Everything **not yet completed** to finish the project, organized by area. Check
 - [x] Part 1 and Part 3 flows — themed question sets from a new `speaking_questions`
       bank (`GET /speaking/questions?part=`), answered in order and scored as one
       run, with part-specific guidance so Part 3 is not answered like Part 1
-- [ ] Highlighted transcript + recording replay with jump-to-issue markers
+- [x] Highlighted transcript + jump-to-issue markers — the AI returns verbatim
+      quotes, the API locates each in the transcript and **drops any it cannot
+      find**, so a paraphrase never highlights the wrong words
+- [ ] Recording replay alongside the transcript — blocked on the voice pipeline
 - [x] Speaking history (shown in the unified History screen)
 
 ### Writing (practice + feedback built)
@@ -76,7 +79,9 @@ Everything **not yet completed** to finish the project, organized by area. Check
 - [x] Writing timer — real IELTS allowances (20 min Task 1, 40 min Task 2), amber
       under 5 minutes, start/pause/restart. Expiry never discards or force-submits
       the essay; it only stops claiming there is time left
-- [x] Writing history (unified History screen) — [ ] band-trend chart + essay diffs
+- [x] Writing history (unified History screen), with a per-module band-trend chart
+- [x] Essay diffs — a Changes tab word-diffs the draft against the model essay,
+      ignoring punctuation-only edits so real changes are not lost in noise
 
 ### Reading (built)
 - [x] Passage + question runner (MCQ / True-False-Not-Given / short answer)

@@ -7,6 +7,7 @@ import {
   BandBadge,
   Button,
   Card,
+  LineChart,
   Icon,
   ScreenContainer,
   useTheme,
@@ -43,6 +44,7 @@ export const History: React.FC = () => {
     hasMore,
     error,
     setModule,
+    trendBands,
     loadMore,
     onBack,
   } = useHistory();
@@ -89,6 +91,27 @@ export const History: React.FC = () => {
           );
         })}
       </View>
+
+      {trendBands.length > 0 ? (
+        <Card style={styles.section} testID="history-trend">
+          <AppText variant="labelMd" color="textSecondary">
+            BAND TREND
+          </AppText>
+          <LineChart
+            series={[
+              {
+                label:
+                  MODULES.find((m) => m.value === module)?.label ?? module,
+                color: theme.colors.primary,
+                values: trendBands,
+              },
+            ]}
+            height={140}
+            showLegend={false}
+            testID="history-trend-chart"
+          />
+        </Card>
+      ) : null}
 
       {isLoading ? (
         <View style={styles.center}>

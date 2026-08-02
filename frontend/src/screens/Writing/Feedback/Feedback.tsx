@@ -6,6 +6,9 @@ import {
   AppText,
   Button,
   Card,
+  DiffText,
+  diffWords,
+  summariseDiff,
   Icon,
   ProgressBar,
   ScreenContainer,
@@ -146,6 +149,12 @@ export const Feedback: React.FC = () => {
             activeTab={activeTab}
             onPress={setTab}
           />
+          <TabButton
+            label="Changes"
+            tab="changes"
+            activeTab={activeTab}
+            onPress={setTab}
+          />
         </View>
 
         {activeTab === 'draft' ? (
@@ -160,10 +169,15 @@ export const Feedback: React.FC = () => {
               ))}
             </AppText>
           </>
-        ) : (
+        ) : activeTab === 'model' ? (
           <AppText variant="bodyLg" style={styles.essay}>
             {feedback.modelEssay}
           </AppText>
+        ) : (
+          <ChangesTab
+            draft={feedback.draftSegments.map((segment) => segment.text).join('')}
+            model={feedback.modelEssay}
+          />
         )}
 
         <View style={styles.essayFooter}>
@@ -214,6 +228,25 @@ const TabButton: React.FC<{
         {label}
       </AppText>
     </Pressable>
+  );
+};
+
+const ChangesTab: React.FC<{ draft: string; model: string }> = ({
+  draft,
+  model,
+}) => {
+  // Diffing is O(n*m) in words, so it is memoised against the two texts rather
+  // than recomputed on every tab switch or re-render.
+  const tokens = React.useMemo(() => diffWords(draft, model), [draft, model]);
+  const summary = React.useMemo(() => summariseDiff(tokens), [tokens]);
+
+  return (
+    <View testID="changes-tab">
+      <AppText variant="labelSm" color="textMuted" style={styles.diffSummary}>
+        {`${summary.added} added · ${summary.removed} removed · ${summary.unchanged} kept`}
+      </AppText>
+      <DiffText tokens={tokens} testID="essay-diff" />
+    </View>
   );
 };
 
@@ -334,6 +367,7 @@ const styles = StyleSheet.create({
   legendItem: { flexDirection: 'row', alignItems: 'center', marginRight: SPACING.md },
   dot: { width: 8, height: 8, borderRadius: 4, marginRight: SPACING.xxs },
   essay: { marginTop: SPACING.xs },
+  diffSummary: { marginBottom: SPACING.sm },
   essayFooter: {
     flexDirection: 'row',
     justifyContent: 'space-between',
