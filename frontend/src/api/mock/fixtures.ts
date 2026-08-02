@@ -243,8 +243,15 @@ export const MOCK_WRITING_RESULT: WritingResult = {
   feedbackSummary:
     'Clear position and relevant ideas; widen your range of complex structures and precise vocabulary to lift your band.',
   improvedEssay:
-    'Nowadays, technology has become increasingly important in our lives...',
+    'Nowadays, technology has become increasingly significant in our daily lives.',
+  essayText:
+    'Nowadays, technology is very important in our lives.',
+  promptText:
+    'Some people believe technology has made our lives more complex, while others think it has simplified them.',
 };
+
+const MOCK_TRANSCRIPT =
+  'I think technology is very useful for study. It help me to find information quickly and easy.';
 
 export const MOCK_SPEAKING_RESULT: SpeakingResult = {
   attemptId: 'sp_mock_1',
@@ -259,6 +266,25 @@ export const MOCK_SPEAKING_RESULT: SpeakingResult = {
   },
   feedbackSummary:
     'Good pronunciation and fluency; reduce fillers and use a wider range of connectives.',
+  transcript: MOCK_TRANSCRIPT,
+  // Offsets are real positions in MOCK_TRANSCRIPT, matching how the API
+  // returns already-validated spans.
+  issues: [
+    {
+      start: MOCK_TRANSCRIPT.indexOf('It help me'),
+      end: MOCK_TRANSCRIPT.indexOf('It help me') + 'It help me'.length,
+      quote: 'It help me',
+      tag: 'grammatical_range',
+      note: 'Subject-verb agreement: "it helps me".',
+    },
+    {
+      start: MOCK_TRANSCRIPT.indexOf('quickly and easy'),
+      end: MOCK_TRANSCRIPT.indexOf('quickly and easy') + 'quickly and easy'.length,
+      quote: 'quickly and easy',
+      tag: 'lexical_resource',
+      note: 'Use the adverb form: "quickly and easily".',
+    },
+  ],
 };
 
 export const MOCK_SPEAKING_SESSION: SpeakingSession = {

@@ -18,6 +18,13 @@ SPEAKING_SCORE_SCHEMA = {
     "pronunciation": "number 0-9 (0.5 steps)",
     "overall_band": "number 0-9 (0.5 steps)",
     "feedback_summary": "string (2-4 sentences, actionable)",
+    "issues": (
+        "array of up to 4 objects {quote, tag, note}. `quote` MUST be copied "
+        "verbatim from the candidate's response, word for word, so it can be "
+        "located in the text; never paraphrase or correct it. `tag` is one of "
+        "fluency_coherence, lexical_resource, grammatical_range, pronunciation. "
+        "`note` is one short sentence saying what to fix."
+    ),
 }
 
 _SYSTEM_PROMPT = (

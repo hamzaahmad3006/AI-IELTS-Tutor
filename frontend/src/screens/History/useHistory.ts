@@ -4,12 +4,18 @@ import { useCallback, useEffect, useState } from 'react';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import {
+  analyticsApi,
   listeningApi,
   readingApi,
   speakingApi,
   writingApi,
 } from '../../api';
-import type { Band, IeltsModule, RootStackParamList } from '../../types';
+import type {
+  Band,
+  IeltsModule,
+  RootStackParamList,
+  TrendResponse,
+} from '../../types';
 
 type Nav = NativeStackNavigationProp<RootStackParamList>;
 
@@ -30,6 +36,8 @@ interface UseHistoryResult {
   hasMore: boolean;
   error: string | null;
   setModule: (module: IeltsModule) => void;
+  /** Band series for the selected module, oldest first. */
+  trendBands: number[];
   loadMore: () => void;
   onBack: () => void;
 }
@@ -102,6 +110,26 @@ async function fetchPage(
 export const useHistory = (initial: IeltsModule = 'writing'): UseHistoryResult => {
   const navigation = useNavigation<Nav>();
   const [module, setModuleState] = useState<IeltsModule>(initial);
+  const [trend, setTrend] = useState<TrendResponse | null>(null);
+
+  // Loaded once and filtered per module client-side: the endpoint already
+  // returns every module, so switching tabs should not refetch.
+  useEffect(() => {
+    let active = true;
+    analyticsApi
+      .getTrend()
+      .then((data) => {
+        if (active) {
+          setTrend(data);
+        }
+      })
+      .catch(() => {
+        // Non-fatal: the list is the point, the chart is context.
+      });
+    return () => {
+      active = false;
+    };
+  }, []);
   const [rows, setRows] = useState<HistoryRow[]>([]);
   const [cursor, setCursor] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -152,6 +180,9 @@ export const useHistory = (initial: IeltsModule = 'writing'): UseHistoryResult =
 
   return {
     module,
+    trendBands:
+      trend?.modules.find((m) => m.module === module)?.points.map((p) => p.band) ??
+      [],
     rows,
     isLoading,
     isLoadingMore,

@@ -14,6 +14,17 @@ export { RadarChart, type RadarAxis } from './RadarChart/RadarChart';
 export { ComingSoon } from './ComingSoon/ComingSoon';
 export { DifficultySelector } from './DifficultySelector/DifficultySelector';
 export { QuestionNavigator } from './QuestionNavigator/QuestionNavigator';
+export {
+  HighlightedText,
+  DiffText,
+  type TextIssue,
+} from './HighlightedText/HighlightedText';
+export {
+  diffWords,
+  summariseDiff,
+  type DiffToken,
+  type DiffSummary,
+} from './HighlightedText/diff';
 export { TimerBar } from './Timer/TimerBar';
 export {
   useCountdown,

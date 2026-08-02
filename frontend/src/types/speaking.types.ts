@@ -69,6 +69,9 @@ export interface SpeakingResult {
   overallBand: Band | null;
   criteria: SpeakingCriteriaScore | null;
   feedbackSummary: string | null;
+  /** The scored transcript, so highlight offsets refer to known text. */
+  transcript: string;
+  issues: TranscriptIssue[];
 }
 
 export interface SpeakingHistoryItem {
@@ -82,6 +85,14 @@ export interface SpeakingHistoryItem {
 export interface SpeakingHistoryPage {
   items: SpeakingHistoryItem[];
   nextCursor: string | null;
+}
+
+export interface TranscriptIssue {
+  start: number;
+  end: number;
+  quote: string;
+  tag: string;
+  note: string;
 }
 
 export interface SpeakingQuestionItem {

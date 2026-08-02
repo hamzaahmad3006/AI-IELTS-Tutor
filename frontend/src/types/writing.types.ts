@@ -36,6 +36,9 @@ export interface WritingResult {
   criteria: WritingCriteriaScore | null;
   feedbackSummary: string | null;
   improvedEssay: string | null;
+  /** The learner's own text, for diffing against the improved version. */
+  essayText: string;
+  promptText: string | null;
 }
 
 export interface WritingHistoryItem {
@@ -66,7 +69,7 @@ export interface KeyImprovement {
   description: string;
 }
 
-export type FeedbackTab = 'draft' | 'model';
+export type FeedbackTab = 'draft' | 'model' | 'changes';
 
 export interface WritingFeedback {
   attemptId: string;
