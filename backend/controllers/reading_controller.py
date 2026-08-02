@@ -173,6 +173,77 @@ async def _seed_easy_passage(session: AsyncSession) -> None:
     await session.flush()
 
 
+_SEED_BODY_HEADINGS = (
+    "A. For most of human history, ice was a local luxury. It could be cut from "
+    "frozen lakes in winter and packed in sawdust, but it melted long before it "
+    "could travel far. Only the wealthy, and only in cold regions, ate anything "
+    "chilled.\n\n"
+    "B. That changed in the nineteenth century, when merchants began shipping "
+    "lake ice across oceans in insulated holds. A trade that started as a "
+    "curiosity grew into a substantial industry, and ice harvested in New England "
+    "was sold in India and the Caribbean.\n\n"
+    "C. Mechanical refrigeration eventually made the harvest obsolete. Compressors "
+    "could produce ice anywhere, at any time of year, and the vast ice houses that "
+    "had lined northern rivers were abandoned within a generation.\n\n"
+    "D. The consequences reached far beyond drinks. Reliable cold allowed meat, "
+    "dairy and vaccines to be moved over long distances, reshaping what people ate "
+    "and how far medicine could travel."
+)
+
+_HEADINGS = [
+    "A trade built on natural ice",
+    "How cold changed diets and medicine",
+    "Why early ice stayed local",
+    "The technology that ended an industry",
+    "The cost of transporting goods",
+]
+
+
+async def _seed_matching_headings_passage(session: AsyncSession) -> None:
+    """A passage exercising the matching-headings question type.
+
+    Modelled as one question per paragraph sharing a single heading list, which
+    is exactly a grouped multiple choice — so the existing grading path applies
+    unchanged and no new answer shape is introduced.
+    """
+    passage = Passage(
+        title="The Ice Trade",
+        body=_SEED_BODY_HEADINGS,
+        exam_type="academic",
+        difficulty="medium",
+        topic="history",
+        word_count=len(_SEED_BODY_HEADINGS.split()),
+        source="seed",
+    )
+    session.add(passage)
+    await session.flush()
+
+    # More headings than paragraphs, as in the real exam: the distractor is what
+    # makes the task a test of comprehension rather than elimination.
+    answers = [
+        ("Paragraph A", "Why early ice stayed local"),
+        ("Paragraph B", "A trade built on natural ice"),
+        ("Paragraph C", "The technology that ended an industry"),
+        ("Paragraph D", "How cold changed diets and medicine"),
+    ]
+    session.add_all(
+        [
+            Question(
+                passage_id=passage.id,
+                order_index=index,
+                type="matching_headings",
+                prompt=f"Choose the best heading for {label}.",
+                options=list(_HEADINGS),
+                correct_answer=answer,
+                explanation=f"{label} is summarised by “{answer}”.",
+                difficulty="medium",
+            )
+            for index, (label, answer) in enumerate(answers, start=1)
+        ]
+    )
+    await session.flush()
+
+
 async def _ensure_seeded(session: AsyncSession) -> None:
     existing = {
         difficulty
@@ -180,14 +251,24 @@ async def _ensure_seeded(session: AsyncSession) -> None:
             await session.execute(select(Passage.difficulty).distinct())
         ).all()
     }
+    has_headings = await session.scalar(
+        select(func.count())
+        .select_from(Question)
+        .where(Question.type == "matching_headings")
+    )
+
     if existing:
-        # Already seeded, but possibly from a bank that predates easy content.
-        # Checked per difficulty rather than "is the table empty", so a level
+        # Already seeded, but possibly from a bank that predates this content.
+        # Checked per addition rather than "is the table empty", so anything
         # added later still reaches databases seeded earlier.
         if "easy" not in existing:
             await _seed_easy_passage(session)
+        if not has_headings:
+            await _seed_matching_headings_passage(session)
         return
+
     await _seed_easy_passage(session)
+    await _seed_matching_headings_passage(session)
     passage = Passage(
         title="The History of Tea",
         body=_SEED_BODY,

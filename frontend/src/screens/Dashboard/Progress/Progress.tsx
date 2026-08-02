@@ -23,6 +23,7 @@ import type {
   ConsistencyStats,
   InsightsResponse,
   ModuleProgressStat,
+  PredictionModules,
   PredictionResponse,
   TrendResponse,
   WeaknessItem,
@@ -349,6 +350,8 @@ const PredictionCard: React.FC<{ prediction: PredictionResponse }> = ({
           />
         </View>
       </View>
+      <VelocityRows velocity={prediction.velocityPerWeek} />
+
       {prediction.horizonDate ? (
         <AppText variant="bodySm" color="textSecondary" style={styles.horizon}>
           Projected for your exam on {prediction.horizonDate}
@@ -358,6 +361,52 @@ const PredictionCard: React.FC<{ prediction: PredictionResponse }> = ({
         {prediction.note}
       </AppText>
     </Card>
+  );
+};
+
+const VelocityRows: React.FC<{ velocity: PredictionModules }> = ({
+  velocity,
+}) => {
+  const theme = useTheme();
+  const entries = (
+    Object.entries(velocity) as [keyof PredictionModules, number | null][]
+  ).filter(([, value]) => value !== null && value !== 0);
+
+  if (entries.length === 0) {
+    // Velocity needs at least two scored attempts in a module to mean
+    // anything; showing "0.00/wk" everywhere would look like stagnation
+    // rather than absence of data.
+    return (
+      <AppText variant="labelSm" color="textMuted" style={styles.velocityNote}>
+        Practise a module twice and your weekly rate of change appears here.
+      </AppText>
+    );
+  }
+
+  return (
+    <View style={styles.velocityWrap} testID="velocity-rows">
+      <AppText variant="labelSm" color="textMuted">
+        WEEKLY CHANGE
+      </AppText>
+      {entries.map(([module, value]) => {
+        const rate = value ?? 0;
+        return (
+          <View key={module} style={styles.velocityRow}>
+            <AppText variant="bodySm" color="textSecondary">
+              {MODULE_LABELS[module] ?? module}
+            </AppText>
+            <AppText
+              variant="labelMd"
+              style={{
+                color: rate > 0 ? theme.colors.success : theme.colors.error,
+              }}
+            >
+              {`${rate > 0 ? '+' : ''}${rate.toFixed(2)} band/wk`}
+            </AppText>
+          </View>
+        );
+      })}
+    </View>
   );
 };
 
@@ -423,6 +472,13 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     marginTop: SPACING.xs,
   },
+  velocityWrap: { marginTop: SPACING.md, gap: 2 },
+  velocityRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  velocityNote: { marginTop: SPACING.md },
   confidenceWrap: { flex: 1, marginLeft: SPACING.lg },
   confidenceBar: { marginTop: SPACING.xxs },
   horizon: { marginTop: SPACING.xs },

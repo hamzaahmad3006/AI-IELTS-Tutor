@@ -8,6 +8,7 @@ import {
   Button,
   Card,
   DifficultySelector,
+  MatchingHeadings,
   QuestionNavigator,
   TimerBar,
   Icon,
@@ -92,6 +93,15 @@ export const Practice: React.FC = () => {
   }
 
   // ---- Practice view ----
+  // Matching-headings questions share one heading bank, so they are rendered
+  // together rather than repeating the same five options four times.
+  const matchingQuestions = passage.questions.filter(
+    (q) => q.type === 'matching_headings',
+  );
+  const standardQuestions = passage.questions.filter(
+    (q) => q.type !== 'matching_headings',
+  );
+
   return (
     <ScreenContainer scroll>
       <Header title="Reading Practice" onBack={onBack} />
@@ -131,17 +141,42 @@ export const Practice: React.FC = () => {
         onSelect={goToQuestion}
       />
 
-      {passage.questions.map((q, index) => (
-        <QuestionCard
-          key={q.id}
-          index={index}
-          question={q}
-          value={answers[q.id]}
-          isCurrent={index === currentIndex}
-          onFocus={() => goToQuestion(index)}
-          onChange={(value) => setAnswer(q.id, value)}
+      {matchingQuestions.length > 0 ? (
+        <MatchingHeadings
+          headings={matchingQuestions[0].options ?? []}
+          slots={matchingQuestions.map((q) => ({
+            id: q.id,
+            // The paragraph is named in the prompt; the slot only needs that.
+            label: q.prompt.replace(/^Choose the best heading for /, '').replace(/\.$/, ''),
+          }))}
+          assignments={Object.fromEntries(
+            matchingQuestions.map((q) => [
+              q.id,
+              typeof answers[q.id] === 'string'
+                ? (answers[q.id] as string)
+                : undefined,
+            ]),
+          )}
+          onAssign={(questionId, heading) => setAnswer(questionId, heading ?? '')}
         />
-      ))}
+      ) : null}
+
+      {standardQuestions.map((q) => {
+        // Numbering follows the passage, not this filtered list, so the
+        // navigator and the cards agree when both kinds are present.
+        const questionIndex = passage.questions.indexOf(q);
+        return (
+          <QuestionCard
+            key={q.id}
+            index={questionIndex}
+            question={q}
+            value={answers[q.id]}
+            isCurrent={questionIndex === currentIndex}
+            onFocus={() => goToQuestion(questionIndex)}
+            onChange={(value) => setAnswer(q.id, value)}
+          />
+        );
+      })}
 
       {error ? (
         <AppText variant="labelMd" color="error" style={styles.section}>

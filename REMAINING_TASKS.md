@@ -2,14 +2,14 @@
 
 Everything **not yet completed** to finish the project, organized by area. Checked = done, unchecked = remaining. Use this as the living backlog.
 
-> **Status as of PR #63** — **117 of 191 checklist items done (~61%)**. Weighted by
+> **Status as of PR #64** — **119 of 191 checklist items done (~62%)**. Weighted by
 > effort it is further along than that, since the backend and data layer are largely
 > complete while most remaining items are large features (live voice, deployment) or
 > are blocked on native modules.
 > **Running on real infrastructure:** live Supabase PostgreSQL 17.6 and the real Groq
 > API, verified on a physical Android phone — register → onboarding → dashboard → all
 > four practice modules → progress → coach → profile → logout.
-> **Verified by:** 23 backend smoke suites, a 13-step E2E user-journey check, 132
+> **Verified by:** 23 backend smoke suites, a 13-step E2E user-journey check, 140
 > frontend tests, `tsc --noEmit`, and a Docker image build — all four gates run in CI
 > on every push.
 > **Biggest remaining:** the live voice (LiveKit) pipeline, production deployment,
@@ -91,7 +91,11 @@ Everything **not yet completed** to finish the project, organized by area. Check
       actually served shown alongside the request
 - [x] Question navigator + timer — numbered strip showing answered state (labelled
       for screen readers, not colour-only), and a 20-minute passage clock
-- [ ] Matching-headings drag UI
+- [x] Matching-headings task — **tap-to-assign, not drag**. Dragging a small target
+      on a phone is error-prone and has no accessible equivalent for screen
+      readers; tapping a heading then a paragraph expresses the same intent and
+      is fully operable by assistive tech. Modelled as grouped multiple choice,
+      so the existing grading path is unchanged
 
 ### Listening (built)
 - [x] Clip delivery + question runner with answer capture
@@ -122,7 +126,9 @@ Everything **not yet completed** to finish the project, organized by area. Check
       chart is unreadable, and per-module current bands are in the radar below it)
 - [x] Radar chart of 4 modules (current band per module, unmeasured axes collapse
       to the centre rather than reading as 0)
-- [ ] Improvement velocity + predicted exam-day band with confidence
+- [x] Improvement velocity — per-module weekly rate of change, signed and
+      unit-bearing. Modules with too little history are omitted rather than shown
+      as 0.00/wk, which would read as stagnation instead of absence of data
 - [x] Consistency — current and longest streak, active days in the last 30, and an
       8-week activity histogram (`GET /analytics/insights`). Time-on-task reports
       **only** measured speaking minutes and says so; the other modules record no
