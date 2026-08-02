@@ -7,6 +7,7 @@ import { readingApi } from '../../../api';
 import type {
   AnswerMap,
   AnswerValue,
+  Difficulty,
   ReadingPassage,
   ReadingResult,
   RootStackParamList,
@@ -22,6 +23,8 @@ interface UseReadingResult {
   isSubmitting: boolean;
   result: ReadingResult | null;
   error: string | null;
+  difficulty: Difficulty;
+  setDifficulty: (value: Difficulty) => void;
   setAnswer: (questionId: string, value: AnswerValue) => void;
   submit: () => void;
   tryAnother: () => void;
@@ -31,6 +34,7 @@ interface UseReadingResult {
 export const useReading = (): UseReadingResult => {
   const navigation = useNavigation<Nav>();
   const [passage, setPassage] = useState<ReadingPassage | null>(null);
+  const [difficulty, setDifficultyState] = useState<Difficulty>('adaptive');
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [answers, setAnswers] = useState<AnswerMap>({});
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
@@ -41,18 +45,28 @@ export const useReading = (): UseReadingResult => {
     setIsLoading(true);
     setError(null);
     try {
-      const data = await readingApi.getPassage();
+      const data = await readingApi.getPassage(
+        difficulty === 'adaptive' ? undefined : difficulty,
+      );
       setPassage(data);
     } catch {
       setError('Could not load a passage. Please try again.');
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [difficulty]);
 
   useEffect(() => {
     void loadPassage();
   }, [loadPassage]);
+
+  const setDifficulty = useCallback((value: Difficulty): void => {
+    // Answers belong to the old item, so they are cleared rather than carried
+    // onto whatever content the new level returns.
+    setDifficultyState(value);
+    setAnswers({});
+    setResult(null);
+  }, []);
 
   const setAnswer = useCallback(
     (questionId: string, value: AnswerValue): void => {
@@ -92,6 +106,8 @@ export const useReading = (): UseReadingResult => {
     isSubmitting,
     result,
     error,
+    difficulty,
+    setDifficulty,
     setAnswer,
     submit,
     tryAnother,
