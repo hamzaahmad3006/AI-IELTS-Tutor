@@ -2,14 +2,14 @@
 
 Everything **not yet completed** to finish the project, organized by area. Checked = done, unchecked = remaining. Use this as the living backlog.
 
-> **Status as of PR #60** — **110 of 190 checklist items done (~58%)**. Weighted by
+> **Status as of PR #61** — **112 of 190 checklist items done (~59%)**. Weighted by
 > effort it is further along than that, since the backend and data layer are largely
 > complete while most remaining items are large features (live voice, deployment) or
 > are blocked on native modules.
 > **Running on real infrastructure:** live Supabase PostgreSQL 17.6 and the real Groq
 > API, verified on a physical Android phone — register → onboarding → dashboard → all
 > four practice modules → progress → coach → profile → logout.
-> **Verified by:** 21 backend smoke suites, a 13-step E2E user-journey check, 109
+> **Verified by:** 21 backend smoke suites, a 13-step E2E user-journey check, 115
 > frontend tests, `tsc --noEmit`, and a Docker image build — all four gates run in CI
 > on every push.
 > **Biggest remaining:** the live voice (LiveKit) pipeline, production deployment,
@@ -42,9 +42,12 @@ Everything **not yet completed** to finish the project, organized by area. Check
 - [x] Consent (AI processing required, voice optional)
 - [x] Submits the full draft to `POST /onboarding`, then enters the app shell
 - [x] Wired into navigation (Splash → Auth → Register → Onboarding → Main)
-- [ ] Welcome / value-proposition carousel
-- [ ] Exam date picker in onboarding — carried in the draft but not user-set here;
-      the `DatePickerSheet` component now exists, so this is a wiring job
+- [x] Welcome / value-proposition carousel — three swipeable slides, dots, and a
+      Skip route out. Copy is limited to what the app actually does (a test
+      guards against "guaranteed band" style claims creeping in)
+- [x] Exam date picker in onboarding — optional by design, since many learners have
+      not booked yet and blocking on a date they do not have would stall them at
+      the door. Verified end to end: it persists and becomes the prediction horizon
 - [ ] Adaptive placement diagnostic runner (all 4 modules)
 - [ ] Baseline results + CEFR + "generating plan" screen
 

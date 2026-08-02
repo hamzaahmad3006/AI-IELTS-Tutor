@@ -35,6 +35,11 @@ interface UseExamSetupResult {
   setExamType: (value: ExamType) => void;
   setSelfLevel: (value: ProficiencyLevel) => void;
   setDailyMinutes: (value: number) => void;
+  examDate: string | null;
+  dateSheetOpen: boolean;
+  openDateSheet: () => void;
+  closeDateSheet: () => void;
+  setExamDate: (isoDate: string | null) => void;
   toggleConsentAi: () => void;
   toggleConsentVoice: () => void;
   submit: () => void;
@@ -44,6 +49,7 @@ interface UseExamSetupResult {
 export const useExamSetup = (): UseExamSetupResult => {
   const dispatch = useAppDispatch();
   const navigation = useNavigation<Nav>();
+  const [dateSheetOpen, setDateSheetOpen] = useState<boolean>(false);
   const { step, totalSteps, draft } = useAppSelector(
     (state) => state.onboarding,
   );
@@ -78,6 +84,14 @@ export const useExamSetup = (): UseExamSetupResult => {
   const toggleConsentVoice = useCallback((): void => {
     dispatch(updateDraft({ consentVoice: !draft.consentVoice }));
   }, [dispatch, draft.consentVoice]);
+
+  const setExamDate = useCallback(
+    (isoDate: string | null): void => {
+      dispatch(updateDraft({ examDate: isoDate }));
+      setDateSheetOpen(false);
+    },
+    [dispatch],
+  );
 
   const submit = useCallback((): void => {
     if (!draft.consentAi) {
@@ -123,6 +137,11 @@ export const useExamSetup = (): UseExamSetupResult => {
     setExamType,
     setSelfLevel,
     setDailyMinutes,
+    examDate: draft.examDate,
+    dateSheetOpen,
+    openDateSheet: () => setDateSheetOpen(true),
+    closeDateSheet: () => setDateSheetOpen(false),
+    setExamDate,
     toggleConsentAi,
     toggleConsentVoice,
     submit,

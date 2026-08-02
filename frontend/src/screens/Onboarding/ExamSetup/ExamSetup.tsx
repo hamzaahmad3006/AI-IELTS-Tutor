@@ -6,6 +6,7 @@ import {
   AppText,
   Button,
   Card,
+  DatePickerSheet,
   Icon,
   ScreenContainer,
   useTheme,
@@ -42,6 +43,11 @@ export const ExamSetup: React.FC = () => {
     setExamType,
     setSelfLevel,
     setDailyMinutes,
+    examDate,
+    dateSheetOpen,
+    openDateSheet,
+    closeDateSheet,
+    setExamDate,
     toggleConsentAi,
     toggleConsentVoice,
     submit,
@@ -114,6 +120,33 @@ export const ExamSetup: React.FC = () => {
         ))}
       </View>
 
+      {/* Exam date */}
+      <AppText variant="titleLg" style={styles.sectionTitle}>
+        Exam date
+      </AppText>
+      <Card style={styles.dateCard}>
+        <View style={styles.dateRow}>
+          <View>
+            <AppText variant="bodyMd">
+              {examDate ?? 'Not decided yet'}
+            </AppText>
+            <AppText variant="labelSm" color="textSecondary">
+              {/* Optional on purpose: many learners book the test later, and
+                  blocking onboarding on a date they do not have would stall
+                  them at the door. */}
+              Optional — it sets the horizon for your predicted band
+            </AppText>
+          </View>
+          <Button
+            title={examDate ? 'Change' : 'Set date'}
+            variant="secondary"
+            fullWidth={false}
+            onPress={openDateSheet}
+            testID="onboarding-set-date"
+          />
+        </View>
+      </Card>
+
       {/* Consent */}
       <AppText variant="titleLg" style={styles.sectionTitle}>
         Permissions
@@ -148,6 +181,14 @@ export const ExamSetup: React.FC = () => {
       <AppText variant="labelSm" color="textMuted" align="center" style={styles.footnote}>
         Estimated band scores are for practice and are not official IELTS results.
       </AppText>
+      <DatePickerSheet
+        visible={dateSheetOpen}
+        value={examDate}
+        title="When is your exam?"
+        onClose={closeDateSheet}
+        onSelect={setExamDate}
+        onClear={() => setExamDate(null)}
+      />
     </ScreenContainer>
   );
 };
@@ -260,6 +301,13 @@ const styles = StyleSheet.create({
   },
   title: { marginTop: SPACING.xs },
   subtitle: { marginTop: SPACING.xxs },
+  dateCard: { marginTop: SPACING.sm },
+  dateRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: SPACING.md,
+  },
   sectionTitle: { marginTop: SPACING.lg, marginBottom: SPACING.xs },
   selectCard: { marginBottom: SPACING.sm },
   selectRow: { flexDirection: 'row', alignItems: 'center' },
