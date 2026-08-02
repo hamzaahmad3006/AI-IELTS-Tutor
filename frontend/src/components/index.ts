@@ -15,6 +15,10 @@ export { ComingSoon } from './ComingSoon/ComingSoon';
 export { DifficultySelector } from './DifficultySelector/DifficultySelector';
 export { QuestionNavigator } from './QuestionNavigator/QuestionNavigator';
 export {
+  MatchingHeadings,
+  type MatchingSlot,
+} from './MatchingHeadings/MatchingHeadings';
+export {
   HighlightedText,
   DiffText,
   type TextIssue,

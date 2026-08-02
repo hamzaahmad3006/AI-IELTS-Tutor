@@ -72,6 +72,16 @@ describe('Progress tab', () => {
     // presented as total study time.
     expect(screen.getByText(/covers Speaking only/)).toBeTruthy();
   });
+
+  it('shows weekly rate of change per module', async () => {
+    renderWithProviders(<Progress />);
+    await waitFor(() => {
+      expect(screen.getByTestId('velocity-rows')).toBeTruthy();
+    });
+    expect(screen.getByText('WEEKLY CHANGE')).toBeTruthy();
+    // Signed and unit-bearing, so the number is not mistaken for a band.
+    expect(screen.getByText('+0.15 band/wk')).toBeTruthy();
+  });
 });
 
 describe('Coach tab', () => {
