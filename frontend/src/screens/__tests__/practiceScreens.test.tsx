@@ -106,6 +106,47 @@ describe('Writing practice screen', () => {
   });
 });
 
+describe('Difficulty selection', () => {
+  it('offers adaptive plus explicit levels on Reading', async () => {
+    renderWithProviders(<ReadingPractice />);
+    await waitFor(() => {
+      expect(screen.getByTestId('difficulty-selector')).toBeTruthy();
+    });
+    // Adaptive stays a first-class option, so an override can be undone.
+    ['adaptive', 'easy', 'medium', 'hard'].forEach((level) => {
+      expect(screen.getByTestId(`difficulty-${level}`)).toBeTruthy();
+    });
+  });
+
+  it('reports the level actually served, not just the one requested', async () => {
+    renderWithProviders(<ReadingPractice />);
+    await waitFor(() => {
+      expect(screen.getByTestId('difficulty-served')).toBeTruthy();
+    });
+    // Under adaptive the copy says the app chose it.
+    expect(screen.getByTestId('difficulty-served')).toHaveTextContent(/Chose/);
+  });
+
+  it('offers the same control on Listening', async () => {
+    renderWithProviders(<ListeningPractice />);
+    await waitFor(() => {
+      expect(screen.getByTestId('difficulty-selector')).toBeTruthy();
+    });
+    expect(screen.getByTestId('difficulty-hard')).toBeTruthy();
+  });
+
+  it('switches to an explicit level on request', async () => {
+    renderWithProviders(<ReadingPractice />);
+    await waitFor(() => {
+      expect(screen.getByTestId('difficulty-hard')).toBeTruthy();
+    });
+    fireEvent.press(screen.getByTestId('difficulty-hard'));
+    await waitFor(() => {
+      expect(screen.getByTestId('difficulty-served')).toHaveTextContent(/Serving/);
+    });
+  });
+});
+
 describe('Speaking practice screen', () => {
   it('renders the cue card and prep phase', async () => {
     renderWithProviders(<SpeakingPractice />);

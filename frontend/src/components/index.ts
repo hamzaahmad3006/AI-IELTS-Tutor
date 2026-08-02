@@ -12,6 +12,7 @@ export { BandSlider } from './BandSlider/BandSlider';
 export { LineChart, type LineSeries } from './LineChart/LineChart';
 export { RadarChart, type RadarAxis } from './RadarChart/RadarChart';
 export { ComingSoon } from './ComingSoon/ComingSoon';
+export { DifficultySelector } from './DifficultySelector/DifficultySelector';
 export { ToastHost } from './Toast/ToastHost';
 export { BottomSheet } from './BottomSheet/BottomSheet';
 export {

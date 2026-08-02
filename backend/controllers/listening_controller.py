@@ -90,10 +90,87 @@ _SEED_TRANSCRIPT_BOOKING = (
 )
 
 
+_SEED_TRANSCRIPT_CAFE = (
+    "Good morning, and thanks for calling the Riverside Cafe. We open at eight "
+    "o'clock every day except Sunday, when we open at ten. Breakfast is served "
+    "until eleven thirty. We do take bookings for groups of six or more, but for "
+    "smaller tables it is first come, first served. There is free parking behind "
+    "the building, and the entrance on Mill Street has a ramp. If you would like "
+    "to speak to a member of staff, please call back after nine o'clock."
+)
+
+
+async def _seed_easy_clip(session: AsyncSession) -> None:
+    """Add the easy clip and its questions.
+
+    Separate from the main seed so a database populated before easy content
+    existed still receives it; otherwise choosing Easy quietly plays a medium
+    clip.
+    """
+    clip = AudioClip(
+        title="Cafe Information Line",
+        object_key="seed/audio/cafe.wav",
+        transcript=_SEED_TRANSCRIPT_CAFE,
+        duration_sec=40,
+        exam_type="academic",
+        difficulty="easy",
+        accent="British",
+        source="seed",
+    )
+    session.add(clip)
+    await session.flush()
+    session.add_all(
+        [
+            ListeningQuestion(
+                audio_id=clip.id,
+                order_index=1,
+                type="short_answer",
+                prompt="What time does the cafe open on Sunday?",
+                options=None,
+                correct_answer="ten",
+                explanation="The speaker says they open at ten on Sunday.",
+                answer_timestamp="00:05-00:09",
+                difficulty="easy",
+            ),
+            ListeningQuestion(
+                audio_id=clip.id,
+                order_index=2,
+                type="mcq",
+                prompt="Bookings are only taken for groups of how many?",
+                options=["Two or more", "Four or more", "Six or more", "Ten or more"],
+                correct_answer="Six or more",
+                explanation="Bookings are taken for groups of six or more.",
+                answer_timestamp="00:14-00:19",
+                difficulty="easy",
+            ),
+            ListeningQuestion(
+                audio_id=clip.id,
+                order_index=3,
+                type="form_completion",
+                prompt="Free parking is available ____ the building.",
+                options=None,
+                correct_answer="behind",
+                explanation="There is free parking behind the building.",
+                answer_timestamp="00:22-00:26",
+                difficulty="easy",
+            ),
+        ]
+    )
+    await session.flush()
+
+
 async def _ensure_seeded(session: AsyncSession) -> None:
-    count = await session.scalar(select(func.count()).select_from(AudioClip))
-    if count and count > 0:
+    existing = {
+        difficulty
+        for (difficulty,) in (
+            await session.execute(select(AudioClip.difficulty).distinct())
+        ).all()
+    }
+    if existing:
+        if "easy" not in existing:
+            await _seed_easy_clip(session)
         return
+    await _seed_easy_clip(session)
     clip = AudioClip(
         title="University Orientation",
         object_key="seed/audio/orientation.wav",

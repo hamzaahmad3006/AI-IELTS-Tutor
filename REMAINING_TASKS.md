@@ -2,14 +2,14 @@
 
 Everything **not yet completed** to finish the project, organized by area. Checked = done, unchecked = remaining. Use this as the living backlog.
 
-> **Status as of PR #55** — **99 of 187 checklist items done (~53%)**. Weighted by
+> **Status as of PR #59** — **108 of 190 checklist items done (~57%)**. Weighted by
 > effort it is further along than that, since the backend and data layer are largely
 > complete while most remaining items are large features (live voice, deployment) or
 > are blocked on native modules.
 > **Running on real infrastructure:** live Supabase PostgreSQL 17.6 and the real Groq
 > API, verified on a physical Android phone — register → onboarding → dashboard → all
 > four practice modules → progress → coach → profile → logout.
-> **Verified by:** 19 backend smoke suites, a 13-step E2E user-journey check, 89
+> **Verified by:** 21 backend smoke suites, a 13-step E2E user-journey check, 104
 > frontend tests, `tsc --noEmit`, and a Docker image build — all four gates run in CI
 > on every push.
 > **Biggest remaining:** the live voice (LiveKit) pipeline, production deployment,
@@ -74,7 +74,8 @@ Everything **not yet completed** to finish the project, organized by area. Check
 - [x] Passage + question runner (MCQ / True-False-Not-Given / short answer)
 - [x] Result screen: raw score → band + per-question correctness & explanations
 - [x] Adaptive difficulty (server-resolved) + randomized passage selection
-- [ ] Explicit difficulty selection UI
+- [x] Explicit difficulty selection UI — Adaptive/Easy/Medium/Hard, with the level
+      actually served shown alongside the request
 - [ ] Question navigator + timer
 - [ ] Matching-headings drag UI
 
@@ -85,7 +86,8 @@ Everything **not yet completed** to finish the project, organized by area. Check
 - [x] **Audio is now actually served** — `/media/...` route (the advertised `audioUrl` used to 404), path-traversal guarded, covered by a smoke test
 - [ ] **Native audio playback in the app** — needs a player library (`react-native-video`/`sound`) that requires native linking; cannot be verified without a device build
 - [ ] **Replace silent placeholder audio with real recordings** — clips are valid WAVs of the right duration but contain silence (`scripts/generate_placeholder_audio.py`)
-- [ ] Explicit difficulty selection UI + single-play/replay policy enforcement
+- [x] Explicit difficulty selection UI (shared `DifficultySelector`)
+- [ ] Single-play / replay policy enforcement
 
 ### AI Tutor / Learning
 - [x] Daily Coach feed (message + weakness-driven recommendations that tap through to practice)

@@ -96,10 +96,98 @@ _SEED_BODY_URBAN = (
 )
 
 
+_SEED_BODY_MARKET = (
+    "Farmers' markets have become a familiar sight in towns across the country. "
+    "At a farmers' market, growers sell their produce directly to the public "
+    "rather than through a supermarket. Shoppers say they like being able to ask "
+    "where food comes from, and many enjoy the atmosphere on a Saturday morning. "
+    "Prices are not always lower than in the shops, but the fruit and vegetables "
+    "are usually picked within a day or two of being sold, so they stay fresh for "
+    "longer. Most markets open early and close by lunchtime. Some now accept card "
+    "payments, though a number of smaller stalls still ask for cash."
+)
+
+
+async def _seed_easy_passage(session: AsyncSession) -> None:
+    """Add the easy passage and its questions.
+
+    Split out so it can run on a database that was seeded before easy content
+    existed. Without this, selecting Easy silently serves a medium passage.
+    """
+    passage = Passage(
+        title="Farmers' Markets",
+        body=_SEED_BODY_MARKET,
+        exam_type="academic",
+        difficulty="easy",
+        topic="food",
+        word_count=len(_SEED_BODY_MARKET.split()),
+        source="seed",
+    )
+    session.add(passage)
+    await session.flush()
+    session.add_all(
+        [
+            Question(
+                passage_id=passage.id,
+                order_index=1,
+                type="mcq",
+                prompt="Who sells the produce at a farmers' market?",
+                options=[
+                    "Supermarket buyers",
+                    "The growers themselves",
+                    "Government inspectors",
+                    "Delivery drivers",
+                ],
+                correct_answer="The growers themselves",
+                explanation=(
+                    "The passage says growers sell directly to the public rather "
+                    "than through a supermarket."
+                ),
+                difficulty="easy",
+            ),
+            Question(
+                passage_id=passage.id,
+                order_index=2,
+                type="true_false_notgiven",
+                prompt="Farmers' markets are always cheaper than supermarkets.",
+                options=["true", "false", "not_given"],
+                correct_answer="false",
+                explanation=(
+                    "The passage states prices are not always lower than in the "
+                    "shops."
+                ),
+                difficulty="easy",
+            ),
+            Question(
+                passage_id=passage.id,
+                order_index=3,
+                type="short_answer",
+                prompt="By what time of day do most markets close?",
+                options=None,
+                correct_answer="lunchtime",
+                explanation="The passage says most markets close by lunchtime.",
+                difficulty="easy",
+            ),
+        ]
+    )
+    await session.flush()
+
+
 async def _ensure_seeded(session: AsyncSession) -> None:
-    count = await session.scalar(select(func.count()).select_from(Passage))
-    if count and count > 0:
+    existing = {
+        difficulty
+        for (difficulty,) in (
+            await session.execute(select(Passage.difficulty).distinct())
+        ).all()
+    }
+    if existing:
+        # Already seeded, but possibly from a bank that predates easy content.
+        # Checked per difficulty rather than "is the table empty", so a level
+        # added later still reaches databases seeded earlier.
+        if "easy" not in existing:
+            await _seed_easy_passage(session)
         return
+    await _seed_easy_passage(session)
     passage = Passage(
         title="The History of Tea",
         body=_SEED_BODY,

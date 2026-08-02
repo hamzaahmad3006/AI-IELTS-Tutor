@@ -7,6 +7,7 @@ import { listeningApi } from '../../../api';
 import type {
   AnswerMap,
   AnswerValue,
+  Difficulty,
   ListeningClip,
   ListeningResult,
   RootStackParamList,
@@ -23,6 +24,8 @@ interface UseListeningResult {
   isSubmitting: boolean;
   result: ListeningResult | null;
   error: string | null;
+  difficulty: Difficulty;
+  setDifficulty: (value: Difficulty) => void;
   togglePlayback: () => void;
   setAnswer: (questionId: string, value: AnswerValue) => void;
   submit: () => void;
@@ -33,6 +36,7 @@ interface UseListeningResult {
 export const useListening = (): UseListeningResult => {
   const navigation = useNavigation<Nav>();
   const [clip, setClip] = useState<ListeningClip | null>(null);
+  const [difficulty, setDifficultyState] = useState<Difficulty>('adaptive');
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [answers, setAnswers] = useState<AnswerMap>({});
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
@@ -44,14 +48,16 @@ export const useListening = (): UseListeningResult => {
     setIsLoading(true);
     setError(null);
     try {
-      const data = await listeningApi.getClip();
+      const data = await listeningApi.getClip(
+        difficulty === 'adaptive' ? undefined : difficulty,
+      );
       setClip(data);
     } catch {
       setError('Could not load audio. Please try again.');
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [difficulty]);
 
   useEffect(() => {
     void loadClip();
@@ -63,6 +69,14 @@ export const useListening = (): UseListeningResult => {
    */
   const togglePlayback = useCallback((): void => {
     setIsPlaying((prev) => !prev);
+  }, []);
+
+  const setDifficulty = useCallback((value: Difficulty): void => {
+    // Answers belong to the old clip, so they are cleared rather than carried
+    // onto whatever content the new level returns.
+    setDifficultyState(value);
+    setAnswers({});
+    setResult(null);
   }, []);
 
   const setAnswer = useCallback(
@@ -105,6 +119,8 @@ export const useListening = (): UseListeningResult => {
     isSubmitting,
     result,
     error,
+    difficulty,
+    setDifficulty,
     togglePlayback,
     setAnswer,
     submit,

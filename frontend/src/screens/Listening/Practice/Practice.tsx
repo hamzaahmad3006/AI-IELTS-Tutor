@@ -7,6 +7,7 @@ import {
   BandBadge,
   Button,
   Card,
+  DifficultySelector,
   Icon,
   Input,
   ScreenContainer,
@@ -41,6 +42,8 @@ export const Practice: React.FC = () => {
     submit,
     tryAnother,
     onBack,
+    difficulty,
+    setDifficulty,
   } = useListening();
 
   if (isLoading || !clip) {
@@ -89,6 +92,13 @@ export const Practice: React.FC = () => {
   return (
     <ScreenContainer scroll>
       <Header title="Listening Practice" onBack={onBack} />
+
+      <DifficultySelector
+        value={difficulty}
+        onChange={setDifficulty}
+        served={clip?.difficulty ?? null}
+        disabled={isLoading}
+      />
 
       {/* Audio player */}
       <Card style={styles.section}>

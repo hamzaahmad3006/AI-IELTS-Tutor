@@ -18,6 +18,7 @@ CLIPS = {
     "orientation.wav": 45,
     "museum.wav": 48,
     "booking.wav": 52,
+    "cafe.wav": 40,
 }
 
 # Low fidelity on purpose: these are silent placeholders, so keep them small.

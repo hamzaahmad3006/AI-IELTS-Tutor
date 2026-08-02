@@ -7,6 +7,7 @@ import {
   BandBadge,
   Button,
   Card,
+  DifficultySelector,
   Icon,
   Input,
   ScreenContainer,
@@ -33,6 +34,8 @@ export const Practice: React.FC = () => {
     submit,
     tryAnother,
     onBack,
+    difficulty,
+    setDifficulty,
   } = useReading();
 
   if (isLoading || !passage) {
@@ -81,6 +84,13 @@ export const Practice: React.FC = () => {
   return (
     <ScreenContainer scroll>
       <Header title="Reading Practice" onBack={onBack} />
+
+      <DifficultySelector
+        value={difficulty}
+        onChange={setDifficulty}
+        served={passage?.difficulty ?? null}
+        disabled={isLoading}
+      />
 
       <Card style={styles.section} backgroundToken="cardAlt">
         <AppText variant="titleLg">{passage.title}</AppText>
