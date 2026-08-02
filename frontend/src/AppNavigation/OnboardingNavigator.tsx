@@ -5,6 +5,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { Welcome } from '../screens/Onboarding/Welcome/Welcome';
 import { TargetBand } from '../screens/Onboarding/TargetBand/TargetBand';
 import { ExamSetup } from '../screens/Onboarding/ExamSetup/ExamSetup';
+import { Diagnostic } from '../screens/Onboarding/Diagnostic/Diagnostic';
 import type { OnboardingStackParamList } from '../types';
 
 const Stack = createNativeStackNavigator<OnboardingStackParamList>();
@@ -17,5 +18,6 @@ export const OnboardingNavigator: React.FC = () => (
     <Stack.Screen name="Welcome" component={Welcome} />
     <Stack.Screen name="TargetBand" component={TargetBand} />
     <Stack.Screen name="ExamSetup" component={ExamSetup} />
+    <Stack.Screen name="Diagnostic" component={Diagnostic} />
   </Stack.Navigator>
 );

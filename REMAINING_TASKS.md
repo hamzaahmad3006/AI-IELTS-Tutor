@@ -2,14 +2,14 @@
 
 Everything **not yet completed** to finish the project, organized by area. Checked = done, unchecked = remaining. Use this as the living backlog.
 
-> **Status as of PR #64** — **119 of 191 checklist items done (~62%)**. Weighted by
+> **Status as of PR #65** — **121 of 192 checklist items done (~63%)**. Weighted by
 > effort it is further along than that, since the backend and data layer are largely
 > complete while most remaining items are large features (live voice, deployment) or
 > are blocked on native modules.
 > **Running on real infrastructure:** live Supabase PostgreSQL 17.6 and the real Groq
 > API, verified on a physical Android phone — register → onboarding → dashboard → all
 > four practice modules → progress → coach → profile → logout.
-> **Verified by:** 23 backend smoke suites, a 13-step E2E user-journey check, 140
+> **Verified by:** 24 backend smoke suites, a 13-step E2E user-journey check, 145
 > frontend tests, `tsc --noEmit`, and a Docker image build — all four gates run in CI
 > on every push.
 > **Biggest remaining:** the live voice (LiveKit) pipeline, production deployment,
@@ -48,8 +48,13 @@ Everything **not yet completed** to finish the project, organized by area. Check
 - [x] Exam date picker in onboarding — optional by design, since many learners have
       not booked yet and blocking on a date they do not have would stall them at
       the door. Verified end to end: it persists and becomes the prediction horizon
-- [ ] Adaptive placement diagnostic runner (all 4 modules)
-- [ ] Baseline results + CEFR + "generating plan" screen
+- [x] Placement diagnostic runner — one short sitting across all four modules,
+      skippable at any point. Reading and Listening grade instantly from the key;
+      Writing and Speaking are optional and a skipped or too-short response
+      records **no** baseline rather than a fabricated one
+- [x] Baseline results + CEFR — per-module bands with the reason for each, overall
+      band, and an indicative CEFR level; written back to the learner profile
+- [ ] "Generating plan" screen — waits on the planner endpoints
 
 ### Speaking (AI-scored practice built; live voice pipeline pending)
 - [x] Part 2 cue-card practice: real cue card from the backend bank, prep → speak timers driven by the card, response capture

@@ -8,6 +8,7 @@ from . import (
     analytics,
     auth,
     dashboard,
+    diagnostic,
     grammar,
     listening,
     me,
@@ -32,6 +33,7 @@ api_router.include_router(listening.router)
 api_router.include_router(speaking.router)
 api_router.include_router(vocabulary.router)
 api_router.include_router(grammar.router)
+api_router.include_router(diagnostic.router)
 api_router.include_router(analytics.router)
 api_router.include_router(admin.router)
 api_router.include_router(admin_content.router)

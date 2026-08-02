@@ -70,7 +70,10 @@ export const useWelcome = (): UseWelcomeResult => {
   const start = useCallback((): void => {
     // Replace rather than push: the carousel is an intro, and swiping back to
     // it from the first real step would be confusing.
-    navigation.replace('TargetBand');
+    //
+    // The placement test comes first so the target band step can be framed
+    // against a real starting point; it is skippable from there.
+    navigation.replace('Diagnostic');
   }, [navigation]);
 
   const next = useCallback((): void => {
