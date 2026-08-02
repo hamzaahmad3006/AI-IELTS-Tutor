@@ -26,12 +26,18 @@ interface UseListeningResult {
   error: string | null;
   difficulty: Difficulty;
   setDifficulty: (value: Difficulty) => void;
+  playMode: PlayMode;
+  setPlayMode: (mode: PlayMode) => void;
+  playsUsed: number;
+  canPlay: boolean;
   togglePlayback: () => void;
   setAnswer: (questionId: string, value: AnswerValue) => void;
   submit: () => void;
   tryAnother: () => void;
   onBack: () => void;
 }
+
+export type PlayMode = 'exam' | 'practice';
 
 export const useListening = (): UseListeningResult => {
   const navigation = useNavigation<Nav>();
@@ -40,6 +46,8 @@ export const useListening = (): UseListeningResult => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [answers, setAnswers] = useState<AnswerMap>({});
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
+  const [playMode, setPlayModeState] = useState<PlayMode>('exam');
+  const [playsUsed, setPlaysUsed] = useState<number>(0);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [result, setResult] = useState<ListeningResult | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -67,8 +75,33 @@ export const useListening = (): UseListeningResult => {
    * Playback state only. Native audio playback lands with the media player
    * integration; the transcript-based questions are answerable meanwhile.
    */
+  // In the real exam the recording plays once and is never repeated, so `exam`
+  // is the default. `practice` exists because drilling a clip you failed is a
+  // legitimate way to learn, and forcing exam rules on every session would make
+  // the feature worse, not more faithful.
+  const canPlay = playMode === 'practice' || playsUsed < 1;
+
   const togglePlayback = useCallback((): void => {
-    setIsPlaying((prev) => !prev);
+    setIsPlaying((prev) => {
+      if (prev) {
+        return false;
+      }
+      if (playMode === 'exam' && playsUsed >= 1) {
+        return false;
+      }
+      setPlaysUsed((used) => used + 1);
+      return true;
+    });
+  }, [playMode, playsUsed]);
+
+  const setPlayMode = useCallback((mode: PlayMode): void => {
+    setPlayModeState(mode);
+    // Switching to practice mid-clip must not retroactively grant a replay it
+    // had already used, so the counter is only cleared going back to exam.
+    if (mode === 'exam') {
+      setPlaysUsed(0);
+      setIsPlaying(false);
+    }
   }, []);
 
   const setDifficulty = useCallback((value: Difficulty): void => {
@@ -77,6 +110,8 @@ export const useListening = (): UseListeningResult => {
     setDifficultyState(value);
     setAnswers({});
     setResult(null);
+    setPlaysUsed(0);
+    setIsPlaying(false);
   }, []);
 
   const setAnswer = useCallback(
@@ -121,6 +156,10 @@ export const useListening = (): UseListeningResult => {
     error,
     difficulty,
     setDifficulty,
+    playMode,
+    setPlayMode,
+    playsUsed,
+    canPlay,
     togglePlayback,
     setAnswer,
     submit,

@@ -2,14 +2,14 @@
 
 Everything **not yet completed** to finish the project, organized by area. Checked = done, unchecked = remaining. Use this as the living backlog.
 
-> **Status as of PR #59** — **108 of 190 checklist items done (~57%)**. Weighted by
+> **Status as of PR #60** — **110 of 190 checklist items done (~58%)**. Weighted by
 > effort it is further along than that, since the backend and data layer are largely
 > complete while most remaining items are large features (live voice, deployment) or
 > are blocked on native modules.
 > **Running on real infrastructure:** live Supabase PostgreSQL 17.6 and the real Groq
 > API, verified on a physical Android phone — register → onboarding → dashboard → all
 > four practice modules → progress → coach → profile → logout.
-> **Verified by:** 21 backend smoke suites, a 13-step E2E user-journey check, 104
+> **Verified by:** 21 backend smoke suites, a 13-step E2E user-journey check, 109
 > frontend tests, `tsc --noEmit`, and a Docker image build — all four gates run in CI
 > on every push.
 > **Biggest remaining:** the live voice (LiveKit) pipeline, production deployment,
@@ -76,7 +76,8 @@ Everything **not yet completed** to finish the project, organized by area. Check
 - [x] Adaptive difficulty (server-resolved) + randomized passage selection
 - [x] Explicit difficulty selection UI — Adaptive/Easy/Medium/Hard, with the level
       actually served shown alongside the request
-- [ ] Question navigator + timer
+- [x] Question navigator + timer — numbered strip showing answered state (labelled
+      for screen readers, not colour-only), and a 20-minute passage clock
 - [ ] Matching-headings drag UI
 
 ### Listening (built)
@@ -87,7 +88,10 @@ Everything **not yet completed** to finish the project, organized by area. Check
 - [ ] **Native audio playback in the app** — needs a player library (`react-native-video`/`sound`) that requires native linking; cannot be verified without a device build
 - [ ] **Replace silent placeholder audio with real recordings** — clips are valid WAVs of the right duration but contain silence (`scripts/generate_placeholder_audio.py`)
 - [x] Explicit difficulty selection UI (shared `DifficultySelector`)
-- [ ] Single-play / replay policy enforcement
+- [x] Single-play / replay policy — exam rules by default (one play, no repeat),
+      with an explicit practice mode because drilling a failed clip is a
+      legitimate way to learn. Note: playback is still simulated until a native
+      player lands, so this enforces the policy, not the audio
 
 ### AI Tutor / Learning
 - [x] Daily Coach feed (message + weakness-driven recommendations that tap through to practice)

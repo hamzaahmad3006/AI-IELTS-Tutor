@@ -1,7 +1,7 @@
 /** Elevated surface container (Level 1 card). */
 
 import React from 'react';
-import { View, type ViewStyle } from 'react-native';
+import { View, type StyleProp, type ViewStyle } from 'react-native';
 import { useTheme } from '../theme/useTheme';
 import { RADIUS, SPACING, type ShadowToken } from '../../constants';
 
@@ -11,7 +11,7 @@ interface CardProps {
   radius?: number;
   shadow?: ShadowToken;
   backgroundToken?: 'card' | 'cardAlt' | 'container';
-  style?: ViewStyle;
+  style?: StyleProp<ViewStyle>;
   testID?: string;
 }
 

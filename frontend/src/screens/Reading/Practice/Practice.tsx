@@ -8,6 +8,8 @@ import {
   Button,
   Card,
   DifficultySelector,
+  QuestionNavigator,
+  TimerBar,
   Icon,
   Input,
   ScreenContainer,
@@ -36,6 +38,15 @@ export const Practice: React.FC = () => {
     onBack,
     difficulty,
     setDifficulty,
+    answeredFlags,
+    currentIndex,
+    goToQuestion,
+    secondsLeft,
+    timerState,
+    isWarning,
+    startTimer,
+    pauseTimer,
+    resetTimer,
   } = useReading();
 
   if (isLoading || !passage) {
@@ -92,6 +103,17 @@ export const Practice: React.FC = () => {
         disabled={isLoading}
       />
 
+      <TimerBar
+        secondsLeft={secondsLeft}
+        state={timerState}
+        isWarning={isWarning}
+        onStart={startTimer}
+        onPause={pauseTimer}
+        onReset={resetTimer}
+        testID="reading-timer"
+        expiredNote="Time is up. Your answers are kept — finish and submit when ready."
+      />
+
       <Card style={styles.section} backgroundToken="cardAlt">
         <AppText variant="titleLg">{passage.title}</AppText>
         <AppText variant="bodyLg" color="textSecondary" style={styles.body}>
@@ -103,12 +125,20 @@ export const Practice: React.FC = () => {
         Questions
       </AppText>
 
+      <QuestionNavigator
+        answered={answeredFlags}
+        currentIndex={currentIndex}
+        onSelect={goToQuestion}
+      />
+
       {passage.questions.map((q, index) => (
         <QuestionCard
           key={q.id}
           index={index}
           question={q}
           value={answers[q.id]}
+          isCurrent={index === currentIndex}
+          onFocus={() => goToQuestion(index)}
           onChange={(value) => setAnswer(q.id, value)}
         />
       ))}
@@ -149,12 +179,26 @@ const QuestionCard: React.FC<{
   index: number;
   question: PracticeQuestion;
   value: string | string[] | undefined;
+  isCurrent: boolean;
+  onFocus: () => void;
   onChange: (value: string) => void;
-}> = ({ index, question, value, onChange }) => {
+}> = ({ index, question, value, isCurrent, onFocus, onChange }) => {
   const theme = useTheme();
   return (
-    <Card style={styles.qCard}>
-      <AppText variant="bodyMd" style={styles.qPrompt}>
+    <Card
+      style={[
+        styles.qCard,
+        // Ring the question the navigator points at, so tapping a number has a
+        // visible effect even before the list is scrolled.
+        isCurrent && { borderWidth: 2, borderColor: theme.colors.accent },
+      ]}
+      testID={`question-card-${index + 1}`}
+    >
+      <AppText
+        variant="bodyMd"
+        style={styles.qPrompt}
+        onPress={onFocus}
+      >
         {index + 1}. {question.prompt}
       </AppText>
       {question.options ? (

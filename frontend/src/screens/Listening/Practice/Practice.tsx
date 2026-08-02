@@ -37,6 +37,10 @@ export const Practice: React.FC = () => {
     isSubmitting,
     result,
     error,
+    playMode,
+    setPlayMode,
+    playsUsed,
+    canPlay,
     togglePlayback,
     setAnswer,
     submit,
@@ -108,8 +112,23 @@ export const Practice: React.FC = () => {
           {formatDuration(clip.durationSec)} · {clip.difficulty}
         </AppText>
         <View style={styles.playerRow}>
-          <Pressable onPress={togglePlayback}>
-            <View style={[styles.playButton, { backgroundColor: theme.colors.accent }]}>
+          <Pressable
+            onPress={togglePlayback}
+            disabled={!canPlay && !isPlaying}
+            accessibilityRole="button"
+            accessibilityState={{ disabled: !canPlay && !isPlaying }}
+            accessibilityLabel={isPlaying ? 'Pause' : 'Play'}
+            testID="play-button"
+          >
+            <View
+              style={[
+                styles.playButton,
+                {
+                  backgroundColor: theme.colors.accent,
+                  opacity: !canPlay && !isPlaying ? 0.4 : 1,
+                },
+              ]}
+            >
               <Icon name={isPlaying ? 'pause' : 'play'} size={26} color="onAccent" />
             </View>
           </Pressable>
@@ -117,10 +136,36 @@ export const Practice: React.FC = () => {
             <View
               style={[styles.playerTrack, { backgroundColor: theme.colors.containerHighest }]}
             />
-            <AppText variant="labelSm" color="textMuted" style={styles.playerHint}>
-              {isPlaying ? 'Playing…' : 'Tap play to listen'}
+            <AppText
+              variant="labelSm"
+              color="textMuted"
+              style={styles.playerHint}
+              testID="player-hint"
+            >
+              {isPlaying
+                ? 'Playing…'
+                : !canPlay
+                  ? 'Played once — the exam does not replay the recording'
+                  : 'Tap play to listen'}
             </AppText>
           </View>
+        </View>
+
+        <View style={styles.modeRow}>
+          <AppText variant="labelSm" color="textMuted">
+            {playMode === 'exam'
+              ? `Exam rules · ${playsUsed}/1 play used`
+              : 'Practice · replay allowed'}
+          </AppText>
+          <Pressable
+            onPress={() => setPlayMode(playMode === 'exam' ? 'practice' : 'exam')}
+            accessibilityRole="button"
+            testID="play-mode-toggle"
+          >
+            <AppText variant="labelSm" color="primary">
+              {playMode === 'exam' ? 'Allow replay' : 'Use exam rules'}
+            </AppText>
+          </Pressable>
         </View>
       </Card>
 
@@ -295,6 +340,12 @@ const styles = StyleSheet.create({
   headerSpacer: { width: 24 },
   section: { marginTop: SPACING.lg },
   clipMeta: { marginTop: SPACING.xxs },
+  modeRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginTop: SPACING.sm,
+  },
   playerRow: {
     flexDirection: 'row',
     alignItems: 'center',
