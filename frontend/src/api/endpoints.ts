@@ -32,6 +32,7 @@ export const ENDPOINTS = {
   speaking: {
     sessions: '/speaking/sessions',
     cueCards: '/speaking/cue-cards',
+    questions: '/speaking/questions',
     attempts: '/speaking/attempts',
     attempt: (id: string): string => `/speaking/attempts/${id}`,
     history: '/speaking/history',

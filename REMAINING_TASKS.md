@@ -2,14 +2,14 @@
 
 Everything **not yet completed** to finish the project, organized by area. Checked = done, unchecked = remaining. Use this as the living backlog.
 
-> **Status as of PR #61** — **112 of 190 checklist items done (~59%)**. Weighted by
+> **Status as of PR #62** — **114 of 190 checklist items done (~60%)**. Weighted by
 > effort it is further along than that, since the backend and data layer are largely
 > complete while most remaining items are large features (live voice, deployment) or
 > are blocked on native modules.
 > **Running on real infrastructure:** live Supabase PostgreSQL 17.6 and the real Groq
 > API, verified on a physical Android phone — register → onboarding → dashboard → all
 > four practice modules → progress → coach → profile → logout.
-> **Verified by:** 21 backend smoke suites, a 13-step E2E user-journey check, 115
+> **Verified by:** 22 backend smoke suites, a 13-step E2E user-journey check, 122
 > frontend tests, `tsc --noEmit`, and a Docker image build — all four gates run in CI
 > on every push.
 > **Biggest remaining:** the live voice (LiveKit) pipeline, production deployment,
@@ -54,8 +54,13 @@ Everything **not yet completed** to finish the project, organized by area. Check
 ### Speaking (AI-scored practice built; live voice pipeline pending)
 - [x] Part 2 cue-card practice: real cue card from the backend bank, prep → speak timers driven by the card, response capture
 - [x] AI scoring result (band + 4 criteria bars + examiner feedback)
-- [ ] Session start screen (full interview vs single part, mic permission)
-- [ ] Part 1 and Part 3 flows
+- [x] Session start screen — full interview or any single part. It states plainly
+      that answers are typed and does **not** request microphone access, since
+      voice capture is not wired yet and asking for a permission the app cannot
+      use would be worse than saying so
+- [x] Part 1 and Part 3 flows — themed question sets from a new `speaking_questions`
+      bank (`GET /speaking/questions?part=`), answered in order and scored as one
+      run, with part-specific guidance so Part 3 is not answered like Part 1
 - [ ] Highlighted transcript + recording replay with jump-to-issue markers
 - [x] Speaking history (shown in the unified History screen)
 

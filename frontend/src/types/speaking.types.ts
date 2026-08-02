@@ -83,3 +83,18 @@ export interface SpeakingHistoryPage {
   items: SpeakingHistoryItem[];
   nextCursor: string | null;
 }
+
+export interface SpeakingQuestionItem {
+  id: string;
+  orderIndex: number;
+  question: string;
+}
+
+export interface SpeakingQuestionSet {
+  part: SpeakingPart;
+  topic: string;
+  difficulty: string;
+  questions: SpeakingQuestionItem[];
+  /** How this part should be answered — Part 1 and Part 3 differ. */
+  guidance: string;
+}

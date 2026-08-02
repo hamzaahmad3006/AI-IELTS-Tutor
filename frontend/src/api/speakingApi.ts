@@ -3,8 +3,12 @@
 import { apiClient, toApiProblem } from './client';
 import { API_CONFIG } from './config';
 import { ENDPOINTS } from './endpoints';
-import { MOCK_SPEAKING_RESULT, MOCK_SPEAKING_SESSION } from './mock/fixtures';
+import { MOCK_SPEAKING_RESULT, MOCK_SPEAKING_SESSION ,
+  MOCK_SPEAKING_QUESTIONS,
+} from './mock/fixtures';
 import type {
+  SpeakingPart,
+  SpeakingQuestionSet,
   CueCard,
   SpeakingHistoryPage,
   SpeakingResult,
@@ -48,6 +52,25 @@ export const speakingApi = {
   },
 
   /** Submit an interview transcript for AI scoring. */
+  async getQuestionSet(
+    part: SpeakingPart,
+    difficulty?: string,
+  ): Promise<SpeakingQuestionSet> {
+    if (API_CONFIG.useMock) {
+      await delay(300);
+      return { ...MOCK_SPEAKING_QUESTIONS, part };
+    }
+    try {
+      const { data } = await apiClient.get<SpeakingQuestionSet>(
+        ENDPOINTS.speaking.questions,
+        { params: difficulty ? { part, difficulty } : { part } },
+      );
+      return data;
+    } catch (error) {
+      throw toApiProblem(error);
+    }
+  },
+
   async submit(payload: SpeakingSubmit): Promise<SpeakingResult> {
     if (API_CONFIG.useMock) {
       await delay(800);

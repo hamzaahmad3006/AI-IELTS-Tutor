@@ -65,7 +65,8 @@ export const usePractice = (): UsePracticeResult => {
           navigation.navigate('WritingPractice');
           break;
         case 'speaking':
-          navigation.navigate('SpeakingPractice');
+          // Speaking now opens the session picker; the cue card is one option.
+          navigation.navigate('SpeakingSession');
           break;
       }
     },

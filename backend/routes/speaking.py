@@ -18,6 +18,10 @@ from controllers.speaking_controller import (
 )
 from core.config import get_settings
 from core.rate_limit import limit_by_user
+from controllers.speaking_questions import (
+    SpeakingQuestionSet,
+    get_question_set,
+)
 from db.session import get_db
 from dependencies import get_current_user, get_orchestrator
 from models.user import User
@@ -52,6 +56,16 @@ async def get_cue_card(
     difficulty: Annotated[str | None, Query()] = None,
 ) -> CueCardResponse:
     return await SpeakingController.get_cue_card(session, difficulty)
+
+
+@router.get("/questions", response_model=SpeakingQuestionSet)
+async def questions(
+    current: CurrentUser,
+    session: DbSession,
+    part: Annotated[int, Query(ge=1, le=3)] = 1,
+    difficulty: Annotated[str | None, Query()] = None,
+) -> SpeakingQuestionSet:
+    return await get_question_set(session, part, difficulty)
 
 
 @router.get("/history", response_model=SpeakingHistoryPage)

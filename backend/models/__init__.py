@@ -10,6 +10,7 @@ from .listening import ListeningAttempt
 from .profile import LearnerProfile
 from .reading import ReadingAttempt
 from .speaking import SpeakingAttempt
+from .speaking_question import SpeakingQuestion
 from .user import RefreshToken, User
 from .vocabulary import VocabItem, VocabReview
 from .weakness import Weakness
@@ -27,6 +28,7 @@ __all__ = [
     "ListeningQuestion",
     "ListeningAttempt",
     "SpeakingAttempt",
+    "SpeakingQuestion",
     "AIInteraction",
     "AuditLog",
     "Weakness",
