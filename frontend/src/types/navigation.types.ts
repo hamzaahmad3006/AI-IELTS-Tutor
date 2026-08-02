@@ -12,6 +12,7 @@ export type AuthStackParamList = {
 };
 
 export type OnboardingStackParamList = {
+  Welcome: undefined;
   TargetBand: undefined;
   ExamSetup: undefined;
   Diagnostic: undefined;
