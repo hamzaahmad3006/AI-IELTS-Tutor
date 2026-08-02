@@ -4,6 +4,7 @@ import type { NavigatorScreenParams } from '@react-navigation/native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 import type { IeltsModule } from './common.types';
+import type { SpeakingPart } from './speaking.types';
 
 export type AuthStackParamList = {
   Login: undefined;
@@ -37,6 +38,8 @@ export type RootStackParamList = {
   ReadingPractice: undefined;
   ListeningPractice: undefined;
   SpeakingPractice: undefined;
+  SpeakingSession: undefined;
+  SpeakingParts: { part: SpeakingPart; full?: boolean };
   History: undefined;
   VocabularyReview: undefined;
   GrammarLessons: undefined;

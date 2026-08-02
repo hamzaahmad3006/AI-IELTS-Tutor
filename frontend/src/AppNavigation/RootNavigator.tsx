@@ -9,6 +9,8 @@ import { Practice as ReadingPractice } from '../screens/Reading/Practice/Practic
 import { Practice as WritingPractice } from '../screens/Writing/Practice/Practice';
 import { Practice as ListeningPractice } from '../screens/Listening/Practice/Practice';
 import { Practice as SpeakingPractice } from '../screens/Speaking/Practice/Practice';
+import { SpeakingSession } from '../screens/Speaking/Session/SpeakingSession';
+import { SpeakingParts } from '../screens/Speaking/Parts/SpeakingParts';
 import { History } from '../screens/History/History';
 import { Review as VocabularyReview } from '../screens/Vocabulary/Review/Review';
 import { Lessons as GrammarLessons } from '../screens/Grammar/Lessons/Lessons';
@@ -38,6 +40,8 @@ export const RootNavigator: React.FC = () => (
     <Stack.Screen name="ReadingPractice" component={ReadingPractice} />
     <Stack.Screen name="ListeningPractice" component={ListeningPractice} />
     <Stack.Screen name="SpeakingPractice" component={SpeakingPractice} />
+    <Stack.Screen name="SpeakingSession" component={SpeakingSession} />
+    <Stack.Screen name="SpeakingParts" component={SpeakingParts} />
     <Stack.Screen name="History" component={History} />
     <Stack.Screen name="VocabularyReview" component={VocabularyReview} />
     <Stack.Screen name="GrammarLessons" component={GrammarLessons} />

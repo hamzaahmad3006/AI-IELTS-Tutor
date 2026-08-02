@@ -19,6 +19,7 @@ import type {
   DataExport,
   InsightsResponse,
   SpeakingResult,
+  SpeakingQuestionSet,
   SpeakingSession,
   TrendPoint,
   TrendResponse,
@@ -398,4 +399,18 @@ export const MOCK_INSIGHTS: InsightsResponse = {
     timeNote: 'Only spoken responses are timed, so this covers Speaking only.',
   },
   summary: 'Listening is carrying you at band 7.5. Your biggest drag is grammatical range in writing.',
+};
+
+export const MOCK_SPEAKING_QUESTIONS: SpeakingQuestionSet = {
+  part: 1,
+  topic: 'work and study',
+  difficulty: 'medium',
+  questions: [
+    { id: 'sq1', orderIndex: 1, question: 'Do you work, or are you a student?' },
+    { id: 'sq2', orderIndex: 2, question: 'What made you choose that field?' },
+    { id: 'sq3', orderIndex: 3, question: 'What is the most difficult part of it?' },
+    { id: 'sq4', orderIndex: 4, question: 'What would you like to be doing in five years?' },
+  ],
+  guidance:
+    'Short, natural answers — two or three sentences each. Give a reason or an example rather than a bare yes or no.',
 };
