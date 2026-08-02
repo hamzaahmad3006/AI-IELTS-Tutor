@@ -17,6 +17,8 @@ import type {
   ReadingResult,
   RecommendationsResponse,
   DataExport,
+  DiagnosticResult,
+  DiagnosticSet,
   InsightsResponse,
   SpeakingResult,
   SpeakingQuestionSet,
@@ -439,4 +441,50 @@ export const MOCK_SPEAKING_QUESTIONS: SpeakingQuestionSet = {
   ],
   guidance:
     'Short, natural answers — two or three sentences each. Give a reason or an example rather than a bare yes or no.',
+};
+
+export const MOCK_DIAGNOSTIC_SET: DiagnosticSet = {
+  reading: {
+    passageId: 'pa_mock_1',
+    title: 'The History of Tea',
+    body: 'Tea originated in China, where it was first used as a medicinal drink.',
+    questions: [
+      { id: 'dr1', type: 'mcq', prompt: 'Where did tea originate?', options: ['India', 'China', 'Japan'] },
+      { id: 'dr2', type: 'true_false_notgiven', prompt: 'Tea was first medicinal.', options: ['true', 'false', 'not_given'] },
+    ],
+  },
+  listening: {
+    clipId: 'au_mock_1',
+    title: 'University Orientation',
+    audioUrl: '/media/seed/audio/orientation.wav',
+    durationSec: 45,
+    questions: [
+      { id: 'dl1', type: 'short_answer', prompt: 'What do you need to borrow books?', options: null },
+    ],
+  },
+  writing: {
+    promptId: 'wp_mock_1',
+    prompt: 'Some people believe technology has made our lives more complex. Discuss.',
+    minWords: 40,
+  },
+  speaking: {
+    prompt: 'Describe a place you enjoy spending time in, and explain why.',
+    minWords: 30,
+  },
+  note: 'Reading and Listening are marked instantly. Writing and Speaking are optional.',
+};
+
+export const MOCK_DIAGNOSTIC_RESULT: DiagnosticResult = {
+  baselines: [
+    { module: 'reading', band: 6.5, detail: '2 of 3 correct.' },
+    { module: 'listening', band: null, detail: 'Not attempted.' },
+    { module: 'writing', band: 6.0, detail: 'Scored by the AI examiner.' },
+    { module: 'speaking', band: 6.5, detail: 'Scored by the AI examiner.' },
+  ],
+  overallBand: 6.5,
+  cefrLevel: 'B2',
+  cefrDescription:
+    'Generally effective command; copes with complex language in familiar areas.',
+  summary:
+    'Your starting point is around band 6.5. Listening was not attempted, so it is excluded rather than guessed.',
 };

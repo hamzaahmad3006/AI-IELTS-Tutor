@@ -64,6 +64,9 @@ export const ENDPOINTS = {
     lessons: '/grammar/lessons',
     lesson: (id: string): string => `/grammar/lessons/${id}`,
   },
+  diagnostic: {
+    root: '/diagnostic',
+  },
   analytics: {
     overview: '/analytics/overview',
     progress: '/analytics/progress',
