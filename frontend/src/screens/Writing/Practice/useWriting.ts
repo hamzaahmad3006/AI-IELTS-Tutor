@@ -3,14 +3,14 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { writingApi } from '../../../api';
-import { useCountdown, type TimerState } from '../../../components';
+import { writingApi } from '@api';
+import { useCountdown, type TimerState } from '@components';
 import type {
   ExamType,
   RootStackParamList,
   WritingPrompt,
   WritingResult,
-} from '../../../types';
+} from '@models';
 
 type Nav = NativeStackNavigationProp<RootStackParamList>;
 
@@ -70,7 +70,7 @@ export const useWriting = (): UseWritingResult => {
   const loadPrompt = useCallback((): void => {
     writingApi
       .getPrompt(taskNumber, examType)
-      .then((data) => setPrompt(data))
+      .then(data => setPrompt(data))
       .catch(() => {
         // Non-fatal: fall back to a built-in prompt so practice still works.
       });
@@ -111,7 +111,7 @@ export const useWriting = (): UseWritingResult => {
         taskType: prompt?.taskNumber ?? taskNumber,
         promptText: prompt?.prompt,
       })
-      .then((res) => setResult(res))
+      .then(res => setResult(res))
       .catch(() => setError('Scoring failed. Please try again.'))
       .finally(() => setIsSubmitting(false));
   }, [essayText, wordCount, prompt, taskNumber, countdown]);

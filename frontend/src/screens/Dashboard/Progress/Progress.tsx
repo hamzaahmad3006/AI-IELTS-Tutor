@@ -17,8 +17,8 @@ import {
   useTheme,
   type LineSeries,
   type RadarAxis,
-} from '../../../components';
-import { getBandColor, RADIUS, SPACING } from '../../../constants';
+} from '@components';
+import { getBandColor, RADIUS, SPACING } from '@constants';
 import type {
   ConsistencyStats,
   InsightsResponse,
@@ -27,7 +27,7 @@ import type {
   PredictionResponse,
   TrendResponse,
   WeaknessItem,
-} from '../../../types';
+} from '@models';
 import { useProgress } from './useProgress';
 
 const MODULE_LABELS: Record<string, string> = {
@@ -38,7 +38,7 @@ const MODULE_LABELS: Record<string, string> = {
 };
 
 const prettyTag = (tag: string): string =>
-  tag.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
+  tag.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
 
 export const Progress: React.FC = () => {
   const {
@@ -94,7 +94,11 @@ export const Progress: React.FC = () => {
       {!hasAttempts ? (
         <Card style={styles.section} backgroundToken="cardAlt">
           <AppText variant="titleLg">No practice yet</AppText>
-          <AppText variant="bodyMd" color="textSecondary" style={styles.emptyBody}>
+          <AppText
+            variant="bodyMd"
+            color="textSecondary"
+            style={styles.emptyBody}
+          >
             Complete a practice session in any module and your bands, trends and
             predicted score will appear here.
           </AppText>
@@ -112,10 +116,13 @@ export const Progress: React.FC = () => {
               variant="displayLg"
               style={{ color: getBandColor(progress.overallBand ?? 0) }}
             >
-              {progress.overallBand !== null ? progress.overallBand.toFixed(1) : '—'}
+              {progress.overallBand !== null
+                ? progress.overallBand.toFixed(1)
+                : '—'}
             </AppText>
             <AppText variant="bodySm" color="textMuted">
-              {progress.totalAttempts} practice{progress.totalAttempts === 1 ? '' : 's'}
+              {progress.totalAttempts} practice
+              {progress.totalAttempts === 1 ? '' : 's'}
             </AppText>
           </View>
           {progress.overallBand !== null ? (
@@ -139,7 +146,7 @@ export const Progress: React.FC = () => {
       <AppText variant="titleLg" style={styles.sectionTitle}>
         By module
       </AppText>
-      {progress.modules.map((module) => (
+      {progress.modules.map(module => (
         <ModuleRow key={module.module} stat={module} />
       ))}
 
@@ -166,8 +173,11 @@ export const Progress: React.FC = () => {
           <AppText variant="titleLg" style={styles.sectionTitle}>
             Focus areas
           </AppText>
-          {weaknesses.slice(0, 5).map((weakness) => (
-            <WeaknessRow key={`${weakness.module}-${weakness.tag}`} weakness={weakness} />
+          {weaknesses.slice(0, 5).map(weakness => (
+            <WeaknessRow
+              key={`${weakness.module}-${weakness.tag}`}
+              weakness={weakness}
+            />
           ))}
         </>
       ) : null}
@@ -184,7 +194,7 @@ const TrendCard: React.FC<{ trend: TrendResponse }> = ({ trend }) => {
     {
       label: 'Overall band',
       color: theme.colors.primary,
-      values: trend.overall.map((point) => point.band),
+      values: trend.overall.map(point => point.band),
     },
   ];
 
@@ -201,7 +211,7 @@ const TrendCard: React.FC<{ trend: TrendResponse }> = ({ trend }) => {
 const BalanceCard: React.FC<{ modules: ModuleProgressStat[] }> = ({
   modules,
 }) => {
-  const axes: RadarAxis[] = modules.map((stat) => ({
+  const axes: RadarAxis[] = modules.map(stat => ({
     label: MODULE_LABELS[stat.module] ?? stat.module,
     value: stat.currentBand,
   }));
@@ -236,7 +246,7 @@ const InsightsCard: React.FC<{ insights: InsightsResponse }> = ({
           <AppText variant="labelSm" color="textMuted">
             STRENGTHS
           </AppText>
-          {insights.strengths.map((s) => (
+          {insights.strengths.map(s => (
             <View key={`s-${s.module}`} style={styles.insightRow}>
               <View
                 style={[styles.dot, { backgroundColor: getBandColor(s.band) }]}
@@ -254,7 +264,7 @@ const InsightsCard: React.FC<{ insights: InsightsResponse }> = ({
           <AppText variant="labelSm" color="textMuted">
             FOCUS NEXT
           </AppText>
-          {insights.weaknesses.map((w) => (
+          {insights.weaknesses.map(w => (
             <View key={`w-${w.module}-${w.tag}`} style={styles.insightRow}>
               <View
                 style={[styles.dot, { backgroundColor: theme.colors.warning }]}
@@ -273,7 +283,7 @@ const InsightsCard: React.FC<{ insights: InsightsResponse }> = ({
 const ConsistencyCard: React.FC<{ stats: ConsistencyStats }> = ({ stats }) => {
   const theme = useTheme();
   // Scale bars against the busiest week so a quiet history still reads.
-  const peak = Math.max(1, ...stats.weeks.map((w) => w.attempts));
+  const peak = Math.max(1, ...stats.weeks.map(w => w.attempts));
 
   return (
     <Card style={styles.section} testID="consistency-card">
@@ -288,7 +298,7 @@ const ConsistencyCard: React.FC<{ stats: ConsistencyStats }> = ({ stats }) => {
       </View>
 
       <View style={styles.bars}>
-        {stats.weeks.map((w) => (
+        {stats.weeks.map(w => (
           <View key={w.weekStart} style={styles.barSlot}>
             <View
               style={[
@@ -337,7 +347,11 @@ const PredictionCard: React.FC<{ prediction: PredictionResponse }> = ({
     <Card style={styles.section} backgroundToken="cardAlt">
       <View style={styles.predictionHead}>
         <Icon name="sparkle" size={18} color="primary" />
-        <AppText variant="labelMd" color="primary" style={styles.predictionLabel}>
+        <AppText
+          variant="labelMd"
+          color="primary"
+          style={styles.predictionLabel}
+        >
           PREDICTED BAND
         </AppText>
       </View>
@@ -426,7 +440,9 @@ const ModuleRow: React.FC<{ stat: ModuleProgressStat }> = ({ stat }) => {
   return (
     <Card style={styles.moduleCard}>
       <View style={styles.moduleHead}>
-        <AppText variant="bodyMd">{MODULE_LABELS[stat.module] ?? stat.module}</AppText>
+        <AppText variant="bodyMd">
+          {MODULE_LABELS[stat.module] ?? stat.module}
+        </AppText>
         <AppText variant="labelMd" style={{ color }}>
           {band !== null ? band.toFixed(1) : '—'}
         </AppText>
@@ -434,7 +450,9 @@ const ModuleRow: React.FC<{ stat: ModuleProgressStat }> = ({ stat }) => {
       <ProgressBar progress={(band ?? 0) / 9} fillColor={color} height={6} />
       <AppText variant="labelSm" color="textMuted" style={styles.moduleMeta}>
         {stat.attempts} attempt{stat.attempts === 1 ? '' : 's'}
-        {stat.averageBand !== null ? ` · avg ${stat.averageBand.toFixed(1)}` : ''}
+        {stat.averageBand !== null
+          ? ` · avg ${stat.averageBand.toFixed(1)}`
+          : ''}
       </AppText>
     </Card>
   );
@@ -446,7 +464,12 @@ const WeaknessRow: React.FC<{ weakness: WeaknessItem }> = ({ weakness }) => {
     <Card style={styles.moduleCard}>
       <View style={styles.moduleHead}>
         <AppText variant="bodyMd">{prettyTag(weakness.tag)}</AppText>
-        <View style={[styles.modulePill, { backgroundColor: theme.colors.primaryContainer }]}>
+        <View
+          style={[
+            styles.modulePill,
+            { backgroundColor: theme.colors.primaryContainer },
+          ]}
+        >
           <AppText variant="labelSm" color="primary">
             {MODULE_LABELS[weakness.module] ?? weakness.module}
           </AppText>

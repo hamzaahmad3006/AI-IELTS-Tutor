@@ -46,7 +46,10 @@ describe('DeleteAccountSheet', () => {
     render(
       <DeleteAccountSheet visible onClose={jest.fn()} onConfirm={onConfirm} />,
     );
-    fireEvent.changeText(screen.getByTestId('delete-confirm-input'), ' delete ');
+    fireEvent.changeText(
+      screen.getByTestId('delete-confirm-input'),
+      ' delete ',
+    );
     fireEvent.press(screen.getByTestId('delete-confirm-button'));
     expect(onConfirm).toHaveBeenCalledTimes(1);
   });

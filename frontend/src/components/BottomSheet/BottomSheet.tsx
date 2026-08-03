@@ -19,7 +19,7 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { AppText } from '../AppText/AppText';
 import { useTheme } from '../theme/useTheme';
-import { RADIUS, SPACING } from '../../constants';
+import { RADIUS, SPACING } from '@constants';
 
 interface BottomSheetProps {
   visible: boolean;

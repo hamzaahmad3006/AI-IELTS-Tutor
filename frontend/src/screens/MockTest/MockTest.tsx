@@ -12,9 +12,9 @@ import {
   ScreenContainer,
   TimerBar,
   useTheme,
-} from '../../components';
-import { getBandColor, RADIUS, SPACING } from '../../constants';
-import type { MockResult, ReadinessReport } from '../../types';
+} from '@components';
+import { getBandColor, RADIUS, SPACING } from '@constants';
+import type { MockResult, ReadinessReport } from '@models';
 import { useMockTest } from './useMockTest';
 
 const MODULE_LABELS: Record<string, string> = {
@@ -33,7 +33,6 @@ export const MockTest: React.FC = () => {
     isSubmitting,
     error,
     sectionIndex,
-    currentModule,
     isLastSection,
     writingText,
     speakingText,
@@ -155,7 +154,9 @@ export const MockTest: React.FC = () => {
           // The objective sections are sat in their own practice runners; this
           // states that plainly rather than half-rendering a question list.
           <AppText variant="bodySm" color="textSecondary" style={styles.body}>
-            {`Open ${MODULE_LABELS[section.module]} practice to answer this section, or skip it — the report will say it was not attempted.`}
+            {`Open ${
+              MODULE_LABELS[section.module]
+            } practice to answer this section, or skip it — the report will say it was not attempted.`}
           </AppText>
         )}
       </Card>
@@ -216,7 +217,7 @@ const ReportView: React.FC<{ result: MockResult; onBack: () => void }> = ({
         <AppText variant="labelMd" color="textSecondary">
           BY SECTION
         </AppText>
-        {report.modules.map((module) => (
+        {report.modules.map(module => (
           <View key={module.module} style={styles.moduleRow}>
             <View style={styles.grow}>
               <AppText variant="bodyMd">
@@ -260,7 +261,11 @@ const Header: React.FC<{ title: string; onBack: () => void }> = ({
   onBack,
 }) => (
   <View style={styles.header}>
-    <Pressable onPress={onBack} accessibilityRole="button" accessibilityLabel="Back">
+    <Pressable
+      onPress={onBack}
+      accessibilityRole="button"
+      accessibilityLabel="Back"
+    >
       <Icon name="back" size={22} color="primary" />
     </Pressable>
     <AppText variant="titleLg" style={styles.grow}>

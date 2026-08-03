@@ -10,7 +10,7 @@ import React from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 import { AppText } from '../AppText/AppText';
 import { useTheme } from '../theme/useTheme';
-import { RADIUS, SPACING } from '../../constants';
+import { RADIUS, SPACING } from '@constants';
 import type { DiffToken } from './diff';
 
 export interface TextIssue {

@@ -12,7 +12,7 @@ import type {
 } from '../types';
 
 const delay = (ms: number): Promise<void> =>
-  new Promise((resolve) => setTimeout(resolve, ms));
+  new Promise(resolve => setTimeout(resolve, ms));
 
 export const authApi = {
   async login(payload: LoginRequest): Promise<AuthResponse> {
@@ -34,7 +34,14 @@ export const authApi = {
   async register(payload: RegisterRequest): Promise<AuthResponse> {
     if (API_CONFIG.useMock) {
       await delay(700);
-      return { ...MOCK_AUTH, user: { ...MOCK_AUTH.user, fullName: payload.fullName, email: payload.email } };
+      return {
+        ...MOCK_AUTH,
+        user: {
+          ...MOCK_AUTH.user,
+          fullName: payload.fullName,
+          email: payload.email,
+        },
+      };
     }
     try {
       const { data } = await apiClient.post<AuthResponse>(
@@ -69,7 +76,9 @@ export const authApi = {
       return MOCK_AUTH.user;
     }
     try {
-      const { data } = await apiClient.get<AuthenticatedUser>(ENDPOINTS.auth.me);
+      const { data } = await apiClient.get<AuthenticatedUser>(
+        ENDPOINTS.auth.me,
+      );
       return data;
     } catch (error) {
       throw toApiProblem(error);

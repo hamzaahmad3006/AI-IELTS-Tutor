@@ -3,12 +3,7 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import { AppText } from '../AppText/AppText';
-import {
-  getBandColor,
-  getBandScaleLabel,
-  RADIUS,
-  SPACING,
-} from '../../constants';
+import { getBandColor, getBandScaleLabel, RADIUS, SPACING } from '@constants';
 
 interface BandBadgeProps {
   band: number;

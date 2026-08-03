@@ -5,14 +5,14 @@ import {
   createSlice,
   type PayloadAction,
 } from '@reduxjs/toolkit';
-import { authApi } from '../../api';
+import { authApi } from '@api';
 import type {
   AuthResponse,
   AuthState,
   ApiProblem,
   LoginRequest,
   RegisterRequest,
-} from '../../types';
+} from '@models';
 
 const initialState: AuthState = {
   user: null,
@@ -62,7 +62,7 @@ export const refreshThunk = createAsyncThunk<
 /** Revoke the refresh token server-side, then clear local state. */
 export const logoutThunk = createAsyncThunk<void, string | undefined>(
   'auth/logoutServer',
-  async (refreshToken) => {
+  async refreshToken => {
     if (refreshToken) {
       await authApi.logout(refreshToken);
     }
@@ -83,7 +83,7 @@ const authSlice = createSlice({
       state.error = null;
     },
   },
-  extraReducers: (builder) => {
+  extraReducers: builder => {
     const onFulfilled = (
       state: AuthState,
       action: PayloadAction<AuthResponse>,
@@ -96,7 +96,7 @@ const authSlice = createSlice({
     };
 
     builder
-      .addCase(loginThunk.pending, (state) => {
+      .addCase(loginThunk.pending, state => {
         state.isBootstrapping = true;
         state.error = null;
       })
@@ -105,7 +105,7 @@ const authSlice = createSlice({
         state.isBootstrapping = false;
         state.error = action.payload ?? 'Login failed';
       })
-      .addCase(registerThunk.pending, (state) => {
+      .addCase(registerThunk.pending, state => {
         state.isBootstrapping = true;
         state.error = null;
       })
@@ -120,14 +120,14 @@ const authSlice = createSlice({
         state.tokens = action.payload.tokens;
         state.isAuthenticated = true;
       })
-      .addCase(refreshThunk.rejected, (state) => {
+      .addCase(refreshThunk.rejected, state => {
         // Refresh failed -> force a clean sign-out.
         state.user = null;
         state.tokens = null;
         state.isAuthenticated = false;
       })
       // Server logout: clear local session regardless of the call's outcome.
-      .addCase(logoutThunk.fulfilled, (state) => {
+      .addCase(logoutThunk.fulfilled, state => {
         state.user = null;
         state.tokens = null;
         state.isAuthenticated = false;

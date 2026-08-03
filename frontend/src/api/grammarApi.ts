@@ -6,7 +6,7 @@ import { ENDPOINTS } from './endpoints';
 import type { GrammarLessonDetail, GrammarLessonList } from '../types';
 
 const delay = (ms: number): Promise<void> =>
-  new Promise((resolve) => setTimeout(resolve, ms));
+  new Promise(resolve => setTimeout(resolve, ms));
 
 const MOCK_LIST: GrammarLessonList = {
   items: [
@@ -23,7 +23,8 @@ const MOCK_LIST: GrammarLessonList = {
       id: 'g2',
       title: 'Complex sentences for a higher band',
       conceptTag: 'sentence_complexity',
-      summary: 'Combine ideas with subordinate clauses instead of short sentences.',
+      summary:
+        'Combine ideas with subordinate clauses instead of short sentences.',
       level: 'intermediate',
       minutes: 8,
       recommended: false,

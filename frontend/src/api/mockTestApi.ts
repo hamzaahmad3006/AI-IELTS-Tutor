@@ -7,7 +7,7 @@ import { MOCK_MOCK_RESULT, MOCK_MOCK_TEST } from './mock/fixtures';
 import type { MockResult, MockSubmission, MockTest } from '../types';
 
 const delay = (ms: number): Promise<void> =>
-  new Promise((resolve) => setTimeout(resolve, ms));
+  new Promise(resolve => setTimeout(resolve, ms));
 
 export const mockTestApi = {
   async start(): Promise<MockTest> {

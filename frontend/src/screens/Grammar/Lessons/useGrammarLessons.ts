@@ -3,12 +3,12 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { grammarApi } from '../../../api';
+import { grammarApi } from '@api';
 import type {
   GrammarLessonDetail,
   GrammarLessonSummary,
   RootStackParamList,
-} from '../../../types';
+} from '@models';
 
 type Nav = NativeStackNavigationProp<RootStackParamList>;
 
@@ -37,7 +37,7 @@ export const useGrammarLessons = (): UseGrammarLessonsResult => {
     let mounted = true;
     grammarApi
       .listLessons()
-      .then((data) => {
+      .then(data => {
         if (mounted) {
           setLessons(data.items);
           setRecommendedCount(data.recommendedCount);
@@ -63,7 +63,7 @@ export const useGrammarLessons = (): UseGrammarLessonsResult => {
     setError(null);
     grammarApi
       .getLesson(id)
-      .then((detail) => setSelected(detail))
+      .then(detail => setSelected(detail))
       .catch(() => setError('Could not open that lesson.'))
       .finally(() => setIsLoadingLesson(false));
   }, []);

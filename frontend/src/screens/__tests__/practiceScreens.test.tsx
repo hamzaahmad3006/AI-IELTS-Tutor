@@ -113,7 +113,7 @@ describe('Difficulty selection', () => {
       expect(screen.getByTestId('difficulty-selector')).toBeTruthy();
     });
     // Adaptive stays a first-class option, so an override can be undone.
-    ['adaptive', 'easy', 'medium', 'hard'].forEach((level) => {
+    ['adaptive', 'easy', 'medium', 'hard'].forEach(level => {
       expect(screen.getByTestId(`difficulty-${level}`)).toBeTruthy();
     });
   });
@@ -142,7 +142,9 @@ describe('Difficulty selection', () => {
     });
     fireEvent.press(screen.getByTestId('difficulty-hard'));
     await waitFor(() => {
-      expect(screen.getByTestId('difficulty-served')).toHaveTextContent(/Serving/);
+      expect(screen.getByTestId('difficulty-served')).toHaveTextContent(
+        /Serving/,
+      );
     });
   });
 });

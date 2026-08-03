@@ -73,7 +73,12 @@ describe('ConsentSheet', () => {
   it('keeps Save inert until something changes', () => {
     const onSave = jest.fn();
     render(
-      <ConsentSheet visible value={value} onClose={jest.fn()} onSave={onSave} />,
+      <ConsentSheet
+        visible
+        value={value}
+        onClose={jest.fn()}
+        onSave={onSave}
+      />,
     );
     fireEvent.press(screen.getByText('Save'));
     expect(onSave).not.toHaveBeenCalled();
@@ -82,7 +87,12 @@ describe('ConsentSheet', () => {
   it('says what stops working when AI consent is withdrawn', () => {
     // Withdrawal must be allowed, but not silently degrade the app.
     render(
-      <ConsentSheet visible value={value} onClose={jest.fn()} onSave={jest.fn()} />,
+      <ConsentSheet
+        visible
+        value={value}
+        onClose={jest.fn()}
+        onSave={jest.fn()}
+      />,
     );
     fireEvent.press(screen.getByTestId('consent-ai-row'));
     expect(screen.getByText(/Reading and Listening/)).toBeTruthy();
@@ -94,7 +104,7 @@ describe('DatePickerSheet', () => {
     // 1 June 2026 is a Monday -> no leading blanks; 30 days.
     const june = buildMonthGrid(2026, 5);
     expect(june[0]).toBe(1);
-    expect(june.filter((d) => d !== null)).toHaveLength(30);
+    expect(june.filter(d => d !== null)).toHaveLength(30);
 
     // 1 July 2026 is a Wednesday -> two leading blanks.
     const july = buildMonthGrid(2026, 6);

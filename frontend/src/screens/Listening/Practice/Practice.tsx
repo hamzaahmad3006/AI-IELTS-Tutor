@@ -12,12 +12,9 @@ import {
   Input,
   ScreenContainer,
   useTheme,
-} from '../../../components';
-import { getBandColor, RADIUS, SPACING } from '../../../constants';
-import type {
-  ListeningPerQuestionResult,
-  PracticeQuestion,
-} from '../../../types';
+} from '@components';
+import { getBandColor, RADIUS, SPACING } from '@constants';
+import type { ListeningPerQuestionResult, PracticeQuestion } from '@models';
 import { useListening } from './useListening';
 
 const formatDuration = (seconds: number): string => {
@@ -87,7 +84,11 @@ export const Practice: React.FC = () => {
           <ResultRow key={pq.questionId} index={index} pq={pq} />
         ))}
 
-        <Button title="Try another clip" onPress={tryAnother} style={styles.section} />
+        <Button
+          title="Try another clip"
+          onPress={tryAnother}
+          style={styles.section}
+        />
       </ScreenContainer>
     );
   }
@@ -129,12 +130,19 @@ export const Practice: React.FC = () => {
                 },
               ]}
             >
-              <Icon name={isPlaying ? 'pause' : 'play'} size={26} color="onAccent" />
+              <Icon
+                name={isPlaying ? 'pause' : 'play'}
+                size={26}
+                color="onAccent"
+              />
             </View>
           </Pressable>
           <View style={styles.playerBar}>
             <View
-              style={[styles.playerTrack, { backgroundColor: theme.colors.containerHighest }]}
+              style={[
+                styles.playerTrack,
+                { backgroundColor: theme.colors.containerHighest },
+              ]}
             />
             <AppText
               variant="labelSm"
@@ -145,8 +153,8 @@ export const Practice: React.FC = () => {
               {isPlaying
                 ? 'Playing…'
                 : !canPlay
-                  ? 'Played once — the exam does not replay the recording'
-                  : 'Tap play to listen'}
+                ? 'Played once — the exam does not replay the recording'
+                : 'Tap play to listen'}
             </AppText>
           </View>
         </View>
@@ -158,7 +166,9 @@ export const Practice: React.FC = () => {
               : 'Practice · replay allowed'}
           </AppText>
           <Pressable
-            onPress={() => setPlayMode(playMode === 'exam' ? 'practice' : 'exam')}
+            onPress={() =>
+              setPlayMode(playMode === 'exam' ? 'practice' : 'exam')
+            }
             accessibilityRole="button"
             testID="play-mode-toggle"
           >
@@ -182,7 +192,7 @@ export const Practice: React.FC = () => {
           index={index}
           question={question}
           value={answers[question.id]}
-          onChange={(value) => setAnswer(question.id, value)}
+          onChange={value => setAnswer(question.id, value)}
         />
       ))}
 
@@ -231,7 +241,7 @@ const QuestionCard: React.FC<{
         {index + 1}. {question.prompt}
       </AppText>
       {question.options ? (
-        question.options.map((option) => {
+        question.options.map(option => {
           const selected = value === option;
           return (
             <Pressable
@@ -240,7 +250,9 @@ const QuestionCard: React.FC<{
               style={[
                 styles.option,
                 {
-                  borderColor: selected ? theme.colors.primary : theme.colors.border,
+                  borderColor: selected
+                    ? theme.colors.primary
+                    : theme.colors.border,
                   backgroundColor: selected
                     ? theme.colors.primaryContainer
                     : theme.colors.card,
@@ -250,11 +262,20 @@ const QuestionCard: React.FC<{
               <View
                 style={[
                   styles.radio,
-                  { borderColor: selected ? theme.colors.primary : theme.colors.outline },
+                  {
+                    borderColor: selected
+                      ? theme.colors.primary
+                      : theme.colors.outline,
+                  },
                 ]}
               >
                 {selected ? (
-                  <View style={[styles.radioDot, { backgroundColor: theme.colors.primary }]} />
+                  <View
+                    style={[
+                      styles.radioDot,
+                      { backgroundColor: theme.colors.primary },
+                    ]}
+                  />
                 ) : null}
               </View>
               <AppText variant="bodyMd" style={styles.optionLabel}>
@@ -313,14 +334,22 @@ const ResultRow: React.FC<{
         </AppText>
       ) : null}
       {pq.explanation ? (
-        <AppText variant="bodySm" color="textSecondary" style={styles.resultLine}>
+        <AppText
+          variant="bodySm"
+          color="textSecondary"
+          style={styles.resultLine}
+        >
           {pq.explanation}
         </AppText>
       ) : null}
       {pq.answerTimestamp ? (
         <View style={styles.timestampRow}>
           <Icon name="timer" size={14} color="primary" />
-          <AppText variant="labelSm" color="primary" style={styles.timestampText}>
+          <AppText
+            variant="labelSm"
+            color="primary"
+            style={styles.timestampText}
+          >
             Heard at {pq.answerTimestamp}
           </AppText>
         </View>
@@ -394,7 +423,11 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
   },
-  resultHead: { flexDirection: 'row', alignItems: 'center', marginBottom: SPACING.xs },
+  resultHead: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: SPACING.xs,
+  },
   resultIcon: {
     width: 26,
     height: 26,

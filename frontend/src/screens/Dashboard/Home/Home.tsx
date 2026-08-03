@@ -11,15 +11,15 @@ import {
   ProgressBar,
   ScreenContainer,
   useTheme,
-} from '../../../components';
+} from '@components';
 import {
   APP_CONFIG,
   PALETTE,
   RADIUS,
   SPACING,
   type IconName,
-} from '../../../constants';
-import type { IeltsModule, ModuleProgress, ChecklistItem } from '../../../types';
+} from '@constants';
+import type { IeltsModule, ModuleProgress, ChecklistItem } from '@models';
 import { useHome } from './useHome';
 
 const MODULE_META: Record<IeltsModule, { label: string; icon: IconName }> = {
@@ -50,7 +50,12 @@ export const Home: React.FC = () => {
       {/* Header */}
       <View style={styles.header}>
         <View style={styles.headerLeft}>
-          <View style={[styles.avatar, { backgroundColor: theme.colors.primaryContainer }]}>
+          <View
+            style={[
+              styles.avatar,
+              { backgroundColor: theme.colors.primaryContainer },
+            ]}
+          >
             <Icon name="profile" size={20} color="primary" />
           </View>
           <AppText variant="titleLg" color="primary" style={styles.brand}>
@@ -62,7 +67,11 @@ export const Home: React.FC = () => {
 
       {/* Greeting */}
       <AppText variant="headlineMobile">Hi, {data.greetingName}!</AppText>
-      <AppText variant="bodyMd" color="textSecondary" style={styles.greetingSub}>
+      <AppText
+        variant="bodyMd"
+        color="textSecondary"
+        style={styles.greetingSub}
+      >
         Ready to push your band score higher today?
       </AppText>
 
@@ -80,7 +89,11 @@ export const Home: React.FC = () => {
           PREDICTED IELTS BAND
         </AppText>
         <View style={styles.bandRow}>
-          <AppText variant="displayLg" color="primary" style={styles.bandNumber}>
+          <AppText
+            variant="displayLg"
+            color="primary"
+            style={styles.bandNumber}
+          >
             {prediction.predictedBand.toFixed(1)}
           </AppText>
           <BandBadge band={prediction.predictedBand} />
@@ -111,7 +124,7 @@ export const Home: React.FC = () => {
 
       {/* Module tiles */}
       <View style={styles.grid}>
-        {data.modules.map((module) => (
+        {data.modules.map(module => (
           <ModuleTile
             key={module.module}
             module={module}
@@ -128,7 +141,7 @@ export const Home: React.FC = () => {
             {data.checklistCompletionPct}% Complete
           </AppText>
         </View>
-        {data.checklist.map((item) => (
+        {data.checklist.map(item => (
           <ChecklistRow key={item.id} item={item} />
         ))}
       </Card>
@@ -184,7 +197,12 @@ const ModuleTile: React.FC<{ module: ModuleProgress; onPress: () => void }> = ({
         theme.shadows.card,
       ]}
     >
-      <View style={[styles.tileIcon, { backgroundColor: theme.colors.primaryContainer }]}>
+      <View
+        style={[
+          styles.tileIcon,
+          { backgroundColor: theme.colors.primaryContainer },
+        ]}
+      >
         <Icon name={meta.icon} size={22} color="primary" />
       </View>
       <AppText variant="titleLg" style={styles.tileLabel}>
@@ -219,7 +237,9 @@ const ChecklistRow: React.FC<{ item: ChecklistItem }> = ({ item }) => {
           },
         ]}
       >
-        {item.isCompleted ? <Icon name="check" size={14} color="onAccent" /> : null}
+        {item.isCompleted ? (
+          <Icon name="check" size={14} color="onAccent" />
+        ) : null}
       </View>
       <View style={styles.checkText}>
         <AppText

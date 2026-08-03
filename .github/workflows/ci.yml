@@ -84,7 +84,7 @@ jobs:
         run: cat /tmp/api.log
 
   frontend:
-    name: Frontend (typecheck)
+    name: Frontend (lint + typecheck + tests)
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -102,6 +102,14 @@ jobs:
 
       - name: Install dependencies
         run: npm ci
+
+      - name: Lint
+        # --max-warnings 0, so a warning fails the build rather than
+        # accumulating until nobody reads the output.
+        run: npm run lint
+
+      - name: Formatting
+        run: npm run format:check
 
       - name: TypeScript typecheck
         run: npm run typecheck

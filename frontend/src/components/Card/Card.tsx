@@ -3,7 +3,7 @@
 import React from 'react';
 import { View, type StyleProp, type ViewStyle } from 'react-native';
 import { useTheme } from '../theme/useTheme';
-import { RADIUS, SPACING, type ShadowToken } from '../../constants';
+import { RADIUS, SPACING, type ShadowToken } from '@constants';
 
 interface CardProps {
   children: React.ReactNode;

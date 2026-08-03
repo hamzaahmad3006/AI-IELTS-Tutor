@@ -14,7 +14,7 @@ import { BottomSheet } from '../BottomSheet/BottomSheet';
 import { Button } from '../Button/Button';
 import { Icon } from '../Icon/Icon';
 import { useTheme } from '../theme/useTheme';
-import { RADIUS, SPACING } from '../../constants';
+import { RADIUS, SPACING } from '@constants';
 
 export interface ConsentValues {
   consentAi: boolean;
@@ -102,7 +102,7 @@ export const ConsentSheet: React.FC<ConsentSheetProps> = ({
         label="AI processing"
         description="Lets the AI examiner score your answers. Turning this off disables Writing and Speaking feedback."
         checked={draft.consentAi}
-        onToggle={() => setDraft((d) => ({ ...d, consentAi: !d.consentAi }))}
+        onToggle={() => setDraft(d => ({ ...d, consentAi: !d.consentAi }))}
         testID="consent-ai-row"
       />
       <ConsentRow
@@ -110,7 +110,7 @@ export const ConsentSheet: React.FC<ConsentSheetProps> = ({
         description="Needed for spoken interview practice. Recordings are used only to score that attempt."
         checked={draft.consentVoice}
         onToggle={() =>
-          setDraft((d) => ({ ...d, consentVoice: !d.consentVoice }))
+          setDraft(d => ({ ...d, consentVoice: !d.consentVoice }))
         }
         testID="consent-voice-row"
       />

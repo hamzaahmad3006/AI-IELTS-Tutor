@@ -9,9 +9,9 @@ import {
   Icon,
   ScreenContainer,
   useTheme,
-} from '../../../components';
-import { PALETTE, RADIUS, SPACING } from '../../../constants';
-import type { GrammarExample, GrammarLessonSummary } from '../../../types';
+} from '@components';
+import { PALETTE, RADIUS, SPACING } from '@constants';
+import type { GrammarExample, GrammarLessonSummary } from '@models';
 import { useGrammarLessons } from './useGrammarLessons';
 
 export const Lessons: React.FC = () => {
@@ -102,7 +102,9 @@ export const Lessons: React.FC = () => {
       ) : null}
 
       {recommendedCount > 0 ? (
-        <View style={[styles.banner, { backgroundColor: PALETTE.tealContainer }]}>
+        <View
+          style={[styles.banner, { backgroundColor: PALETTE.tealContainer }]}
+        >
           <Icon name="sparkle" size={18} color="accent" />
           <AppText variant="bodyMd" style={styles.bannerText}>
             {recommendedCount} lesson{recommendedCount === 1 ? '' : 's'} target
@@ -112,10 +114,13 @@ export const Lessons: React.FC = () => {
       ) : null}
 
       {isLoadingLesson ? (
-        <ActivityIndicator color={theme.colors.primary} style={styles.inlineLoader} />
+        <ActivityIndicator
+          color={theme.colors.primary}
+          style={styles.inlineLoader}
+        />
       ) : null}
 
-      {lessons.map((lesson) => (
+      {lessons.map(lesson => (
         <LessonCard
           key={lesson.id}
           lesson={lesson}
@@ -149,7 +154,9 @@ const LessonCard: React.FC<{
             </AppText>
           </View>
           {lesson.recommended ? (
-            <View style={[styles.pill, { backgroundColor: theme.colors.accent }]}>
+            <View
+              style={[styles.pill, { backgroundColor: theme.colors.accent }]}
+            >
               <AppText variant="labelSm" color="textInverse">
                 FOR YOU
               </AppText>
@@ -171,7 +178,11 @@ const ExampleCard: React.FC<{ example: GrammarExample }> = ({ example }) => {
       {example.incorrect ? (
         <View style={styles.exampleRow}>
           <Icon name="info" size={16} color="error" />
-          <AppText variant="bodyMd" color="textSecondary" style={styles.exampleText}>
+          <AppText
+            variant="bodyMd"
+            color="textSecondary"
+            style={styles.exampleText}
+          >
             {example.incorrect}
           </AppText>
         </View>
@@ -229,7 +240,11 @@ const styles = StyleSheet.create({
   },
   summary: { marginTop: SPACING.xs },
   exampleCard: { marginBottom: SPACING.sm },
-  exampleRow: { flexDirection: 'row', alignItems: 'flex-start', marginBottom: SPACING.xs },
+  exampleRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    marginBottom: SPACING.xs,
+  },
   exampleText: { flex: 1, marginLeft: SPACING.xs },
   note: { marginTop: SPACING.xs, paddingLeft: SPACING.sm, borderLeftWidth: 2 },
 });

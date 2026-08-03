@@ -2,7 +2,7 @@
 
 Everything **not yet completed** to finish the project, organized by area. Checked = done, unchecked = remaining. Use this as the living backlog.
 
-> **Status as of PR #67** — **126 of 192 checklist items done (~66%)**. Weighted by
+> **Status as of PR #68** — **128 of 192 checklist items done (~67%)**. Weighted by
 > effort it is further along than that, since the backend and data layer are largely
 > complete while most remaining items are large features (live voice, deployment) or
 > are blocked on native modules.
@@ -10,8 +10,8 @@ Everything **not yet completed** to finish the project, organized by area. Check
 > API, verified on a physical Android phone — register → onboarding → dashboard → all
 > four practice modules → progress → coach → profile → logout.
 > **Verified by:** 26 backend smoke suites, a 13-step E2E user-journey check, 154
-> frontend tests, `tsc --noEmit`, and a Docker image build — all four gates run in CI
-> on every push.
+> frontend tests, ESLint at zero warnings, Prettier, `tsc --noEmit`, and a Docker image
+> build — all gated in CI on every push.
 > **Biggest remaining:** the live voice (LiveKit) pipeline, native audio playback,
 > production deployment, and iOS — all of which need hardware or hosting to verify.
 
@@ -25,10 +25,16 @@ Everything **not yet completed** to finish the project, organized by area. Check
 - [x] Platform-aware API base URL (Android `10.0.2.2`, iOS `localhost`) with a single documented override point
 - [ ] iOS: `cd ios && pod install`
 - [ ] Add Plus Jakarta Sans + Inter `.ttf` files to `src/assets/fonts` and run `npx react-native-asset`
-- [ ] Configure ESLint + Prettier scripts and run a clean lint pass
+- [x] ESLint + Prettier — `npm run lint` (**`--max-warnings 0`**), `format`,
+      `format:check`, all three gated in CI. Fixed 6 real errors and formatted
+      103 files; rules that fight the architecture (theme-driven inline styles,
+      deliberate `void` on fire-and-forget promises) are disabled **with reasons**
+      rather than worked around case by case
 - [ ] **Verify the app boots on an Android emulator / iOS simulator** ← main outstanding validation
 - [ ] Add `react-native-config` (or equivalent) so `.env` is actually read by the app
-- [ ] Set up absolute imports / path aliases (`@components`, `@constants`, …) in `tsconfig` + Babel
+- [x] Path aliases in tsconfig + Babel + Jest — 86 files migrated, zero three-level
+      climbs left. `src/types` is aliased as `@models`, not `@types`, because
+      module-resolver matches by prefix and would capture `@types/react`
 
 ---
 

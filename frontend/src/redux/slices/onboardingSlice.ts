@@ -1,7 +1,7 @@
 /** Onboarding wizard slice (multi-step draft state). */
 
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
-import type { Band, OnboardingDraft, OnboardingState } from '../../types';
+import type { Band, OnboardingDraft, OnboardingState } from '@models';
 
 const initialState: OnboardingState = {
   step: 1,

@@ -31,7 +31,7 @@ import type {
   WeaknessList,
   WritingFeedback,
   WritingResult,
-} from '../../types';
+} from '@models';
 
 export const MOCK_AUTH: AuthResponse = {
   user: {
@@ -131,7 +131,12 @@ export const MOCK_PREDICTION: PredictionResponse = {
   confidence: 0.72,
   horizonDate: '2026-10-15',
   modules: { speaking: 7.5, writing: 6.5, reading: 7.0, listening: 7.5 },
-  velocityPerWeek: { speaking: 0.12, writing: 0.15, reading: 0.05, listening: 0.1 },
+  velocityPerWeek: {
+    speaking: 0.12,
+    writing: 0.15,
+    reading: 0.05,
+    listening: 0.1,
+  },
   note: 'Estimate based on your recent trajectory; not an official IELTS result.',
 };
 
@@ -150,24 +155,75 @@ export const MOCK_PROFILE: ProfileResponse = {
 
 export const MOCK_WEAKNESSES: WeaknessList = {
   items: [
-    { module: 'writing', tag: 'grammatical_range', severity: 0.44, occurrences: 3, lastSeenAt: '2026-07-24T09:00:00Z', resolved: false, priority: 0.42 },
-    { module: 'reading', tag: 'true_false_notgiven', severity: 0.25, occurrences: 1, lastSeenAt: '2026-07-23T09:00:00Z', resolved: false, priority: 0.2 },
+    {
+      module: 'writing',
+      tag: 'grammatical_range',
+      severity: 0.44,
+      occurrences: 3,
+      lastSeenAt: '2026-07-24T09:00:00Z',
+      resolved: false,
+      priority: 0.42,
+    },
+    {
+      module: 'reading',
+      tag: 'true_false_notgiven',
+      severity: 0.25,
+      occurrences: 1,
+      lastSeenAt: '2026-07-23T09:00:00Z',
+      resolved: false,
+      priority: 0.2,
+    },
   ],
 };
 
 export const MOCK_ADAPTIVE_DIFFICULTY: AdaptiveDifficultyResponse = {
   modules: [
-    { module: 'speaking', difficulty: 'medium', recentBand: 6.5, rationale: 'Recent average band 6.5 maps to medium.' },
-    { module: 'writing', difficulty: 'medium', recentBand: 6.0, rationale: 'Recent average band 6.0 maps to medium.' },
-    { module: 'reading', difficulty: 'hard', recentBand: 7.0, rationale: 'Recent average band 7.0 maps to hard.' },
-    { module: 'listening', difficulty: 'medium', recentBand: null, rationale: 'No history yet; starting at medium.' },
+    {
+      module: 'speaking',
+      difficulty: 'medium',
+      recentBand: 6.5,
+      rationale: 'Recent average band 6.5 maps to medium.',
+    },
+    {
+      module: 'writing',
+      difficulty: 'medium',
+      recentBand: 6.0,
+      rationale: 'Recent average band 6.0 maps to medium.',
+    },
+    {
+      module: 'reading',
+      difficulty: 'hard',
+      recentBand: 7.0,
+      rationale: 'Recent average band 7.0 maps to hard.',
+    },
+    {
+      module: 'listening',
+      difficulty: 'medium',
+      recentBand: null,
+      rationale: 'No history yet; starting at medium.',
+    },
   ],
 };
 
 export const MOCK_RECOMMENDATIONS: RecommendationsResponse = {
   items: [
-    { module: 'writing', tag: 'grammatical_range', title: 'Grammatical Range & Accuracy', action: 'Practice complex sentence structures and review common grammar errors.', severity: 0.44, difficulty: 'medium' },
-    { module: 'reading', tag: 'true_false_notgiven', title: 'True/False/Not Given', action: 'Practice distinguishing contradicted vs. absent information.', severity: 0.25, difficulty: 'hard' },
+    {
+      module: 'writing',
+      tag: 'grammatical_range',
+      title: 'Grammatical Range & Accuracy',
+      action:
+        'Practice complex sentence structures and review common grammar errors.',
+      severity: 0.44,
+      difficulty: 'medium',
+    },
+    {
+      module: 'reading',
+      tag: 'true_false_notgiven',
+      title: 'True/False/Not Given',
+      action: 'Practice distinguishing contradicted vs. absent information.',
+      severity: 0.25,
+      difficulty: 'hard',
+    },
   ],
   message: 'Focus on these areas to move toward your target band.',
 };
@@ -186,9 +242,24 @@ export const MOCK_READING_PASSAGE: ReadingPassage = {
   topic: 'history',
   wordCount: 62,
   questions: [
-    { id: 'q1', type: 'mcq', prompt: 'Where did tea originate?', options: ['India', 'China', 'Japan', 'England'] },
-    { id: 'q2', type: 'true_false_notgiven', prompt: 'Tea was first used as a medicinal drink.', options: ['true', 'false', 'not_given'] },
-    { id: 'q3', type: 'short_answer', prompt: 'Which tea is produced by full oxidation?', options: null },
+    {
+      id: 'q1',
+      type: 'mcq',
+      prompt: 'Where did tea originate?',
+      options: ['India', 'China', 'Japan', 'England'],
+    },
+    {
+      id: 'q2',
+      type: 'true_false_notgiven',
+      prompt: 'Tea was first used as a medicinal drink.',
+      options: ['true', 'false', 'not_given'],
+    },
+    {
+      id: 'q3',
+      type: 'short_answer',
+      prompt: 'Which tea is produced by full oxidation?',
+      options: null,
+    },
   ],
 };
 
@@ -199,9 +270,30 @@ export const MOCK_READING_RESULT: ReadingResult = {
   totalQuestions: 3,
   band: 6.0,
   perQuestion: [
-    { questionId: 'q1', type: 'mcq', correct: true, submitted: 'China', correctAnswer: 'China', explanation: 'The passage states tea originated in China.' },
-    { questionId: 'q2', type: 'true_false_notgiven', correct: true, submitted: 'true', correctAnswer: 'true', explanation: 'It was first used medicinally.' },
-    { questionId: 'q3', type: 'short_answer', correct: false, submitted: 'green', correctAnswer: 'black', explanation: 'Black tea is fully oxidized.' },
+    {
+      questionId: 'q1',
+      type: 'mcq',
+      correct: true,
+      submitted: 'China',
+      correctAnswer: 'China',
+      explanation: 'The passage states tea originated in China.',
+    },
+    {
+      questionId: 'q2',
+      type: 'true_false_notgiven',
+      correct: true,
+      submitted: 'true',
+      correctAnswer: 'true',
+      explanation: 'It was first used medicinally.',
+    },
+    {
+      questionId: 'q3',
+      type: 'short_answer',
+      correct: false,
+      submitted: 'green',
+      correctAnswer: 'black',
+      explanation: 'Black tea is fully oxidized.',
+    },
   ],
 };
 
@@ -214,9 +306,29 @@ export const MOCK_LISTENING_CLIP: ListeningClip = {
   difficulty: 'medium',
   accent: 'British',
   questions: [
-    { id: 'lq1', type: 'short_answer', prompt: 'What do you need to borrow books?', options: null },
-    { id: 'lq2', type: 'mcq', prompt: 'Where is the main computer lab?', options: ['Library', 'Science building 2nd floor', 'Arts building', 'Science building 3rd floor'] },
-    { id: 'lq3', type: 'form_completion', prompt: 'The library closes at ____ on weekdays.', options: null },
+    {
+      id: 'lq1',
+      type: 'short_answer',
+      prompt: 'What do you need to borrow books?',
+      options: null,
+    },
+    {
+      id: 'lq2',
+      type: 'mcq',
+      prompt: 'Where is the main computer lab?',
+      options: [
+        'Library',
+        'Science building 2nd floor',
+        'Arts building',
+        'Science building 3rd floor',
+      ],
+    },
+    {
+      id: 'lq3',
+      type: 'form_completion',
+      prompt: 'The library closes at ____ on weekdays.',
+      options: null,
+    },
   ],
 };
 
@@ -227,9 +339,33 @@ export const MOCK_LISTENING_RESULT: ListeningResult = {
   totalQuestions: 3,
   band: 7.5,
   perQuestion: [
-    { questionId: 'lq1', type: 'short_answer', correct: true, submitted: 'student card', correctAnswer: 'student card', explanation: 'You need your student card.', answerTimestamp: '00:12-00:16' },
-    { questionId: 'lq2', type: 'mcq', correct: true, submitted: 'Science building 2nd floor', correctAnswer: 'Science building 2nd floor', explanation: 'Second floor of the science building.', answerTimestamp: '00:20-00:26' },
-    { questionId: 'lq3', type: 'form_completion', correct: true, submitted: 'ten', correctAnswer: 'ten', explanation: 'Open until ten at night.', answerTimestamp: '00:06-00:10' },
+    {
+      questionId: 'lq1',
+      type: 'short_answer',
+      correct: true,
+      submitted: 'student card',
+      correctAnswer: 'student card',
+      explanation: 'You need your student card.',
+      answerTimestamp: '00:12-00:16',
+    },
+    {
+      questionId: 'lq2',
+      type: 'mcq',
+      correct: true,
+      submitted: 'Science building 2nd floor',
+      correctAnswer: 'Science building 2nd floor',
+      explanation: 'Second floor of the science building.',
+      answerTimestamp: '00:20-00:26',
+    },
+    {
+      questionId: 'lq3',
+      type: 'form_completion',
+      correct: true,
+      submitted: 'ten',
+      correctAnswer: 'ten',
+      explanation: 'Open until ten at night.',
+      answerTimestamp: '00:06-00:10',
+    },
   ],
 };
 
@@ -249,8 +385,7 @@ export const MOCK_WRITING_RESULT: WritingResult = {
     'Clear position and relevant ideas; widen your range of complex structures and precise vocabulary to lift your band.',
   improvedEssay:
     'Nowadays, technology has become increasingly significant in our daily lives.',
-  essayText:
-    'Nowadays, technology is very important in our lives.',
+  essayText: 'Nowadays, technology is very important in our lives.',
   promptText:
     'Some people believe technology has made our lives more complex, while others think it has simplified them.',
 };
@@ -284,7 +419,8 @@ export const MOCK_SPEAKING_RESULT: SpeakingResult = {
     },
     {
       start: MOCK_TRANSCRIPT.indexOf('quickly and easy'),
-      end: MOCK_TRANSCRIPT.indexOf('quickly and easy') + 'quickly and easy'.length,
+      end:
+        MOCK_TRANSCRIPT.indexOf('quickly and easy') + 'quickly and easy'.length,
       quote: 'quickly and easy',
       tag: 'lexical_resource',
       note: 'Use the adverb form: "quickly and easily".',
@@ -308,7 +444,10 @@ export const MOCK_SPEAKING_SESSION: SpeakingSession = {
       speaker: 'examiner',
       isFinal: true,
       tokens: [
-        { text: 'AI: Could you tell me about a recent trip you took?', kind: 'normal' },
+        {
+          text: 'AI: Could you tell me about a recent trip you took?',
+          kind: 'normal',
+        },
       ],
     },
     {
@@ -318,9 +457,15 @@ export const MOCK_SPEAKING_SESSION: SpeakingSession = {
       tokens: [
         { text: 'Well, last month I travelled to the ', kind: 'normal' },
         { text: 'scenic', kind: 'strong' },
-        { text: ' coastal town of Amalfi in Italy. It was an absolutely ', kind: 'normal' },
+        {
+          text: ' coastal town of Amalfi in Italy. It was an absolutely ',
+          kind: 'normal',
+        },
         { text: 'breathtaking', kind: 'suggestion' },
-        { text: ' experience. The cliffs were so steep and the water was a deep, crystal-clear blue...', kind: 'normal' },
+        {
+          text: ' experience. The cliffs were so steep and the water was a deep, crystal-clear blue...',
+          kind: 'normal',
+        },
       ],
     },
     {
@@ -358,7 +503,10 @@ export const MOCK_WRITING_FEEDBACK: WritingFeedback = {
     { text: 'serios', kind: 'error' },
     { text: ' issue for everyone. Many coastal cities ', kind: 'normal' },
     { text: 'is', kind: 'error' },
-    { text: ' facing great risks because of rising sea levels. Governments ', kind: 'normal' },
+    {
+      text: ' facing great risks because of rising sea levels. Governments ',
+      kind: 'normal',
+    },
     { text: 'around the world', kind: 'suggestion' },
     { text: ' must take actions to protect their citizens.', kind: 'normal' },
   ],
@@ -404,12 +552,38 @@ export const MOCK_DATA_EXPORT: DataExport = {
 
 export const MOCK_INSIGHTS: InsightsResponse = {
   strengths: [
-    { module: 'listening', label: 'Listening', band: 7.5, detail: '+0.5 above your overall band' },
-    { module: 'speaking', label: 'Speaking', band: 7.5, detail: '+0.5 above your overall band' },
+    {
+      module: 'listening',
+      label: 'Listening',
+      band: 7.5,
+      detail: '+0.5 above your overall band',
+    },
+    {
+      module: 'speaking',
+      label: 'Speaking',
+      band: 7.5,
+      detail: '+0.5 above your overall band',
+    },
   ],
   weaknesses: [
-    { module: 'writing', label: 'Writing', tag: 'grammatical_range', tagLabel: 'Grammatical Range', severity: 0.44, occurrences: 3, detail: 'Seen 3 times in Writing' },
-    { module: 'reading', label: 'Reading', tag: 'true_false_notgiven', tagLabel: 'True False Notgiven', severity: 0.25, occurrences: 1, detail: 'Seen 1 time in Reading' },
+    {
+      module: 'writing',
+      label: 'Writing',
+      tag: 'grammatical_range',
+      tagLabel: 'Grammatical Range',
+      severity: 0.44,
+      occurrences: 3,
+      detail: 'Seen 3 times in Writing',
+    },
+    {
+      module: 'reading',
+      label: 'Reading',
+      tag: 'true_false_notgiven',
+      tagLabel: 'True False Notgiven',
+      severity: 0.25,
+      occurrences: 1,
+      detail: 'Seen 1 time in Reading',
+    },
   ],
   consistency: {
     currentStreak: 5,
@@ -429,7 +603,8 @@ export const MOCK_INSIGHTS: InsightsResponse = {
     measuredSpeakingMinutes: 42,
     timeNote: 'Only spoken responses are timed, so this covers Speaking only.',
   },
-  summary: 'Listening is carrying you at band 7.5. Your biggest drag is grammatical range in writing.',
+  summary:
+    'Listening is carrying you at band 7.5. Your biggest drag is grammatical range in writing.',
 };
 
 export const MOCK_SPEAKING_QUESTIONS: SpeakingQuestionSet = {
@@ -437,10 +612,22 @@ export const MOCK_SPEAKING_QUESTIONS: SpeakingQuestionSet = {
   topic: 'work and study',
   difficulty: 'medium',
   questions: [
-    { id: 'sq1', orderIndex: 1, question: 'Do you work, or are you a student?' },
+    {
+      id: 'sq1',
+      orderIndex: 1,
+      question: 'Do you work, or are you a student?',
+    },
     { id: 'sq2', orderIndex: 2, question: 'What made you choose that field?' },
-    { id: 'sq3', orderIndex: 3, question: 'What is the most difficult part of it?' },
-    { id: 'sq4', orderIndex: 4, question: 'What would you like to be doing in five years?' },
+    {
+      id: 'sq3',
+      orderIndex: 3,
+      question: 'What is the most difficult part of it?',
+    },
+    {
+      id: 'sq4',
+      orderIndex: 4,
+      question: 'What would you like to be doing in five years?',
+    },
   ],
   guidance:
     'Short, natural answers — two or three sentences each. Give a reason or an example rather than a bare yes or no.',
@@ -452,8 +639,18 @@ export const MOCK_DIAGNOSTIC_SET: DiagnosticSet = {
     title: 'The History of Tea',
     body: 'Tea originated in China, where it was first used as a medicinal drink.',
     questions: [
-      { id: 'dr1', type: 'mcq', prompt: 'Where did tea originate?', options: ['India', 'China', 'Japan'] },
-      { id: 'dr2', type: 'true_false_notgiven', prompt: 'Tea was first medicinal.', options: ['true', 'false', 'not_given'] },
+      {
+        id: 'dr1',
+        type: 'mcq',
+        prompt: 'Where did tea originate?',
+        options: ['India', 'China', 'Japan'],
+      },
+      {
+        id: 'dr2',
+        type: 'true_false_notgiven',
+        prompt: 'Tea was first medicinal.',
+        options: ['true', 'false', 'not_given'],
+      },
     ],
   },
   listening: {
@@ -462,12 +659,18 @@ export const MOCK_DIAGNOSTIC_SET: DiagnosticSet = {
     audioUrl: '/media/seed/audio/orientation.wav',
     durationSec: 45,
     questions: [
-      { id: 'dl1', type: 'short_answer', prompt: 'What do you need to borrow books?', options: null },
+      {
+        id: 'dl1',
+        type: 'short_answer',
+        prompt: 'What do you need to borrow books?',
+        options: null,
+      },
     ],
   },
   writing: {
     promptId: 'wp_mock_1',
-    prompt: 'Some people believe technology has made our lives more complex. Discuss.',
+    prompt:
+      'Some people believe technology has made our lives more complex. Discuss.',
     minWords: 40,
   },
   speaking: {
@@ -501,12 +704,70 @@ export const MOCK_STUDY_PLAN: StudyPlan = {
   rationale:
     'Built for 2 weeks until your exam, 45 minutes a day, targeting band 7.5. Sessions are weighted towards the modules furthest from your target.',
   tasks: [
-    { id: 'pt1', week: 1, module: 'writing', title: 'Writing practice', detail: 'Focus on grammatical range. You are at band 6.0, 1.5 from target.', minutes: 45, priority: 1.5, isDone: true },
-    { id: 'pt2', week: 1, module: 'writing', title: 'Writing practice', detail: 'Focus on grammatical range. You are at band 6.0, 1.5 from target.', minutes: 45, priority: 1.5, isDone: false },
-    { id: 'pt3', week: 1, module: 'speaking', title: 'Speaking practice', detail: 'Focus on overall fluency. You are at band 6.5, 1.0 from target.', minutes: 45, priority: 1.0, isDone: false },
-    { id: 'pt4', week: 1, module: 'reading', title: 'Reading practice', detail: 'Focus on true false notgiven. You are at band 7.0, 0.5 from target.', minutes: 45, priority: 0.5, isDone: false },
-    { id: 'pt5', week: 1, module: 'listening', title: 'Listening practice', detail: 'Focus on overall fluency. You are at band 7.0, 0.5 from target.', minutes: 45, priority: 0.5, isDone: false },
-    { id: 'pt6', week: 2, module: 'writing', title: 'Writing practice', detail: 'Focus on grammatical range. You are at band 6.0, 1.5 from target.', minutes: 45, priority: 1.5, isDone: false },
+    {
+      id: 'pt1',
+      week: 1,
+      module: 'writing',
+      title: 'Writing practice',
+      detail:
+        'Focus on grammatical range. You are at band 6.0, 1.5 from target.',
+      minutes: 45,
+      priority: 1.5,
+      isDone: true,
+    },
+    {
+      id: 'pt2',
+      week: 1,
+      module: 'writing',
+      title: 'Writing practice',
+      detail:
+        'Focus on grammatical range. You are at band 6.0, 1.5 from target.',
+      minutes: 45,
+      priority: 1.5,
+      isDone: false,
+    },
+    {
+      id: 'pt3',
+      week: 1,
+      module: 'speaking',
+      title: 'Speaking practice',
+      detail: 'Focus on overall fluency. You are at band 6.5, 1.0 from target.',
+      minutes: 45,
+      priority: 1.0,
+      isDone: false,
+    },
+    {
+      id: 'pt4',
+      week: 1,
+      module: 'reading',
+      title: 'Reading practice',
+      detail:
+        'Focus on true false notgiven. You are at band 7.0, 0.5 from target.',
+      minutes: 45,
+      priority: 0.5,
+      isDone: false,
+    },
+    {
+      id: 'pt5',
+      week: 1,
+      module: 'listening',
+      title: 'Listening practice',
+      detail: 'Focus on overall fluency. You are at band 7.0, 0.5 from target.',
+      minutes: 45,
+      priority: 0.5,
+      isDone: false,
+    },
+    {
+      id: 'pt6',
+      week: 2,
+      module: 'writing',
+      title: 'Writing practice',
+      detail:
+        'Focus on grammatical range. You are at band 6.0, 1.5 from target.',
+      minutes: 45,
+      priority: 1.5,
+      isDone: false,
+    },
   ],
   completedCount: 1,
   totalCount: 6,
@@ -538,12 +799,18 @@ export const MOCK_MOCK_RESULT: MockResult = {
     verdict: 'Nearly ready',
     headline: 'Band 6.5, 0.5 below your 7.0 target.',
     modules: [
-      { module: 'listening', band: 7.0, gap: 0.0, verdict: 'At or above target' },
+      {
+        module: 'listening',
+        band: 7.0,
+        gap: 0.0,
+        verdict: 'At or above target',
+      },
       { module: 'reading', band: 7.0, gap: 0.0, verdict: 'At or above target' },
       { module: 'writing', band: 6.0, gap: 1.0, verdict: 'Needs work' },
       { module: 'speaking', band: 6.5, gap: 0.5, verdict: 'Within reach' },
     ],
     weakestModule: 'writing',
-    advice: 'Your weakest section is writing. Put your next few sessions there.',
+    advice:
+      'Your weakest section is writing. Put your next few sessions there.',
   },
 };

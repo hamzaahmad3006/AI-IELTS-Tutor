@@ -3,12 +3,12 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { diagnosticApi } from '../../../api';
+import { diagnosticApi } from '@api';
 import type {
   DiagnosticResult,
   DiagnosticSet,
   OnboardingStackParamList,
-} from '../../../types';
+} from '@models';
 
 type Nav = NativeStackNavigationProp<OnboardingStackParamList>;
 
@@ -58,10 +58,12 @@ export const useDiagnostic = (): UseDiagnosticResult => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [stepIndex, setStepIndex] = useState<number>(0);
-  const [readingAnswers, setReadingAnswers] = useState<Record<string, string>>({});
-  const [listeningAnswers, setListeningAnswers] = useState<Record<string, string>>(
+  const [readingAnswers, setReadingAnswers] = useState<Record<string, string>>(
     {},
   );
+  const [listeningAnswers, setListeningAnswers] = useState<
+    Record<string, string>
+  >({});
   const [writingText, setWritingText] = useState<string>('');
   const [speakingText, setSpeakingText] = useState<string>('');
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
@@ -71,14 +73,16 @@ export const useDiagnostic = (): UseDiagnosticResult => {
     let active = true;
     diagnosticApi
       .getSet()
-      .then((data) => {
+      .then(data => {
         if (active) {
           setSet(data);
         }
       })
       .catch(() => {
         if (active) {
-          setError('Could not load the placement test. You can skip it for now.');
+          setError(
+            'Could not load the placement test. You can skip it for now.',
+          );
         }
       })
       .finally(() => {
@@ -103,7 +107,7 @@ export const useDiagnostic = (): UseDiagnosticResult => {
         writingText: writingText.trim() || null,
         speakingText: speakingText.trim() || null,
       })
-      .then((data) => setResult(data))
+      .then(data => setResult(data))
       .catch(() => setError('Could not score the placement test.'))
       .finally(() => setIsSubmitting(false));
   }, [readingAnswers, listeningAnswers, writingText, speakingText]);
@@ -125,13 +129,13 @@ export const useDiagnostic = (): UseDiagnosticResult => {
     writingText,
     speakingText,
     setReadingAnswer: (questionId, value) =>
-      setReadingAnswers((prev) => ({ ...prev, [questionId]: value })),
+      setReadingAnswers(prev => ({ ...prev, [questionId]: value })),
     setListeningAnswer: (questionId, value) =>
-      setListeningAnswers((prev) => ({ ...prev, [questionId]: value })),
+      setListeningAnswers(prev => ({ ...prev, [questionId]: value })),
     setWritingText,
     setSpeakingText,
-    next: () => setStepIndex((i) => Math.min(STEPS.length - 1, i + 1)),
-    back: () => setStepIndex((i) => Math.max(0, i - 1)),
+    next: () => setStepIndex(i => Math.min(STEPS.length - 1, i + 1)),
+    back: () => setStepIndex(i => Math.max(0, i - 1)),
     isSubmitting,
     result,
     submit,

@@ -13,7 +13,9 @@ describe('Study plan screen', () => {
     });
     expect(screen.getByText('1 of 6 sessions done')).toBeTruthy();
     // A plan the learner cannot interrogate is just a list of chores.
-    expect(screen.getByText(/weighted towards the modules furthest/)).toBeTruthy();
+    expect(
+      screen.getByText(/weighted towards the modules furthest/),
+    ).toBeTruthy();
   });
 
   it('lists one chip per week and shows only that week', async () => {

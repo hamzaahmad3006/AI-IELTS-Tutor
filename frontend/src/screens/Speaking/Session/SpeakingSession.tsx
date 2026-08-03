@@ -9,8 +9,8 @@ import {
   Icon,
   ScreenContainer,
   useTheme,
-} from '../../../components';
-import { RADIUS, SPACING } from '../../../constants';
+} from '@components';
+import { RADIUS, SPACING } from '@constants';
 import { useSpeakingSession } from './useSpeakingSession';
 
 export const SpeakingSession: React.FC = () => {
@@ -20,7 +20,11 @@ export const SpeakingSession: React.FC = () => {
   return (
     <ScreenContainer scroll>
       <View style={styles.header}>
-        <Pressable onPress={onBack} accessibilityRole="button" accessibilityLabel="Back">
+        <Pressable
+          onPress={onBack}
+          accessibilityRole="button"
+          accessibilityLabel="Back"
+        >
           <Icon name="back" size={22} color="primary" />
         </Pressable>
         <AppText variant="titleLg" style={styles.headerTitle}>
@@ -32,7 +36,7 @@ export const SpeakingSession: React.FC = () => {
         What would you like to practise?
       </AppText>
 
-      {options.map((option) => {
+      {options.map(option => {
         const isSelected = selected === option.choice;
         return (
           <Pressable
@@ -72,10 +76,14 @@ export const SpeakingSession: React.FC = () => {
         {/* Stated up front rather than discovered on the next screen. Asking
             for microphone access we cannot yet use would be worse than saying
             plainly that answers are typed for now. */}
-        <AppText variant="bodySm" color="textSecondary" style={styles.noticeBody}>
+        <AppText
+          variant="bodySm"
+          color="textSecondary"
+          style={styles.noticeBody}
+        >
           Answers are typed for now, and scored on what you say rather than how
-          you sound. Live voice recording is not enabled yet, so the app does not
-          ask for microphone access.
+          you sound. Live voice recording is not enabled yet, so the app does
+          not ask for microphone access.
         </AppText>
       </Card>
 

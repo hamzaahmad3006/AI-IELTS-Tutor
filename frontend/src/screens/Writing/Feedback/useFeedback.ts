@@ -1,14 +1,14 @@
 /** Writing feedback logic: loads feedback + manages draft/model tab. */
 
 import { useCallback, useEffect, useState } from 'react';
-import { useNavigation, useRoute, type RouteProp } from '@react-navigation/native';
+import {
+  useNavigation,
+  useRoute,
+  type RouteProp,
+} from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { writingApi } from '../../../api';
-import type {
-  FeedbackTab,
-  RootStackParamList,
-  WritingFeedback,
-} from '../../../types';
+import { writingApi } from '@api';
+import type { FeedbackTab, RootStackParamList, WritingFeedback } from '@models';
 
 type Nav = NativeStackNavigationProp<RootStackParamList>;
 type FeedbackRoute = RouteProp<RootStackParamList, 'WritingFeedback'>;

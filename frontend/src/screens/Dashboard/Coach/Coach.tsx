@@ -10,13 +10,13 @@ import {
   ProgressBar,
   ScreenContainer,
   useTheme,
-} from '../../../components';
-import { PALETTE, RADIUS, SPACING, type IconName } from '../../../constants';
+} from '@components';
+import { PALETTE, RADIUS, SPACING, type IconName } from '@constants';
 import type {
   AdaptiveDifficultyItem,
   IeltsModule,
   Recommendation,
-} from '../../../types';
+} from '@models';
 import { useCoach } from './useCoach';
 
 const MODULE_LABELS: Record<IeltsModule, string> = {
@@ -68,7 +68,12 @@ export const Coach: React.FC = () => {
       <ScreenContainer>
         <View style={styles.center}>
           <Icon name="info" size={40} color="error" />
-          <AppText variant="bodyMd" color="textSecondary" align="center" style={styles.errorText}>
+          <AppText
+            variant="bodyMd"
+            color="textSecondary"
+            align="center"
+            style={styles.errorText}
+          >
             {error}
           </AppText>
           <Button title="Retry" onPress={reload} fullWidth={false} />
@@ -84,7 +89,9 @@ export const Coach: React.FC = () => {
       </AppText>
 
       {/* Coach message */}
-      <View style={[styles.coachBanner, { backgroundColor: PALETTE.tealContainer }]}>
+      <View
+        style={[styles.coachBanner, { backgroundColor: PALETTE.tealContainer }]}
+      >
         <View style={[styles.coachIcon, { backgroundColor: PALETTE.teal }]}>
           <Icon name="coach" size={22} color="textInverse" />
         </View>
@@ -99,7 +106,7 @@ export const Coach: React.FC = () => {
           <AppText variant="titleLg" style={styles.sectionTitle}>
             Recommended focus
           </AppText>
-          {recommendations.map((rec) => (
+          {recommendations.map(rec => (
             <RecommendationCard
               key={`${rec.module}-${rec.tag}`}
               rec={rec}
@@ -110,9 +117,13 @@ export const Coach: React.FC = () => {
       ) : (
         <Card style={styles.section} backgroundToken="cardAlt">
           <AppText variant="titleLg">Nothing to fix yet</AppText>
-          <AppText variant="bodyMd" color="textSecondary" style={styles.emptyBody}>
-            Complete a few practice sessions and your coach will pinpoint exactly
-            what to work on.
+          <AppText
+            variant="bodyMd"
+            color="textSecondary"
+            style={styles.emptyBody}
+          >
+            Complete a few practice sessions and your coach will pinpoint
+            exactly what to work on.
           </AppText>
         </Card>
       )}
@@ -137,7 +148,7 @@ export const Coach: React.FC = () => {
       <AppText variant="titleLg" style={styles.sectionTitle}>
         Your current level
       </AppText>
-      {difficulty.map((item) => (
+      {difficulty.map(item => (
         <DifficultyRow key={item.module} item={item} />
       ))}
     </ScreenContainer>
@@ -153,7 +164,12 @@ const RecommendationCard: React.FC<{
     <Pressable onPress={onPress}>
       <Card style={styles.recCard}>
         <View style={styles.recHead}>
-          <View style={[styles.recIcon, { backgroundColor: theme.colors.primaryContainer }]}>
+          <View
+            style={[
+              styles.recIcon,
+              { backgroundColor: theme.colors.primaryContainer },
+            ]}
+          >
             <Icon name={MODULE_ICONS[rec.module]} size={20} color="primary" />
           </View>
           <View style={styles.recTitleWrap}>
@@ -164,7 +180,11 @@ const RecommendationCard: React.FC<{
           </View>
           <Icon name="arrow-right" size={20} color="primary" />
         </View>
-        <AppText variant="bodySm" color="textSecondary" style={styles.recAction}>
+        <AppText
+          variant="bodySm"
+          color="textSecondary"
+          style={styles.recAction}
+        >
           {rec.action}
         </AppText>
         <ProgressBar
@@ -178,7 +198,9 @@ const RecommendationCard: React.FC<{
   );
 };
 
-const DifficultyRow: React.FC<{ item: AdaptiveDifficultyItem }> = ({ item }) => {
+const DifficultyRow: React.FC<{ item: AdaptiveDifficultyItem }> = ({
+  item,
+}) => {
   const color = DIFFICULTY_COLORS[item.difficulty] ?? PALETTE.warning;
   return (
     <Card style={styles.diffCard}>

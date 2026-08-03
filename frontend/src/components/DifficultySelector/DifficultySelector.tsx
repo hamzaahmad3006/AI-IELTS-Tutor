@@ -15,8 +15,8 @@ import { Pressable, StyleSheet, View } from 'react-native';
 import { AppText } from '../AppText/AppText';
 import { Card } from '../Card/Card';
 import { useTheme } from '../theme/useTheme';
-import { RADIUS, SPACING } from '../../constants';
-import type { Difficulty } from '../../types';
+import { RADIUS, SPACING } from '@constants';
+import type { Difficulty } from '@models';
 
 const OPTIONS: { value: Difficulty; label: string }[] = [
   { value: 'adaptive', label: 'Adaptive' },
@@ -50,14 +50,18 @@ export const DifficultySelector: React.FC<DifficultySelectorProps> = ({
           DIFFICULTY
         </AppText>
         {served ? (
-          <AppText variant="labelSm" color="textMuted" testID="difficulty-served">
+          <AppText
+            variant="labelSm"
+            color="textMuted"
+            testID="difficulty-served"
+          >
             {value === 'adaptive' ? `Chose ${served}` : `Serving ${served}`}
           </AppText>
         ) : null}
       </View>
 
       <View style={styles.row}>
-        {OPTIONS.map((option) => {
+        {OPTIONS.map(option => {
           const selected = value === option.value;
           return (
             <Pressable

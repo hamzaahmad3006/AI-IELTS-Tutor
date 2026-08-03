@@ -13,7 +13,7 @@ import type {
 } from '../types';
 
 const delay = (ms: number): Promise<void> =>
-  new Promise((resolve) => setTimeout(resolve, ms));
+  new Promise(resolve => setTimeout(resolve, ms));
 
 export const listeningApi = {
   async getClip(difficulty?: Difficulty): Promise<ListeningClip> {

@@ -11,7 +11,7 @@ import type {
 } from '../types';
 
 const delay = (ms: number): Promise<void> =>
-  new Promise((resolve) => setTimeout(resolve, ms));
+  new Promise(resolve => setTimeout(resolve, ms));
 
 export const diagnosticApi = {
   async getSet(): Promise<DiagnosticSet> {

@@ -15,7 +15,7 @@ import { BottomSheet } from '../BottomSheet/BottomSheet';
 import { Button } from '../Button/Button';
 import { Icon } from '../Icon/Icon';
 import { useTheme } from '../theme/useTheme';
-import { RADIUS, SPACING } from '../../constants';
+import { RADIUS, SPACING } from '@constants';
 
 interface DatePickerSheetProps {
   visible: boolean;
@@ -30,8 +30,18 @@ interface DatePickerSheetProps {
 
 const WEEKDAYS = ['M', 'T', 'W', 'T', 'F', 'S', 'S'] as const;
 const MONTHS = [
-  'January', 'February', 'March', 'April', 'May', 'June',
-  'July', 'August', 'September', 'October', 'November', 'December',
+  'January',
+  'February',
+  'March',
+  'April',
+  'May',
+  'June',
+  'July',
+  'August',
+  'September',
+  'October',
+  'November',
+  'December',
 ] as const;
 
 /** Local-time ISO date. `toISOString()` would shift the day across timezones. */
@@ -53,7 +63,10 @@ const parseIsoDate = (iso: string | null): Date | null => {
 };
 
 /** Days in `month`, padded so the grid starts on a Monday. */
-export const buildMonthGrid = (year: number, month: number): (number | null)[] => {
+export const buildMonthGrid = (
+  year: number,
+  month: number,
+): (number | null)[] => {
   const first = new Date(year, month, 1);
   // getDay() is Sunday-based; shift so Monday is 0.
   const lead = (first.getDay() + 6) % 7;
@@ -161,8 +174,8 @@ export const DatePickerSheet: React.FC<DatePickerSheetProps> = ({
                   isSelected
                     ? 'textInverse'
                     : isPast
-                      ? 'textMuted'
-                      : 'textPrimary'
+                    ? 'textMuted'
+                    : 'textPrimary'
                 }
               >
                 {String(day)}

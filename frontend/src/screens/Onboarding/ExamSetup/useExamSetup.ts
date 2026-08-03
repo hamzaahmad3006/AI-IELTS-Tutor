@@ -3,18 +3,14 @@
 import { useCallback, useState } from 'react';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { profileApi } from '../../../api';
+import { profileApi } from '@api';
 import {
   resetOnboarding,
   updateDraft,
   useAppDispatch,
   useAppSelector,
-} from '../../../redux';
-import type {
-  ExamType,
-  ProficiencyLevel,
-  RootStackParamList,
-} from '../../../types';
+} from '@redux';
+import type { ExamType, ProficiencyLevel, RootStackParamList } from '@models';
 
 type Nav = NativeStackNavigationProp<RootStackParamList>;
 
@@ -50,9 +46,7 @@ export const useExamSetup = (): UseExamSetupResult => {
   const dispatch = useAppDispatch();
   const navigation = useNavigation<Nav>();
   const [dateSheetOpen, setDateSheetOpen] = useState<boolean>(false);
-  const { step, totalSteps, draft } = useAppSelector(
-    (state) => state.onboarding,
-  );
+  const { step, totalSteps, draft } = useAppSelector(state => state.onboarding);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 

@@ -14,7 +14,7 @@ import { StyleSheet, View } from 'react-native';
 import { AppText } from '../AppText/AppText';
 import { Button } from '../Button/Button';
 import { Icon } from '../Icon/Icon';
-import { SPACING } from '../../constants';
+import { SPACING } from '@constants';
 
 interface ErrorBoundaryProps {
   children: React.ReactNode;

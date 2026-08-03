@@ -10,7 +10,7 @@ import { renderWithProviders } from '../../testUtils/renderWithProviders';
 describe('Speaking session start', () => {
   it('offers the full interview and each part separately', () => {
     renderWithProviders(<SpeakingSession />);
-    SESSION_OPTIONS.forEach((option) => {
+    SESSION_OPTIONS.forEach(option => {
       expect(screen.getByTestId(`session-${option.choice}`)).toBeTruthy();
       expect(screen.getByText(option.title)).toBeTruthy();
     });
@@ -26,9 +26,9 @@ describe('Speaking session start', () => {
   it('changes selection when another part is chosen', () => {
     renderWithProviders(<SpeakingSession />);
     fireEvent.press(screen.getByTestId('session-part3'));
-    expect(screen.getByTestId('session-part3').props.accessibilityState).toEqual(
-      expect.objectContaining({ selected: true }),
-    );
+    expect(
+      screen.getByTestId('session-part3').props.accessibilityState,
+    ).toEqual(expect.objectContaining({ selected: true }));
   });
 
   it('says plainly that answers are typed rather than requesting a mic', () => {
@@ -82,7 +82,6 @@ describe('Speaking Part runner', () => {
     const answer = 'I am a student studying computer science at a university.';
     for (let i = 0; i < 3; i += 1) {
       fireEvent.changeText(screen.getByTestId('parts-answer-input'), answer);
-      // eslint-disable-next-line no-await-in-loop
       await waitFor(() => {
         expect(screen.getByTestId('parts-next')).toBeTruthy();
       });

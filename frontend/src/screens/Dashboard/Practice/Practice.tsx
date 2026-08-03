@@ -9,9 +9,9 @@ import {
   Icon,
   ScreenContainer,
   useTheme,
-} from '../../../components';
-import { PALETTE, RADIUS, SPACING, type IconName } from '../../../constants';
-import type { AdaptiveDifficultyItem, IeltsModule } from '../../../types';
+} from '@components';
+import { PALETTE, RADIUS, SPACING, type IconName } from '@constants';
+import type { AdaptiveDifficultyItem, IeltsModule } from '@models';
 import { usePractice } from './usePractice';
 
 interface ModuleMeta {
@@ -66,7 +66,7 @@ export const Practice: React.FC = () => {
         Choose a module. Difficulty adapts to your recent performance.
       </AppText>
 
-      {MODULES.map((meta) => (
+      {MODULES.map(meta => (
         <ModuleCard
           key={meta.module}
           meta={meta}
@@ -97,7 +97,12 @@ const ModuleCard: React.FC<{
     <Pressable onPress={onPress}>
       <Card style={styles.card}>
         <View style={styles.row}>
-          <View style={[styles.icon, { backgroundColor: theme.colors.primaryContainer }]}>
+          <View
+            style={[
+              styles.icon,
+              { backgroundColor: theme.colors.primaryContainer },
+            ]}
+          >
             <Icon name={meta.icon} size={22} color="primary" />
           </View>
           <View style={styles.textWrap}>

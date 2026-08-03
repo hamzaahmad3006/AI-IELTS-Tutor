@@ -13,10 +13,10 @@ import {
   ProgressBar,
   ScreenContainer,
   useTheme,
-} from '../../../components';
-import { getBandColor, RADIUS, SPACING } from '../../../constants';
-import type { TextIssue } from '../../../components';
-import type { SpeakingCriteriaScore, SpeakingResult } from '../../../types';
+} from '@components';
+import { getBandColor, RADIUS, SPACING } from '@constants';
+import type { TextIssue } from '@components';
+import type { SpeakingCriteriaScore, SpeakingResult } from '@models';
 import { useSpeakingPractice } from './useSpeakingPractice';
 
 const CRITERIA: Array<{ key: keyof SpeakingCriteriaScore; label: string }> = [
@@ -46,12 +46,18 @@ export const Practice: React.FC = () => {
   } = useSpeakingPractice();
 
   if (phase === 'scored' && result) {
-    return <ResultView result={result} onTryAnother={tryAnother} onBack={onBack} />;
+    return (
+      <ResultView result={result} onTryAnother={tryAnother} onBack={onBack} />
+    );
   }
 
   return (
     <ScreenContainer scroll>
-      <Header title="Speaking · Part 2" onBack={onBack} timerLabel={timerLabel} />
+      <Header
+        title="Speaking · Part 2"
+        onBack={onBack}
+        timerLabel={timerLabel}
+      />
 
       {/* Cue card */}
       <Card style={styles.section} backgroundToken="cardAlt">
@@ -64,9 +70,11 @@ export const Practice: React.FC = () => {
         <AppText variant="bodySm" color="textSecondary" style={styles.cueLabel}>
           You should say:
         </AppText>
-        {cueCard.bulletPoints.map((bullet) => (
+        {cueCard.bulletPoints.map(bullet => (
           <View key={bullet} style={styles.bulletRow}>
-            <View style={[styles.bullet, { backgroundColor: theme.colors.primary }]} />
+            <View
+              style={[styles.bullet, { backgroundColor: theme.colors.primary }]}
+            />
             <AppText variant="bodyMd" style={styles.bulletText}>
               {bullet}
             </AppText>
@@ -77,7 +85,11 @@ export const Practice: React.FC = () => {
       {phase === 'prep' ? (
         <Card style={styles.section}>
           <AppText variant="titleLg">Preparation time</AppText>
-          <AppText variant="bodyMd" color="textSecondary" style={styles.phaseHint}>
+          <AppText
+            variant="bodyMd"
+            color="textSecondary"
+            style={styles.phaseHint}
+          >
             Take up to a minute to plan your answer, then start speaking.
           </AppText>
           <Button
@@ -91,13 +103,20 @@ export const Practice: React.FC = () => {
         <>
           <View style={styles.editorHead}>
             <AppText variant="titleLg">Your response</AppText>
-            <AppText variant="labelMd" color={canSubmit ? 'success' : 'textMuted'}>
+            <AppText
+              variant="labelMd"
+              color={canSubmit ? 'success' : 'textMuted'}
+            >
               {wordCount} words
             </AppText>
           </View>
-          <AppText variant="bodySm" color="textMuted" style={styles.dictationHint}>
-            Speak your answer aloud and type (or dictate) it here — the AI examiner
-            scores the transcript.
+          <AppText
+            variant="bodySm"
+            color="textMuted"
+            style={styles.dictationHint}
+          >
+            Speak your answer aloud and type (or dictate) it here — the AI
+            examiner scores the transcript.
           </AppText>
           <Input
             label=""
@@ -171,7 +190,11 @@ const ResultView: React.FC<{
                     {value.toFixed(1)}
                   </AppText>
                 </View>
-                <ProgressBar progress={value / 9} fillColor={color} height={6} />
+                <ProgressBar
+                  progress={value / 9}
+                  fillColor={color}
+                  height={6}
+                />
               </View>
             );
           })}
@@ -193,7 +216,11 @@ const ResultView: React.FC<{
         <TranscriptCard transcript={result.transcript} issues={result.issues} />
       ) : null}
 
-      <Button title="Practice another" onPress={onTryAnother} style={styles.section} />
+      <Button
+        title="Practice another"
+        onPress={onTryAnother}
+        style={styles.section}
+      />
     </ScreenContainer>
   );
 };
@@ -212,7 +239,11 @@ const TranscriptCard: React.FC<{
           {`${issues.length} to review`}
         </AppText>
       </View>
-      <AppText variant="labelSm" color="textMuted" style={styles.transcriptHint}>
+      <AppText
+        variant="labelSm"
+        color="textMuted"
+        style={styles.transcriptHint}
+      >
         Tap a highlight, or a note below, to jump between them.
       </AppText>
       <HighlightedText
@@ -241,7 +272,12 @@ const Header: React.FC<{
         {title}
       </AppText>
       {timerLabel ? (
-        <View style={[styles.timer, { backgroundColor: theme.colors.primaryContainer }]}>
+        <View
+          style={[
+            styles.timer,
+            { backgroundColor: theme.colors.primaryContainer },
+          ]}
+        >
           <Icon name="timer" size={14} color="primary" />
           <AppText variant="labelMd" color="primary" style={styles.timerText}>
             {timerLabel}
@@ -273,7 +309,11 @@ const styles = StyleSheet.create({
   section: { marginTop: SPACING.lg },
   cuePrompt: { marginTop: SPACING.xs },
   cueLabel: { marginTop: SPACING.md, marginBottom: SPACING.xs },
-  bulletRow: { flexDirection: 'row', alignItems: 'center', marginBottom: SPACING.xxs },
+  bulletRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: SPACING.xxs,
+  },
   bullet: { width: 6, height: 6, borderRadius: 3, marginRight: SPACING.xs },
   bulletText: { flex: 1 },
   phaseHint: { marginTop: SPACING.xs },

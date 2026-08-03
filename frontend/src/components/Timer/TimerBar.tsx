@@ -6,7 +6,7 @@ import { AppText } from '../AppText/AppText';
 import { Button } from '../Button/Button';
 import { Card } from '../Card/Card';
 import { useTheme } from '../theme/useTheme';
-import { SPACING } from '../../constants';
+import { SPACING } from '@constants';
 import { formatClock, type TimerState } from './useCountdown';
 
 interface TimerBarProps {
@@ -36,8 +36,8 @@ export const TimerBar: React.FC<TimerBarProps> = ({
   const color = expired
     ? theme.colors.error
     : isWarning
-      ? theme.colors.warning
-      : theme.colors.textPrimary;
+    ? theme.colors.warning
+    : theme.colors.textPrimary;
 
   return (
     <Card style={styles.card} testID={testID ?? 'practice-timer'}>

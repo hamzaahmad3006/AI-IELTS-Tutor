@@ -3,8 +3,8 @@
 import React from 'react';
 import { StatusBar, StyleSheet, View } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
-import { AppText, Icon, Logo } from '../../components';
-import { PALETTE, RADIUS, SPACING, LAYOUT } from '../../constants';
+import { AppText, Icon, Logo } from '@components';
+import { PALETTE, RADIUS, SPACING, LAYOUT } from '@constants';
 import { useSplash } from './useSplash';
 
 export const Splash: React.FC = () => {
@@ -29,7 +29,12 @@ export const Splash: React.FC = () => {
         <AppText variant="headlineLg" color="textInverse" style={styles.title}>
           {displayName}
         </AppText>
-        <AppText variant="bodyLg" color="textInverse" align="center" style={styles.tagline}>
+        <AppText
+          variant="bodyLg"
+          color="textInverse"
+          align="center"
+          style={styles.tagline}
+        >
           {tagline}
         </AppText>
 
@@ -50,7 +55,12 @@ export const Splash: React.FC = () => {
 
 const styles = StyleSheet.create({
   fill: { flex: 1 },
-  center: { flex: 1, alignItems: 'center', justifyContent: 'center', paddingHorizontal: SPACING.xl },
+  center: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: SPACING.xl,
+  },
   logoTile: {
     width: LAYOUT.logoSizeSplash + 40,
     height: LAYOUT.logoSizeSplash + 40,
@@ -63,7 +73,11 @@ const styles = StyleSheet.create({
   mark: { marginTop: SPACING.xxs, letterSpacing: 1 },
   title: { marginBottom: SPACING.sm },
   tagline: { opacity: 0.85 },
-  poweredRow: { flexDirection: 'row', alignItems: 'center', marginTop: SPACING.md },
+  poweredRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: SPACING.md,
+  },
   powered: { opacity: 0.75, marginLeft: SPACING.xs },
   track: {
     width: 220,

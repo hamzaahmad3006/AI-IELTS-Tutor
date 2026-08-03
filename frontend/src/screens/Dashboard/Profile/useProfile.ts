@@ -4,7 +4,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Share } from 'react-native';
-import { meApi, plannerApi, profileApi } from '../../../api';
+import { meApi, plannerApi, profileApi } from '@api';
 import {
   logout,
   logoutThunk,
@@ -12,15 +12,15 @@ import {
   toggleTheme,
   useAppDispatch,
   useAppSelector,
-} from '../../../redux';
-import type { ConsentValues } from '../../../components';
+} from '@redux';
+import type { ConsentValues } from '@components';
 import type {
   AuthenticatedUser,
   Band,
   ProfileResponse,
   RootStackParamList,
-} from '../../../types';
-import type { ThemeMode } from '../../../constants';
+} from '@models';
+import type { ThemeMode } from '@constants';
 
 type Nav = NativeStackNavigationProp<RootStackParamList>;
 
@@ -55,11 +55,9 @@ interface UseProfileResult {
 export const useProfile = (): UseProfileResult => {
   const dispatch = useAppDispatch();
   const navigation = useNavigation<Nav>();
-  const user = useAppSelector((state) => state.auth.user);
-  const themeMode = useAppSelector((state) => state.theme.mode);
-  const refreshToken = useAppSelector(
-    (state) => state.auth.tokens?.refreshToken,
-  );
+  const user = useAppSelector(state => state.auth.user);
+  const themeMode = useAppSelector(state => state.theme.mode);
+  const refreshToken = useAppSelector(state => state.auth.tokens?.refreshToken);
 
   const [profile, setProfile] = useState<ProfileResponse | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -75,7 +73,7 @@ export const useProfile = (): UseProfileResult => {
     let mounted = true;
     profileApi
       .getProfile()
-      .then((data) => {
+      .then(data => {
         if (mounted) {
           setProfile(data);
         }
@@ -108,7 +106,7 @@ export const useProfile = (): UseProfileResult => {
       setError(null);
       return profileApi
         .updateProfile(changes)
-        .then((updated) => {
+        .then(updated => {
           setProfile(updated);
           if (successMessage) {
             dispatch(showToast({ message: successMessage, tone: 'success' }));
@@ -156,7 +154,7 @@ export const useProfile = (): UseProfileResult => {
         // create a plan for someone who never asked for one.
         void plannerApi
           .getPlan()
-          .then((existing) => (existing ? plannerApi.generate() : null))
+          .then(existing => (existing ? plannerApi.generate() : null))
           .catch(() => {
             // Non-fatal: the date change itself already succeeded.
           });
@@ -169,7 +167,7 @@ export const useProfile = (): UseProfileResult => {
     setIsExporting(true);
     meApi
       .exportData()
-      .then((data) =>
+      .then(data =>
         // Share is part of React Native itself, so the export needs no
         // filesystem permission or native module: the learner picks where it
         // goes (mail, Drive, notes) and the app never touches storage.

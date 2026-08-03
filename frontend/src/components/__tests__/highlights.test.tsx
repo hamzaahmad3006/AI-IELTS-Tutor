@@ -12,15 +12,15 @@ import {
 describe('diffWords', () => {
   it('marks everything unchanged for identical text', () => {
     const tokens = diffWords('the cat sat', 'the cat sat');
-    expect(tokens.every((t) => t.op === 'same')).toBe(true);
+    expect(tokens.every(t => t.op === 'same')).toBe(true);
   });
 
   it('detects a replaced word', () => {
     const tokens = diffWords('it help me', 'it helps me');
-    expect(tokens.map((t) => t.op)).toContain('removed');
-    expect(tokens.map((t) => t.op)).toContain('added');
-    const removed = tokens.find((t) => t.op === 'removed');
-    const added = tokens.find((t) => t.op === 'added');
+    expect(tokens.map(t => t.op)).toContain('removed');
+    expect(tokens.map(t => t.op)).toContain('added');
+    const removed = tokens.find(t => t.op === 'removed');
+    const added = tokens.find(t => t.op === 'added');
     expect(removed?.text.trim()).toBe('help');
     expect(added?.text.trim()).toBe('helps');
   });
@@ -29,12 +29,12 @@ describe('diffWords', () => {
     // Otherwise every sentence would light up as edited and the real changes
     // would be lost in the noise.
     const tokens = diffWords('Hello world', 'Hello, world.');
-    expect(tokens.every((t) => t.op === 'same')).toBe(true);
+    expect(tokens.every(t => t.op === 'same')).toBe(true);
   });
 
   it('handles insertion at the end', () => {
     const tokens = diffWords('one two', 'one two three');
-    const added = tokens.filter((t) => t.op === 'added');
+    const added = tokens.filter(t => t.op === 'added');
     expect(added).toHaveLength(1);
     expect(added[0].text.trim()).toBe('three');
   });
@@ -48,8 +48,8 @@ describe('diffWords', () => {
   it('merges consecutive runs into one token', () => {
     // One node per change, not one per word.
     const tokens = diffWords('a b c d', 'x y z d');
-    expect(tokens.filter((t) => t.op === 'removed')).toHaveLength(1);
-    expect(tokens.filter((t) => t.op === 'added')).toHaveLength(1);
+    expect(tokens.filter(t => t.op === 'removed')).toHaveLength(1);
+    expect(tokens.filter(t => t.op === 'added')).toHaveLength(1);
   });
 
   it('summarises word counts per operation', () => {

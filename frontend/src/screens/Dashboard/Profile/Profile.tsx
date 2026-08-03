@@ -13,8 +13,8 @@ import {
   Icon,
   ScreenContainer,
   useTheme,
-} from '../../../components';
-import { getBandColor, RADIUS, SPACING } from '../../../constants';
+} from '@components';
+import { getBandColor, RADIUS, SPACING } from '@constants';
 import { useProfile } from './useProfile';
 
 const STUDY_TIMES = [15, 30, 60, 90];
@@ -56,33 +56,33 @@ export const Profile: React.FC = () => {
           <ActivityIndicator size="large" color={theme.colors.primary} />
         </View>
         <ConsentSheet
-        visible={consentSheetOpen}
-        value={{
-          consentAi: profile?.consentAi ?? false,
-          consentVoice: profile?.consentVoice ?? false,
-        }}
-        onClose={closeConsentSheet}
-        onSave={onSaveConsent}
-        isSaving={isSaving}
-      />
+          visible={consentSheetOpen}
+          value={{
+            consentAi: profile?.consentAi ?? false,
+            consentVoice: profile?.consentVoice ?? false,
+          }}
+          onClose={closeConsentSheet}
+          onSave={onSaveConsent}
+          isSaving={isSaving}
+        />
 
-      <DeleteAccountSheet
-        visible={deleteSheetOpen}
-        onClose={closeDeleteSheet}
-        onConfirm={onDeleteAccount}
-        isDeleting={isDeleting}
-      />
+        <DeleteAccountSheet
+          visible={deleteSheetOpen}
+          onClose={closeDeleteSheet}
+          onConfirm={onDeleteAccount}
+          isDeleting={isDeleting}
+        />
 
-      <DatePickerSheet
-        visible={dateSheetOpen}
-        value={profile?.examDate ?? null}
-        title="When is your exam?"
-        onClose={closeDateSheet}
-        onSelect={onChangeExamDate}
-        onClear={() => onChangeExamDate(null)}
-        isSaving={isSaving}
-      />
-    </ScreenContainer>
+        <DatePickerSheet
+          visible={dateSheetOpen}
+          value={profile?.examDate ?? null}
+          title="When is your exam?"
+          onClose={closeDateSheet}
+          onSelect={onChangeExamDate}
+          onClear={() => onChangeExamDate(null)}
+          isSaving={isSaving}
+        />
+      </ScreenContainer>
     );
   }
 
@@ -95,11 +95,18 @@ export const Profile: React.FC = () => {
       {/* Identity */}
       <Card style={styles.card}>
         <View style={styles.userRow}>
-          <View style={[styles.avatar, { backgroundColor: theme.colors.primaryContainer }]}>
+          <View
+            style={[
+              styles.avatar,
+              { backgroundColor: theme.colors.primaryContainer },
+            ]}
+          >
             <Icon name="profile" size={26} color="primary" />
           </View>
           <View style={styles.userText}>
-            <AppText variant="titleLg">{user?.fullName ?? 'Guest Learner'}</AppText>
+            <AppText variant="titleLg">
+              {user?.fullName ?? 'Guest Learner'}
+            </AppText>
             <AppText variant="bodySm" color="textSecondary">
               {user?.email ?? 'Not signed in'}
             </AppText>
@@ -120,9 +127,14 @@ export const Profile: React.FC = () => {
                 {profile.targetBand.toFixed(1)}
               </AppText>
             </View>
-            <BandSlider value={profile.targetBand} onChange={onChangeTargetBand} />
+            <BandSlider
+              value={profile.targetBand}
+              onChange={onChangeTargetBand}
+            />
             <AppText variant="labelSm" color="textMuted" style={styles.hint}>
-              {profile.examType === 'academic' ? 'Academic' : 'General Training'}
+              {profile.examType === 'academic'
+                ? 'Academic'
+                : 'General Training'}
               {profile.examDate ? ` · exam ${profile.examDate}` : ''}
               {profile.cefrLevel ? ` · ${profile.cefrLevel}` : ''}
             </AppText>
@@ -134,7 +146,7 @@ export const Profile: React.FC = () => {
               Daily study time
             </AppText>
             <View style={styles.chipRow}>
-              {STUDY_TIMES.map((minutes) => {
+              {STUDY_TIMES.map(minutes => {
                 const selected = profile.dailyMinutes === minutes;
                 return (
                   <Button
@@ -155,19 +167,21 @@ export const Profile: React.FC = () => {
             <AppText variant="titleLg" style={styles.cardTitle}>
               Starting levels
             </AppText>
-            {(['speaking', 'writing', 'reading', 'listening'] as const).map((module) => {
-              const band = profile.baselines[module];
-              return (
-                <View key={module} style={styles.baselineRow}>
-                  <AppText variant="bodyMd" style={styles.baselineLabel}>
-                    {module.charAt(0).toUpperCase() + module.slice(1)}
-                  </AppText>
-                  <AppText variant="labelMd" color="textSecondary">
-                    {band !== null ? band.toFixed(1) : 'Not set'}
-                  </AppText>
-                </View>
-              );
-            })}
+            {(['speaking', 'writing', 'reading', 'listening'] as const).map(
+              module => {
+                const band = profile.baselines[module];
+                return (
+                  <View key={module} style={styles.baselineRow}>
+                    <AppText variant="bodyMd" style={styles.baselineLabel}>
+                      {module.charAt(0).toUpperCase() + module.slice(1)}
+                    </AppText>
+                    <AppText variant="labelMd" color="textSecondary">
+                      {band !== null ? band.toFixed(1) : 'Not set'}
+                    </AppText>
+                  </View>
+                );
+              },
+            )}
           </Card>
         </>
       ) : (
@@ -231,7 +245,11 @@ export const Profile: React.FC = () => {
       {/* Your data */}
       <Card style={styles.card}>
         <AppText variant="bodyMd">Your data</AppText>
-        <AppText variant="labelSm" color="textSecondary" style={styles.dataHint}>
+        <AppText
+          variant="labelSm"
+          color="textSecondary"
+          style={styles.dataHint}
+        >
           Export everything we hold about you, or erase it for good.
         </AppText>
         <Button

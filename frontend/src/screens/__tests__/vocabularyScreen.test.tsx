@@ -28,7 +28,7 @@ describe('Vocabulary review screen', () => {
     await waitFor(() => {
       expect(screen.getByText('Tending to cause harm or damage.')).toBeTruthy();
     });
-    ['Forgot', 'Hard', 'Good', 'Easy'].forEach((label) => {
+    ['Forgot', 'Hard', 'Good', 'Easy'].forEach(label => {
       expect(screen.getByText(label)).toBeTruthy();
     });
   });

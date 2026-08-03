@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { analyticsApi, meApi } from '../../../api';
+import { analyticsApi, meApi } from '@api';
 import type {
   InsightsResponse,
   PredictionResponse,
@@ -11,7 +11,7 @@ import type {
   RootStackParamList,
   TrendResponse,
   WeaknessItem,
-} from '../../../types';
+} from '@models';
 
 type Nav = NativeStackNavigationProp<RootStackParamList>;
 

@@ -12,7 +12,7 @@ import LinearGradient from 'react-native-linear-gradient';
 import { AppText } from '../AppText/AppText';
 import { Icon } from '../Icon/Icon';
 import { useTheme } from '../theme/useTheme';
-import { LAYOUT, RADIUS, SPACING, type IconName } from '../../constants';
+import { LAYOUT, RADIUS, SPACING, type IconName } from '@constants';
 
 type ButtonVariant = 'primary' | 'secondary' | 'text';
 
@@ -57,7 +57,9 @@ export const Button: React.FC<ButtonProps> = ({
     <View style={styles.row}>
       {loading ? (
         <ActivityIndicator
-          color={variant === 'primary' ? theme.colors.onAccent : theme.colors.primary}
+          color={
+            variant === 'primary' ? theme.colors.onAccent : theme.colors.primary
+          }
         />
       ) : (
         <>
@@ -90,7 +92,10 @@ export const Button: React.FC<ButtonProps> = ({
         testID={testID}
       >
         <LinearGradient
-          colors={[theme.colors.accentGradientStart, theme.colors.accentGradientEnd]}
+          colors={[
+            theme.colors.accentGradientStart,
+            theme.colors.accentGradientEnd,
+          ]}
           start={{ x: 0, y: 0 }}
           end={{ x: 0, y: 1 }}
           style={[base, theme.shadows.button]}
@@ -103,7 +108,11 @@ export const Button: React.FC<ButtonProps> = ({
 
   const variantStyle: ViewStyle =
     variant === 'secondary'
-      ? { borderWidth: 1.5, borderColor: theme.colors.primary, backgroundColor: 'transparent' }
+      ? {
+          borderWidth: 1.5,
+          borderColor: theme.colors.primary,
+          backgroundColor: 'transparent',
+        }
       : { backgroundColor: 'transparent', height: 'auto' };
 
   return (

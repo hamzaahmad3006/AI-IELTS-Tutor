@@ -8,8 +8,8 @@ import {
   setTargetBand,
   useAppDispatch,
   useAppSelector,
-} from '../../../redux';
-import type { Band, RootStackParamList } from '../../../types';
+} from '@redux';
+import type { Band, RootStackParamList } from '@models';
 
 type Nav = NativeStackNavigationProp<RootStackParamList>;
 
@@ -46,9 +46,7 @@ const bandToUserLabel = (band: Band): string => {
 export const useTargetBand = (): UseTargetBandResult => {
   const dispatch = useAppDispatch();
   const navigation = useNavigation<Nav>();
-  const { step, totalSteps, draft } = useAppSelector(
-    (state) => state.onboarding,
-  );
+  const { step, totalSteps, draft } = useAppSelector(state => state.onboarding);
 
   const onChangeBand = useCallback(
     (band: Band): void => {

@@ -17,7 +17,7 @@ describe('Home tab', () => {
       expect(screen.getByText('PREDICTED IELTS BAND')).toBeTruthy();
     });
     expect(screen.getByText(/Hi, /)).toBeTruthy();
-    ['Speaking', 'Writing', 'Reading', 'Listening'].forEach((module) => {
+    ['Speaking', 'Writing', 'Reading', 'Listening'].forEach(module => {
       expect(screen.getByText(module)).toBeTruthy();
     });
   });
@@ -29,7 +29,7 @@ describe('Practice tab', () => {
     await waitFor(() => {
       expect(screen.getByText('Practice')).toBeTruthy();
     });
-    ['Speaking', 'Writing', 'Reading', 'Listening'].forEach((module) => {
+    ['Speaking', 'Writing', 'Reading', 'Listening'].forEach(module => {
       expect(screen.getByText(module)).toBeTruthy();
     });
   });
@@ -113,7 +113,7 @@ describe('History screen', () => {
     await waitFor(() => {
       expect(screen.getByText('History')).toBeTruthy();
     });
-    ['Writing', 'Speaking', 'Reading', 'Listening'].forEach((module) => {
+    ['Writing', 'Speaking', 'Reading', 'Listening'].forEach(module => {
       expect(screen.getByText(module)).toBeTruthy();
     });
   });

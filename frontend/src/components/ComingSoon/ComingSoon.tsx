@@ -5,7 +5,7 @@ import { StyleSheet, View } from 'react-native';
 import { AppText } from '../AppText/AppText';
 import { Icon } from '../Icon/Icon';
 import { ScreenContainer } from '../ScreenContainer/ScreenContainer';
-import { SPACING, type IconName } from '../../constants';
+import { SPACING, type IconName } from '@constants';
 
 interface ComingSoonProps {
   title: string;

@@ -3,9 +3,9 @@
 import { useEffect } from 'react';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { useAppSelector } from '../../redux';
-import { APP_CONFIG } from '../../constants';
-import type { RootStackParamList } from '../../types';
+import { useAppSelector } from '@redux';
+import { APP_CONFIG } from '@constants';
+import type { RootStackParamList } from '@models';
 
 type Nav = NativeStackNavigationProp<RootStackParamList, 'Splash'>;
 
@@ -18,7 +18,7 @@ interface UseSplashResult {
 
 export const useSplash = (): UseSplashResult => {
   const navigation = useNavigation<Nav>();
-  const isAuthenticated = useAppSelector((state) => state.auth.isAuthenticated);
+  const isAuthenticated = useAppSelector(state => state.auth.isAuthenticated);
 
   useEffect(() => {
     const timer = setTimeout(() => {

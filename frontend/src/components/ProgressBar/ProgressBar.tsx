@@ -3,7 +3,7 @@
 import React from 'react';
 import { View, type ViewStyle } from 'react-native';
 import { useTheme } from '../theme/useTheme';
-import { RADIUS, type ThemeColors } from '../../constants';
+import { RADIUS, type ThemeColors } from '@constants';
 
 interface ProgressBarProps {
   /** 0..1 */

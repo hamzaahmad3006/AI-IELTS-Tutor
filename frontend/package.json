@@ -4,13 +4,15 @@
   "private": true,
   "scripts": {
     "android": "react-native run-android",
+    "bundle:android": "react-native bundle --platform android --dev false --entry-file index.js --bundle-output .bundle-check/index.android.bundle --assets-dest .bundle-check",
+    "bundle:ios": "react-native bundle --platform ios --dev false --entry-file index.js --bundle-output .bundle-check/index.ios.bundle --assets-dest .bundle-check",
+    "format": "prettier --write \"src/**/*.{ts,tsx}\" \"App.tsx\" \"index.js\"",
+    "format:check": "prettier --check \"src/**/*.{ts,tsx}\" \"App.tsx\" \"index.js\"",
     "ios": "react-native run-ios",
-    "lint": "eslint .",
+    "lint": "eslint . --max-warnings 0",
     "start": "react-native start",
     "test": "jest",
-    "typecheck": "tsc --noEmit",
-    "bundle:android": "react-native bundle --platform android --dev false --entry-file index.js --bundle-output .bundle-check/index.android.bundle --assets-dest .bundle-check",
-    "bundle:ios": "react-native bundle --platform ios --dev false --entry-file index.js --bundle-output .bundle-check/index.ios.bundle --assets-dest .bundle-check"
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@react-native-async-storage/async-storage": "^2.1.1",
@@ -46,6 +48,7 @@
     "@types/jest": "^29.5.13",
     "@types/react": "^19.2.0",
     "@types/react-test-renderer": "^19.1.0",
+    "babel-plugin-module-resolver": "^5.0.3",
     "eslint": "^8.19.0",
     "jest": "^29.6.3",
     "prettier": "2.8.8",

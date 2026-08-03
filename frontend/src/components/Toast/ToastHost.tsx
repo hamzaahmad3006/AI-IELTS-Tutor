@@ -12,9 +12,9 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { AppText } from '../AppText/AppText';
 import { Icon } from '../Icon/Icon';
 import { useTheme } from '../theme/useTheme';
-import { RADIUS, SPACING, type IconName } from '../../constants';
-import { useAppDispatch, useAppSelector } from '../../redux/hooks';
-import { dismissToast, type ToastTone } from '../../redux/slices/toastSlice';
+import { RADIUS, SPACING, type IconName } from '@constants';
+import { useAppDispatch, useAppSelector } from '@redux/hooks';
+import { dismissToast, type ToastTone } from '@redux/slices/toastSlice';
 
 const ICON_FOR: Record<ToastTone, IconName> = {
   success: 'check',
@@ -26,7 +26,7 @@ export const ToastHost: React.FC = () => {
   const theme = useTheme();
   const insets = useSafeAreaInsets();
   const dispatch = useAppDispatch();
-  const toast = useAppSelector((state) => state.toast.queue[0]);
+  const toast = useAppSelector(state => state.toast.queue[0]);
   const opacity = React.useRef(new Animated.Value(0)).current;
 
   const id = toast?.id;
@@ -59,8 +59,8 @@ export const ToastHost: React.FC = () => {
     toast.tone === 'error'
       ? theme.colors.error
       : toast.tone === 'success'
-        ? theme.colors.success
-        : theme.colors.onSurface;
+      ? theme.colors.success
+      : theme.colors.onSurface;
 
   return (
     <View

@@ -13,23 +13,26 @@ import {
   ProgressBar,
   ScreenContainer,
   useTheme,
-} from '../../../components';
+} from '@components';
 import {
   getBandColor,
   PALETTE,
   RADIUS,
   SPACING,
   type IconName,
-} from '../../../constants';
+} from '@constants';
 import type {
   EssaySegment,
   FeedbackTab,
   KeyImprovement,
   WritingFeedback,
-} from '../../../types';
+} from '@models';
 import { useFeedback } from './useFeedback';
 
-const CRITERIA_LABELS: Array<{ key: keyof WritingFeedback['criteria']; label: string }> = [
+const CRITERIA_LABELS: Array<{
+  key: keyof WritingFeedback['criteria'];
+  label: string;
+}> = [
   { key: 'taskResponse', label: 'Task Response' },
   { key: 'coherenceCohesion', label: 'Cohesion & Coherence' },
   { key: 'lexicalResource', label: 'Lexical Resource' },
@@ -175,7 +178,7 @@ export const Feedback: React.FC = () => {
           </AppText>
         ) : (
           <ChangesTab
-            draft={feedback.draftSegments.map((segment) => segment.text).join('')}
+            draft={feedback.draftSegments.map(segment => segment.text).join('')}
             model={feedback.modelEssay}
           />
         )}
@@ -198,7 +201,7 @@ export const Feedback: React.FC = () => {
       <AppText variant="headlineMd" style={styles.section}>
         Key Improvements
       </AppText>
-      {feedback.improvements.map((improvement) => (
+      {feedback.improvements.map(improvement => (
         <ImprovementCard key={improvement.id} improvement={improvement} />
       ))}
     </ScreenContainer>
@@ -279,7 +282,10 @@ const Segment: React.FC<{ segment: EssaySegment }> = ({ segment }) => {
   }
   if (segment.kind === 'suggestion') {
     return (
-      <AppText variant="bodyLg" style={{ backgroundColor: PALETTE.tealContainer }}>
+      <AppText
+        variant="bodyLg"
+        style={{ backgroundColor: PALETTE.tealContainer }}
+      >
         {segment.text}
       </AppText>
     );
@@ -294,12 +300,21 @@ const ImprovementCard: React.FC<{ improvement: KeyImprovement }> = ({
   return (
     <Card style={styles.improvement}>
       <View style={styles.improvementRow}>
-        <View style={[styles.improvementIcon, { backgroundColor: theme.colors.cardAlt }]}>
+        <View
+          style={[
+            styles.improvementIcon,
+            { backgroundColor: theme.colors.cardAlt },
+          ]}
+        >
           <Icon name={improvement.icon as IconName} size={20} color="primary" />
         </View>
         <View style={styles.improvementText}>
           <AppText variant="titleLg">{improvement.title}</AppText>
-          <AppText variant="bodySm" color="textSecondary" style={styles.improvementDesc}>
+          <AppText
+            variant="bodySm"
+            color="textSecondary"
+            style={styles.improvementDesc}
+          >
             {improvement.description}
           </AppText>
         </View>
@@ -333,7 +348,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  criteriaHead: { flexDirection: 'row', alignItems: 'center', marginBottom: SPACING.md },
+  criteriaHead: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: SPACING.md,
+  },
   criteriaTitle: { marginLeft: SPACING.xs },
   criteriaRow: { marginBottom: SPACING.md },
   criteriaLabelRow: {
@@ -348,7 +367,11 @@ const styles = StyleSheet.create({
   },
   tipTitle: { color: PALETTE.tealDeep },
   tipBody: { marginTop: SPACING.xxs, color: PALETTE.ink2 },
-  tipLink: { flexDirection: 'row', alignItems: 'center', marginTop: SPACING.sm },
+  tipLink: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: SPACING.sm,
+  },
   tipLinkText: { color: PALETTE.teal, marginRight: SPACING.xxs },
   tabs: {
     flexDirection: 'row',
@@ -364,7 +387,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   legend: { flexDirection: 'row', marginBottom: SPACING.sm },
-  legendItem: { flexDirection: 'row', alignItems: 'center', marginRight: SPACING.md },
+  legendItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginRight: SPACING.md,
+  },
   dot: { width: 8, height: 8, borderRadius: 4, marginRight: SPACING.xxs },
   essay: { marginTop: SPACING.xs },
   diffSummary: { marginBottom: SPACING.sm },

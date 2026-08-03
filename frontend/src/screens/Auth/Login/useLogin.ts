@@ -8,8 +8,8 @@ import {
   loginThunk,
   useAppDispatch,
   useAppSelector,
-} from '../../../redux';
-import type { RootStackParamList } from '../../../types';
+} from '@redux';
+import type { RootStackParamList } from '@models';
 
 type Nav = NativeStackNavigationProp<RootStackParamList>;
 
@@ -36,7 +36,7 @@ const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 export const useLogin = (): UseLoginResult => {
   const dispatch = useAppDispatch();
   const navigation = useNavigation<Nav>();
-  const { isBootstrapping, error } = useAppSelector((state) => state.auth);
+  const { isBootstrapping, error } = useAppSelector(state => state.auth);
 
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');

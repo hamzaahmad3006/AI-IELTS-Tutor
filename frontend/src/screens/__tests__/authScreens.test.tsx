@@ -20,7 +20,10 @@ describe('Login screen', () => {
       screen.getByPlaceholderText('you@example.com'),
       'not-an-email',
     );
-    fireEvent.changeText(screen.getByPlaceholderText('••••••••'), 'StrongPass123');
+    fireEvent.changeText(
+      screen.getByPlaceholderText('••••••••'),
+      'StrongPass123',
+    );
     fireEvent.press(screen.getByText('Log In'));
 
     await waitFor(() => {

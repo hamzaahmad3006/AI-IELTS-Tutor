@@ -3,12 +3,12 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { meApi } from '../../../api';
+import { meApi } from '@api';
 import type {
   AdaptiveDifficultyItem,
   IeltsModule,
   RootStackParamList,
-} from '../../../types';
+} from '@models';
 
 type Nav = NativeStackNavigationProp<RootStackParamList>;
 
@@ -30,12 +30,12 @@ export const usePractice = (): UsePracticeResult => {
     let mounted = true;
     meApi
       .getAdaptiveDifficulty()
-      .then((res) => {
+      .then(res => {
         if (!mounted) {
           return;
         }
         const map: Record<string, AdaptiveDifficultyItem> = {};
-        res.modules.forEach((item) => {
+        res.modules.forEach(item => {
           map[item.module] = item;
         });
         setDifficultyByModule(map);

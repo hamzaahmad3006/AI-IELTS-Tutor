@@ -44,14 +44,17 @@ setAuthFailureHandler(() => {
   if (store.getState().auth.tokens !== null) {
     store.dispatch(logout());
     store.dispatch(
-      showToast({ message: 'Your session expired. Please sign in again.', tone: 'info' }),
+      showToast({
+        message: 'Your session expired. Please sign in again.',
+        tone: 'info',
+      }),
     );
   }
 });
 
 // Requests that never reached the server surface as a toast; HTTP errors stay
 // with the screen that made the call.
-setErrorReporter((message) => {
+setErrorReporter(message => {
   store.dispatch(showToast({ message, tone: 'error' }));
 });
 

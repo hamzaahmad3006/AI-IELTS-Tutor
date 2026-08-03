@@ -11,7 +11,7 @@ import {
   type LayoutChangeEvent,
 } from 'react-native';
 import { useTheme } from '../theme/useTheme';
-import { getBandColor, RADIUS } from '../../constants';
+import { getBandColor, RADIUS } from '@constants';
 
 interface BandSliderProps {
   value: number;
@@ -63,7 +63,10 @@ export const BandSlider: React.FC<BandSliderProps> = ({
 
   const ratio = (value - min) / (max - min);
   const fillWidth = Math.max(0, Math.min(1, ratio)) * trackWidth;
-  const thumbLeft = Math.max(0, Math.min(trackWidth - THUMB, fillWidth - THUMB / 2));
+  const thumbLeft = Math.max(
+    0,
+    Math.min(trackWidth - THUMB, fillWidth - THUMB / 2),
+  );
   const color = getBandColor(value);
 
   return (
@@ -75,7 +78,12 @@ export const BandSlider: React.FC<BandSliderProps> = ({
       onResponderGrant={handleTouch}
       onResponderMove={handleTouch}
     >
-      <View style={[styles.track, { backgroundColor: theme.colors.containerHighest }]}>
+      <View
+        style={[
+          styles.track,
+          { backgroundColor: theme.colors.containerHighest },
+        ]}
+      >
         <View
           style={[styles.fill, { width: fillWidth, backgroundColor: color }]}
         />

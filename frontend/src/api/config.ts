@@ -41,10 +41,15 @@ const hostFromUrl = (url: string | undefined): string | null => {
  */
 const metroHost = (): string | null => {
   try {
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const getDevServer = require('react-native/Libraries/Core/Devtools/getDevServer') as
-      | (() => { url?: string })
-      | { default?: () => { url?: string } };
+    // No top-level export exists for this; see the Fabric note above.
+    // A block disable rather than disable-next-line: Prettier reflows this
+    // statement, which silently moves the violation off the targeted line.
+    /* eslint-disable @react-native/no-deep-imports */
+    const getDevServer =
+      require('react-native/Libraries/Core/Devtools/getDevServer') as
+        | (() => { url?: string })
+        | { default?: () => { url?: string } };
+    /* eslint-enable @react-native/no-deep-imports */
     const fn =
       typeof getDevServer === 'function' ? getDevServer : getDevServer.default;
     const host = hostFromUrl(fn?.().url);

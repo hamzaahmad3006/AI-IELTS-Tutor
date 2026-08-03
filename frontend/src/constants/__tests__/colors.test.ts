@@ -2,25 +2,25 @@ import { BAND_SCALE, getBandColor, getBandScaleLabel } from '../colors';
 
 describe('getBandColor', () => {
   it('maps the low band range to red', () => {
-    [0, 2.5, 4, 4.5].forEach((band) => {
+    [0, 2.5, 4, 4.5].forEach(band => {
       expect(getBandColor(band)).toBe(BAND_SCALE.low);
     });
   });
 
   it('maps the mid band range to amber', () => {
-    [5, 5.5, 6].forEach((band) => {
+    [5, 5.5, 6].forEach(band => {
       expect(getBandColor(band)).toBe(BAND_SCALE.mid);
     });
   });
 
   it('maps the high band range to lime', () => {
-    [6.5, 7].forEach((band) => {
+    [6.5, 7].forEach(band => {
       expect(getBandColor(band)).toBe(BAND_SCALE.high);
     });
   });
 
   it('maps the top band range to green', () => {
-    [7.5, 8, 9].forEach((band) => {
+    [7.5, 8, 9].forEach(band => {
       expect(getBandColor(band)).toBe(BAND_SCALE.top);
     });
   });

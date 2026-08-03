@@ -4,13 +4,13 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import type { RouteProp } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { speakingApi } from '../../../api';
+import { speakingApi } from '@api';
 import type {
   RootStackParamList,
   SpeakingPart,
   SpeakingQuestionSet,
   SpeakingResult,
-} from '../../../types';
+} from '@models';
 
 type Nav = NativeStackNavigationProp<RootStackParamList>;
 type Route = RouteProp<RootStackParamList, 'SpeakingParts'>;
@@ -68,7 +68,7 @@ export const useSpeakingParts = (): UseSpeakingPartsResult => {
     setResult(null);
     speakingApi
       .getQuestionSet(part)
-      .then((data) => {
+      .then(data => {
         if (active) {
           setSet(data);
         }
@@ -88,15 +88,18 @@ export const useSpeakingParts = (): UseSpeakingPartsResult => {
     };
   }, [part]);
 
-  const questions = set?.questions ?? [];
+  // Memoised because `?? []` would allocate a fresh array on every render,
+  // which silently defeats the useMemo below.
+  const questions = useMemo(() => set?.questions ?? [], [set]);
   const current = questions[index];
-  const currentAnswer = current ? (answers[current.id] ?? '') : '';
+  const currentAnswer = current ? answers[current.id] ?? '' : '';
   const wordCount = countWords(currentAnswer);
 
   const answeredCount = useMemo(
     () =>
-      questions.filter((q) => countWords(answers[q.id] ?? '') >= MIN_WORDS_PER_ANSWER)
-        .length,
+      questions.filter(
+        q => countWords(answers[q.id] ?? '') >= MIN_WORDS_PER_ANSWER,
+      ).length,
     [questions, answers],
   );
 
@@ -105,7 +108,7 @@ export const useSpeakingParts = (): UseSpeakingPartsResult => {
       if (!current) {
         return;
       }
-      setAnswers((previous) => ({ ...previous, [current.id]: text }));
+      setAnswers(previous => ({ ...previous, [current.id]: text }));
     },
     [current],
   );
@@ -125,7 +128,7 @@ export const useSpeakingParts = (): UseSpeakingPartsResult => {
 
     speakingApi
       .submit({ transcript, part: set.part, durationSec: 0 })
-      .then((res) => setResult(res))
+      .then(res => setResult(res))
       .catch(() => setError('Scoring failed. Please try again.'))
       .finally(() => setIsSubmitting(false));
   }, [set, answers]);
@@ -134,7 +137,7 @@ export const useSpeakingParts = (): UseSpeakingPartsResult => {
 
   const nextQuestion = useCallback((): void => {
     if (!isLastQuestion) {
-      setIndex((i) => i + 1);
+      setIndex(i => i + 1);
     }
   }, [isLastQuestion]);
 

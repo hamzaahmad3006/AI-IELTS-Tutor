@@ -32,16 +32,22 @@ describe('Grammar lessons screen', () => {
       expect(screen.getByText('Examples')).toBeTruthy();
     });
     // The corrected example is shown alongside the incorrect one.
-    expect(screen.getByText('The number of students is increasing.')).toBeTruthy();
+    expect(
+      screen.getByText('The number of students is increasing.'),
+    ).toBeTruthy();
     expect(screen.getByText('Back to lessons')).toBeTruthy();
   });
 
   it('returns to the library from a lesson', async () => {
     renderWithProviders(<Lessons />);
-    await waitFor(() => expect(screen.getByText('Subject-verb agreement')).toBeTruthy());
+    await waitFor(() =>
+      expect(screen.getByText('Subject-verb agreement')).toBeTruthy(),
+    );
 
     fireEvent.press(screen.getByText('Subject-verb agreement'));
-    await waitFor(() => expect(screen.getByText('Back to lessons')).toBeTruthy());
+    await waitFor(() =>
+      expect(screen.getByText('Back to lessons')).toBeTruthy(),
+    );
 
     fireEvent.press(screen.getByText('Back to lessons'));
 

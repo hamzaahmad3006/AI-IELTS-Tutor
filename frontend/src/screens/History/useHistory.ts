@@ -9,13 +9,13 @@ import {
   readingApi,
   speakingApi,
   writingApi,
-} from '../../api';
+} from '@api';
 import type {
   Band,
   IeltsModule,
   RootStackParamList,
   TrendResponse,
-} from '../../types';
+} from '@models';
 
 type Nav = NativeStackNavigationProp<RootStackParamList>;
 
@@ -47,16 +47,13 @@ interface Page {
   nextCursor: string | null;
 }
 
-async function fetchPage(
-  module: IeltsModule,
-  cursor?: string,
-): Promise<Page> {
+async function fetchPage(module: IeltsModule, cursor?: string): Promise<Page> {
   switch (module) {
     case 'writing': {
       const page = await writingApi.getHistory(cursor);
       return {
         nextCursor: page.nextCursor,
-        rows: page.items.map((item) => ({
+        rows: page.items.map(item => ({
           attemptId: item.attemptId,
           band: item.overallBand,
           detail: `Task ${item.taskType} · ${item.wordCount} words`,
@@ -69,7 +66,7 @@ async function fetchPage(
       const page = await speakingApi.getHistory(cursor);
       return {
         nextCursor: page.nextCursor,
-        rows: page.items.map((item) => ({
+        rows: page.items.map(item => ({
           attemptId: item.attemptId,
           band: item.overallBand,
           detail: item.part ? `Part ${item.part}` : 'Speaking',
@@ -82,7 +79,7 @@ async function fetchPage(
       const page = await readingApi.getHistory(cursor);
       return {
         nextCursor: page.nextCursor,
-        rows: page.items.map((item) => ({
+        rows: page.items.map(item => ({
           attemptId: item.attemptId,
           band: item.band,
           detail: `${item.rawScore}/${item.totalQuestions} correct`,
@@ -95,7 +92,7 @@ async function fetchPage(
       const page = await listeningApi.getHistory(cursor);
       return {
         nextCursor: page.nextCursor,
-        rows: page.items.map((item) => ({
+        rows: page.items.map(item => ({
           attemptId: item.attemptId,
           band: item.band,
           detail: `${item.rawScore}/${item.totalQuestions} correct`,
@@ -107,7 +104,9 @@ async function fetchPage(
   }
 }
 
-export const useHistory = (initial: IeltsModule = 'writing'): UseHistoryResult => {
+export const useHistory = (
+  initial: IeltsModule = 'writing',
+): UseHistoryResult => {
   const navigation = useNavigation<Nav>();
   const [module, setModuleState] = useState<IeltsModule>(initial);
   const [trend, setTrend] = useState<TrendResponse | null>(null);
@@ -118,7 +117,7 @@ export const useHistory = (initial: IeltsModule = 'writing'): UseHistoryResult =
     let active = true;
     analyticsApi
       .getTrend()
-      .then((data) => {
+      .then(data => {
         if (active) {
           setTrend(data);
         }
@@ -166,8 +165,8 @@ export const useHistory = (initial: IeltsModule = 'writing'): UseHistoryResult =
     }
     setIsLoadingMore(true);
     fetchPage(module, cursor)
-      .then((page) => {
-        setRows((prev) => [...prev, ...page.rows]);
+      .then(page => {
+        setRows(prev => [...prev, ...page.rows]);
         setCursor(page.nextCursor);
       })
       .catch(() => setError('Could not load more attempts.'))
@@ -181,7 +180,7 @@ export const useHistory = (initial: IeltsModule = 'writing'): UseHistoryResult =
   return {
     module,
     trendBands:
-      trend?.modules.find((m) => m.module === module)?.points.map((p) => p.band) ??
+      trend?.modules.find(m => m.module === module)?.points.map(p => p.band) ??
       [],
     rows,
     isLoading,

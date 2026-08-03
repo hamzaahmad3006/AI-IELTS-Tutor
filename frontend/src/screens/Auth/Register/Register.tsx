@@ -2,14 +2,8 @@
 
 import React from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
-import {
-  AppText,
-  Button,
-  Input,
-  Logo,
-  ScreenContainer,
-} from '../../../components';
-import { SPACING } from '../../../constants';
+import { AppText, Button, Input, Logo, ScreenContainer } from '@components';
+import { SPACING } from '@constants';
 import { useRegister } from './useRegister';
 
 export const Register: React.FC = () => {

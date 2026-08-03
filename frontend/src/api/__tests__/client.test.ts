@@ -21,7 +21,7 @@ const adapterReplying = (
   statuses: number[],
 ): { adapter: AxiosAdapter; calls: () => number } => {
   let call = 0;
-  const adapter: AxiosAdapter = (config) => {
+  const adapter: AxiosAdapter = config => {
     const status = statuses[Math.min(call, statuses.length - 1)];
     call += 1;
     const response: AxiosResponse = {

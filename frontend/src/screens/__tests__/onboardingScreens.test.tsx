@@ -19,7 +19,7 @@ describe('Welcome carousel', () => {
 
   it('renders every slide and a dot for each', () => {
     renderWithProviders(<Welcome />);
-    SLIDES.forEach((slide) => {
+    SLIDES.forEach(slide => {
       expect(screen.getByText(slide.title)).toBeTruthy();
       expect(screen.getByTestId(`welcome-slide-${slide.icon}`)).toBeTruthy();
     });
@@ -40,7 +40,9 @@ describe('Welcome carousel', () => {
 
   it('promises only what the app actually does', () => {
     // Guards against marketing copy drifting ahead of the product.
-    const copy = SLIDES.map((s) => `${s.title} ${s.body}`).join(' ').toLowerCase();
+    const copy = SLIDES.map(s => `${s.title} ${s.body}`)
+      .join(' ')
+      .toLowerCase();
     expect(copy).not.toMatch(/guarantee|guaranteed|band 9 in|certified/);
   });
 });
@@ -100,7 +102,9 @@ describe('Placement diagnostic', () => {
       expect(screen.getByTestId('diagnostic-speaking')).toBeTruthy();
     });
     // Last step scores rather than advancing.
-    expect(screen.getByTestId('diagnostic-next')).toHaveTextContent('See my level');
+    expect(screen.getByTestId('diagnostic-next')).toHaveTextContent(
+      'See my level',
+    );
   });
 
   it('says plainly that listening audio is not playable yet', async () => {

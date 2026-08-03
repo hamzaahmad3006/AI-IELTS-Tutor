@@ -1,15 +1,10 @@
 /** Safe-area screen wrapper with themed background + optional scroll. */
 
 import React from 'react';
-import {
-  ScrollView,
-  StyleSheet,
-  View,
-  type ViewStyle,
-} from 'react-native';
+import { ScrollView, StyleSheet, View, type ViewStyle } from 'react-native';
 import { SafeAreaView, type Edge } from 'react-native-safe-area-context';
 import { useTheme } from '../theme/useTheme';
-import { SPACING } from '../../constants';
+import { SPACING } from '@constants';
 
 interface ScreenContainerProps {
   children: React.ReactNode;
@@ -51,7 +46,9 @@ export const ScreenContainer: React.FC<ScreenContainerProps> = ({
           {children}
         </ScrollView>
       ) : (
-        <View style={[styles.flex, paddingStyle, contentStyle]}>{children}</View>
+        <View style={[styles.flex, paddingStyle, contentStyle]}>
+          {children}
+        </View>
       )}
     </SafeAreaView>
   );
