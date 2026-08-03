@@ -20,6 +20,7 @@ import type {
   DiagnosticResult,
   DiagnosticSet,
   InsightsResponse,
+  StudyPlan,
   SpeakingResult,
   SpeakingQuestionSet,
   SpeakingSession,
@@ -487,4 +488,24 @@ export const MOCK_DIAGNOSTIC_RESULT: DiagnosticResult = {
     'Generally effective command; copes with complex language in familiar areas.',
   summary:
     'Your starting point is around band 6.5. Listening was not attempted, so it is excluded rather than guessed.',
+};
+
+export const MOCK_STUDY_PLAN: StudyPlan = {
+  id: 'plan_mock_1',
+  targetBand: 7.5,
+  examDate: '2026-10-15',
+  dailyMinutes: 45,
+  weeks: 2,
+  rationale:
+    'Built for 2 weeks until your exam, 45 minutes a day, targeting band 7.5. Sessions are weighted towards the modules furthest from your target.',
+  tasks: [
+    { id: 'pt1', week: 1, module: 'writing', title: 'Writing practice', detail: 'Focus on grammatical range. You are at band 6.0, 1.5 from target.', minutes: 45, priority: 1.5, isDone: true },
+    { id: 'pt2', week: 1, module: 'writing', title: 'Writing practice', detail: 'Focus on grammatical range. You are at band 6.0, 1.5 from target.', minutes: 45, priority: 1.5, isDone: false },
+    { id: 'pt3', week: 1, module: 'speaking', title: 'Speaking practice', detail: 'Focus on overall fluency. You are at band 6.5, 1.0 from target.', minutes: 45, priority: 1.0, isDone: false },
+    { id: 'pt4', week: 1, module: 'reading', title: 'Reading practice', detail: 'Focus on true false notgiven. You are at band 7.0, 0.5 from target.', minutes: 45, priority: 0.5, isDone: false },
+    { id: 'pt5', week: 1, module: 'listening', title: 'Listening practice', detail: 'Focus on overall fluency. You are at band 7.0, 0.5 from target.', minutes: 45, priority: 0.5, isDone: false },
+    { id: 'pt6', week: 2, module: 'writing', title: 'Writing practice', detail: 'Focus on grammatical range. You are at band 6.0, 1.5 from target.', minutes: 45, priority: 1.5, isDone: false },
+  ],
+  completedCount: 1,
+  totalCount: 6,
 };

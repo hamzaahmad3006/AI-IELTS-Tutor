@@ -14,5 +14,6 @@ export * from './vocabulary.types';
 export * from './grammar.types';
 export * from './analytics.types';
 export * from './diagnostic.types';
+export * from './planner.types';
 export * from './navigation.types';
 export * from './api.types';

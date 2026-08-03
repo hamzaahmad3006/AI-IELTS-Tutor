@@ -13,6 +13,7 @@ from . import (
     listening,
     me,
     onboarding,
+    planner,
     profile,
     reading,
     speaking,
@@ -34,6 +35,7 @@ api_router.include_router(speaking.router)
 api_router.include_router(vocabulary.router)
 api_router.include_router(grammar.router)
 api_router.include_router(diagnostic.router)
+api_router.include_router(planner.router)
 api_router.include_router(analytics.router)
 api_router.include_router(admin.router)
 api_router.include_router(admin_content.router)
