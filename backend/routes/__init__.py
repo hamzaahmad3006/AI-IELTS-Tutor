@@ -12,6 +12,7 @@ from . import (
     grammar,
     listening,
     me,
+    mock_test,
     onboarding,
     planner,
     profile,
@@ -36,6 +37,7 @@ api_router.include_router(vocabulary.router)
 api_router.include_router(grammar.router)
 api_router.include_router(diagnostic.router)
 api_router.include_router(planner.router)
+api_router.include_router(mock_test.router)
 api_router.include_router(analytics.router)
 api_router.include_router(admin.router)
 api_router.include_router(admin_content.router)

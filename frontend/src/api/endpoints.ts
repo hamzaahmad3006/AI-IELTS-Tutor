@@ -22,6 +22,9 @@ export const ENDPOINTS = {
     export: '/me/export',
     deleteAccount: '/me',
   },
+  mockTests: {
+    root: '/mock-tests',
+  },
   planner: {
     // These replace the earlier '/plans/*' placeholders, which were never
     // implemented on the backend.

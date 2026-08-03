@@ -42,6 +42,7 @@ export type RootStackParamList = {
   SpeakingParts: { part: SpeakingPart; full?: boolean };
   History: undefined;
   Plan: undefined;
+  MockTest: undefined;
   VocabularyReview: undefined;
   GrammarLessons: undefined;
 };

@@ -9,6 +9,7 @@ export { dashboardApi } from './dashboardApi';
 export { analyticsApi } from './analyticsApi';
 export { diagnosticApi } from './diagnosticApi';
 export { plannerApi } from './plannerApi';
+export { mockTestApi } from './mockTestApi';
 export { vocabularyApi } from './vocabularyApi';
 export { grammarApi } from './grammarApi';
 export { readingApi } from './readingApi';

@@ -21,6 +21,8 @@ import type {
   DiagnosticSet,
   InsightsResponse,
   StudyPlan,
+  MockResult,
+  MockTest as MockTestType,
   SpeakingResult,
   SpeakingQuestionSet,
   SpeakingSession,
@@ -508,4 +510,40 @@ export const MOCK_STUDY_PLAN: StudyPlan = {
   ],
   completedCount: 1,
   totalCount: 6,
+};
+
+export const MOCK_MOCK_TEST: MockTestType = {
+  id: 'mock_1',
+  status: 'in_progress',
+  sections: [
+    { module: 'listening', minutes: 30 },
+    { module: 'reading', minutes: 60 },
+    { module: 'writing', minutes: 60 },
+    { module: 'speaking', minutes: 14 },
+  ],
+  passageId: 'pa_mock_1',
+  clipId: 'au_mock_1',
+  writingPromptId: 'wp_mock_1',
+  cueCardId: 'cc_mock_1',
+  totalMinutes: 164,
+};
+
+export const MOCK_MOCK_RESULT: MockResult = {
+  id: 'mock_1',
+  status: 'completed',
+  overallBand: 6.5,
+  readiness: {
+    overallBand: 6.5,
+    targetBand: 7.0,
+    verdict: 'Nearly ready',
+    headline: 'Band 6.5, 0.5 below your 7.0 target.',
+    modules: [
+      { module: 'listening', band: 7.0, gap: 0.0, verdict: 'At or above target' },
+      { module: 'reading', band: 7.0, gap: 0.0, verdict: 'At or above target' },
+      { module: 'writing', band: 6.0, gap: 1.0, verdict: 'Needs work' },
+      { module: 'speaking', band: 6.5, gap: 0.5, verdict: 'Within reach' },
+    ],
+    weakestModule: 'writing',
+    advice: 'Your weakest section is writing. Put your next few sessions there.',
+  },
 };
