@@ -16,6 +16,7 @@ interface UsePracticeResult {
   difficultyByModule: Record<string, AdaptiveDifficultyItem>;
   isLoading: boolean;
   openModule: (module: IeltsModule) => void;
+  openMockTest: () => void;
 }
 
 export const usePractice = (): UsePracticeResult => {
@@ -73,5 +74,9 @@ export const usePractice = (): UsePracticeResult => {
     [navigation],
   );
 
-  return { difficultyByModule, isLoading, openModule };
+  const openMockTest = useCallback((): void => {
+    navigation.navigate('MockTest');
+  }, [navigation]);
+
+  return { difficultyByModule, isLoading, openModule, openMockTest };
 };

@@ -2,18 +2,18 @@
 
 Everything **not yet completed** to finish the project, organized by area. Checked = done, unchecked = remaining. Use this as the living backlog.
 
-> **Status as of PR #66** — **124 of 192 checklist items done (~65%)**. Weighted by
+> **Status as of PR #67** — **126 of 192 checklist items done (~66%)**. Weighted by
 > effort it is further along than that, since the backend and data layer are largely
 > complete while most remaining items are large features (live voice, deployment) or
 > are blocked on native modules.
 > **Running on real infrastructure:** live Supabase PostgreSQL 17.6 and the real Groq
 > API, verified on a physical Android phone — register → onboarding → dashboard → all
 > four practice modules → progress → coach → profile → logout.
-> **Verified by:** 25 backend smoke suites, a 13-step E2E user-journey check, 149
+> **Verified by:** 26 backend smoke suites, a 13-step E2E user-journey check, 154
 > frontend tests, `tsc --noEmit`, and a Docker image build — all four gates run in CI
 > on every push.
-> **Biggest remaining:** the live voice (LiveKit) pipeline, production deployment,
-> and mock tests.
+> **Biggest remaining:** the live voice (LiveKit) pipeline, native audio playback,
+> production deployment, and iOS — all of which need hardware or hosting to verify.
 
 ---
 
@@ -120,7 +120,14 @@ Everything **not yet completed** to finish the project, organized by area. Check
 - [x] Daily Coach feed (message + weakness-driven recommendations that tap through to practice)
 - [x] **Vocabulary builder** — SM-2 spaced-repetition flashcards (reveal → grade → reschedule), session summary + stats, reachable from Coach
 - [x] **Grammar tutor** — 8-lesson library with worked examples; lessons that match the learner's recorded weaknesses are badged "FOR YOU" and sorted first; reachable from Coach
-- [ ] Full Mock Test flow (4 modules, timed, assembled, scored) + readiness report
+- [x] Full mock test — four sections with their real allowances, assembled at start
+      so a resumed sitting serves the same items. Each section is submitted through
+      its own module controller, so a mock test produces real attempts and feeds
+      history, trends and weakness tracking like ordinary practice
+- [x] Readiness report — verdict, per-section gap to target, and what to do next.
+      The verdict is driven by the **weakest** section, not just the average:
+      9.0/5.0 averages to target but is not ready, and saying otherwise would be
+      actively misleading
 
 ### Progress / Analytics (built — real data)
 - [x] Progress screen: overall band, predicted band + confidence, per-module bands, focus areas
@@ -255,7 +262,6 @@ Everything **not yet completed** to finish the project, organized by area. Check
 - [x] Analytics: progress + band prediction + **real dashboard overview** (greeting, streak, prediction, module levels, recommendations) — [ ] insights
 - [x] Vocabulary SRS endpoints (`/vocabulary/review`, `/grade`, `/stats`) with an SM-2 scheduler
 - [x] Grammar lesson endpoints (`/grammar/lessons`, `/grammar/lessons/{id}`) with weakness-based recommendation
-- [ ] Mock test assembly + scoring
 - [ ] Notifications / reminders
 
 ---

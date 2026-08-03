@@ -12,6 +12,7 @@ import { Practice as SpeakingPractice } from '../screens/Speaking/Practice/Pract
 import { SpeakingSession } from '../screens/Speaking/Session/SpeakingSession';
 import { SpeakingParts } from '../screens/Speaking/Parts/SpeakingParts';
 import { Plan } from '../screens/Plan/Plan';
+import { MockTest } from '../screens/MockTest/MockTest';
 import { History } from '../screens/History/History';
 import { Review as VocabularyReview } from '../screens/Vocabulary/Review/Review';
 import { Lessons as GrammarLessons } from '../screens/Grammar/Lessons/Lessons';
@@ -44,6 +45,7 @@ export const RootNavigator: React.FC = () => (
     <Stack.Screen name="SpeakingSession" component={SpeakingSession} />
     <Stack.Screen name="SpeakingParts" component={SpeakingParts} />
     <Stack.Screen name="Plan" component={Plan} />
+    <Stack.Screen name="MockTest" component={MockTest} />
     <Stack.Screen name="History" component={History} />
     <Stack.Screen name="VocabularyReview" component={VocabularyReview} />
     <Stack.Screen name="GrammarLessons" component={GrammarLessons} />

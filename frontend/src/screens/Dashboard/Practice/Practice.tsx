@@ -4,6 +4,7 @@ import React from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 import {
   AppText,
+  Button,
   Card,
   Icon,
   ScreenContainer,
@@ -54,7 +55,7 @@ const DIFFICULTY_COLORS: Record<string, string> = {
 };
 
 export const Practice: React.FC = () => {
-  const { difficultyByModule, openModule } = usePractice();
+  const { difficultyByModule, openModule, openMockTest } = usePractice();
 
   return (
     <ScreenContainer scroll>
@@ -73,6 +74,14 @@ export const Practice: React.FC = () => {
           onPress={() => openModule(meta.module)}
         />
       ))}
+      <Button
+        title="Full mock test"
+        variant="secondary"
+        icon="arrow-right"
+        onPress={openMockTest}
+        style={styles.mockButton}
+        testID="open-mock-test"
+      />
     </ScreenContainer>
   );
 };
@@ -119,6 +128,7 @@ const ModuleCard: React.FC<{
 };
 
 const styles = StyleSheet.create({
+  mockButton: { marginTop: SPACING.lg },
   title: { marginTop: SPACING.md },
   subtitle: { marginTop: SPACING.xxs, marginBottom: SPACING.md },
   card: { marginBottom: SPACING.md },

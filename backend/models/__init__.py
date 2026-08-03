@@ -7,6 +7,7 @@ from .content import AudioClip, ListeningQuestion, Passage, Question
 from .cue_card import CueCard
 from .grammar import GrammarLesson
 from .listening import ListeningAttempt
+from .mock_test import MockTest
 from .plan import PlanTask, StudyPlan
 from .profile import LearnerProfile
 from .reading import ReadingAttempt
@@ -23,6 +24,7 @@ __all__ = [
     "LearnerProfile",
     "StudyPlan",
     "PlanTask",
+    "MockTest",
     "WritingAttempt",
     "Passage",
     "Question",
