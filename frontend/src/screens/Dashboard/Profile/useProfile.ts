@@ -4,7 +4,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Share } from 'react-native';
-import { meApi, profileApi } from '../../../api';
+import { meApi, plannerApi, profileApi } from '../../../api';
 import {
   logout,
   logoutThunk,
@@ -149,7 +149,18 @@ export const useProfile = (): UseProfileResult => {
       void patch(
         { examDate: isoDate },
         isoDate ? 'Exam date updated.' : 'Exam date cleared.',
-      ).then(() => setDateSheetOpen(false));
+      ).then(() => {
+        setDateSheetOpen(false);
+        // The plan was built against the old horizon, so it is rebuilt rather
+        // than left quietly stale. Only if one already exists - this must not
+        // create a plan for someone who never asked for one.
+        void plannerApi
+          .getPlan()
+          .then((existing) => (existing ? plannerApi.generate() : null))
+          .catch(() => {
+            // Non-fatal: the date change itself already succeeded.
+          });
+      });
     },
     [patch],
   );

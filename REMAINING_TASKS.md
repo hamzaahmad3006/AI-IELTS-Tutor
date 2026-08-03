@@ -2,18 +2,18 @@
 
 Everything **not yet completed** to finish the project, organized by area. Checked = done, unchecked = remaining. Use this as the living backlog.
 
-> **Status as of PR #65** — **121 of 192 checklist items done (~63%)**. Weighted by
+> **Status as of PR #66** — **124 of 192 checklist items done (~65%)**. Weighted by
 > effort it is further along than that, since the backend and data layer are largely
 > complete while most remaining items are large features (live voice, deployment) or
 > are blocked on native modules.
 > **Running on real infrastructure:** live Supabase PostgreSQL 17.6 and the real Groq
 > API, verified on a physical Android phone — register → onboarding → dashboard → all
 > four practice modules → progress → coach → profile → logout.
-> **Verified by:** 24 backend smoke suites, a 13-step E2E user-journey check, 145
+> **Verified by:** 25 backend smoke suites, a 13-step E2E user-journey check, 149
 > frontend tests, `tsc --noEmit`, and a Docker image build — all four gates run in CI
 > on every push.
 > **Biggest remaining:** the live voice (LiveKit) pipeline, production deployment,
-> mock tests, and the planner.
+> and mock tests.
 
 ---
 
@@ -54,7 +54,8 @@ Everything **not yet completed** to finish the project, organized by area. Check
       records **no** baseline rather than a fabricated one
 - [x] Baseline results + CEFR — per-module bands with the reason for each, overall
       band, and an indicative CEFR level; written back to the learner profile
-- [ ] "Generating plan" screen — waits on the planner endpoints
+- [x] "Generating plan" state — shown while the plan is built, stating what is
+      happening rather than a bare spinner
 
 ### Speaking (AI-scored practice built; live voice pipeline pending)
 - [x] Part 2 cue-card practice: real cue card from the backend bank, prep → speak timers driven by the card, response capture
@@ -149,7 +150,8 @@ Everything **not yet completed** to finish the project, organized by area. Check
       the prediction horizon). Built without
       `@react-native-community/datetimepicker` to avoid a native module and a
       rebuild that cannot be verified on iOS here
-- [ ] Replan trigger on exam-date change — blocked on the planner endpoints
+- [x] Replan on exam-date change — rebuilds only if a plan already exists, so it
+      never creates one for someone who never asked
 - [ ] Notification & reminder scheduling
 - [ ] Real time-on-task across all four modules — needs the client to submit
       elapsed time per attempt (schema + API change); only Speaking records it today
@@ -242,7 +244,10 @@ Everything **not yet completed** to finish the project, organized by area. Check
 ## 6. Backend — Domain Endpoints
 
 - [x] Onboarding submit + profile GET/PATCH — [ ] adaptive diagnostic + baseline computation
-- [ ] Planner: generate/adapt study plans + tasks
+- [x] Planner — `GET/POST /planner/plan`, `PATCH /planner/tasks/{id}`. Deterministic,
+      not AI-generated: a plan has to be explainable and must not change every
+      time it is rebuilt. Sessions are allocated by distance-to-target per module
+      using largest-remainder, so each week totals exactly the intended count
 - [x] Speaking: transcript AI scoring (4 criteria, rubric-as-code) + history + **cue-card bank** (`GET /speaking/cue-cards`) — [ ] session creation (LiveKit token), finish
 - [x] Writing: submission, AI scoring, improved essay (POST/GET attempts) + history + **prompt bank** (`GET /writing/prompts`)
 - [x] Reading (backend): passage/question delivery (no answer leak), auto-grading, raw→band mapping, per-question explanations — [ ] AI question generation

@@ -25,6 +25,7 @@ interface UseProgressResult {
   error: string | null;
   reload: () => void;
   openHistory: () => void;
+  openPlan: () => void;
 }
 
 export const useProgress = (): UseProgressResult => {
@@ -74,6 +75,10 @@ export const useProgress = (): UseProgressResult => {
     navigation.navigate('History');
   }, [navigation]);
 
+  const openPlan = useCallback((): void => {
+    navigation.navigate('Plan');
+  }, [navigation]);
+
   return {
     progress,
     prediction,
@@ -86,5 +91,6 @@ export const useProgress = (): UseProgressResult => {
       void load();
     },
     openHistory,
+    openPlan,
   };
 };

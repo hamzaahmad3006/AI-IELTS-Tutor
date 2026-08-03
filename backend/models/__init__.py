@@ -7,6 +7,7 @@ from .content import AudioClip, ListeningQuestion, Passage, Question
 from .cue_card import CueCard
 from .grammar import GrammarLesson
 from .listening import ListeningAttempt
+from .plan import PlanTask, StudyPlan
 from .profile import LearnerProfile
 from .reading import ReadingAttempt
 from .speaking import SpeakingAttempt
@@ -20,6 +21,8 @@ __all__ = [
     "User",
     "RefreshToken",
     "LearnerProfile",
+    "StudyPlan",
+    "PlanTask",
     "WritingAttempt",
     "Passage",
     "Question",

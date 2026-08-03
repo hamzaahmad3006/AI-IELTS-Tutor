@@ -51,6 +51,7 @@ export const Progress: React.FC = () => {
     error,
     reload,
     openHistory,
+    openPlan,
   } = useProgress();
 
   if (isLoading) {
@@ -141,6 +142,15 @@ export const Progress: React.FC = () => {
       {progress.modules.map((module) => (
         <ModuleRow key={module.module} stat={module} />
       ))}
+
+      <Button
+        title="My study plan"
+        variant="secondary"
+        icon="arrow-right"
+        onPress={openPlan}
+        style={styles.section}
+        testID="open-plan"
+      />
 
       <Button
         title="View attempt history"

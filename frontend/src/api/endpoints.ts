@@ -23,8 +23,10 @@ export const ENDPOINTS = {
     deleteAccount: '/me',
   },
   planner: {
-    generate: '/plans/generate',
-    active: '/plans/active',
+    // These replace the earlier '/plans/*' placeholders, which were never
+    // implemented on the backend.
+    plan: '/planner/plan',
+    tasks: '/planner/tasks',
   },
   dashboard: {
     overview: '/analytics/overview',
