@@ -17,11 +17,13 @@ export interface DiffToken {
 }
 
 /** Split into words while keeping the whitespace that follows each one. */
-const tokenize = (text: string): string[] =>
-  text.match(/\S+\s*/g) ?? [];
+const tokenize = (text: string): string[] => text.match(/\S+\s*/g) ?? [];
 
 const normalise = (token: string): string =>
-  token.trim().toLowerCase().replace(/[.,;:!?"'()]/g, '');
+  token
+    .trim()
+    .toLowerCase()
+    .replace(/[.,;:!?"'()]/g, '');
 
 export const diffWords = (before: string, after: string): DiffToken[] => {
   const a = tokenize(before);

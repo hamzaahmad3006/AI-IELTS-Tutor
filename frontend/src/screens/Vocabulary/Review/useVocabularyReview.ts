@@ -3,13 +3,13 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { vocabularyApi } from '../../../api';
+import { vocabularyApi } from '@api';
 import type {
   RootStackParamList,
   VocabCard,
   VocabGrade,
   VocabStats,
-} from '../../../types';
+} from '@models';
 
 type Nav = NativeStackNavigationProp<RootStackParamList>;
 
@@ -75,9 +75,9 @@ export const useVocabularyReview = (): UseVocabularyReviewResult => {
       }
       // Advance immediately; grading is recorded in the background so the
       // session stays responsive.
-      setIndex((prev) => prev + 1);
+      setIndex(prev => prev + 1);
       setIsRevealed(false);
-      setReviewedCount((prev) => prev + 1);
+      setReviewedCount(prev => prev + 1);
       vocabularyApi.grade(current.itemId, value).catch(() => {
         setError('A grade could not be saved.');
       });

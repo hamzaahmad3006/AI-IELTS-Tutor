@@ -9,8 +9,8 @@ import {
   Input,
   Logo,
   ScreenContainer,
-} from '../../../components';
-import { APP_CONFIG, SPACING } from '../../../constants';
+} from '@components';
+import { APP_CONFIG, SPACING } from '@constants';
 import { useLogin } from './useLogin';
 
 export const Login: React.FC = () => {
@@ -97,7 +97,11 @@ const styles = StyleSheet.create({
   brand: { alignItems: 'center', marginVertical: SPACING.xl },
   brandName: { marginTop: SPACING.sm, marginBottom: SPACING.xxs },
   forgot: { alignSelf: 'flex-end', marginBottom: SPACING.md },
-  authError: { flexDirection: 'row', alignItems: 'center', marginBottom: SPACING.md },
+  authError: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: SPACING.md,
+  },
   authErrorText: { marginLeft: SPACING.xxs },
   submit: { marginTop: SPACING.xs },
   footer: {

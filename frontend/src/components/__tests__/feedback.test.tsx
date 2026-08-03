@@ -11,12 +11,8 @@ import { EmptyState } from '../EmptyState/EmptyState';
 import { ErrorBoundary } from '../ErrorBoundary/ErrorBoundary';
 import { Skeleton, SkeletonCard } from '../Skeleton/Skeleton';
 import { ToastHost } from '../Toast/ToastHost';
-import { store } from '../../redux/store';
-import {
-  clearToasts,
-  dismissToast,
-  showToast,
-} from '../../redux/slices/toastSlice';
+import { store } from '@redux/store';
+import { clearToasts, dismissToast, showToast } from '@redux/slices/toastSlice';
 
 describe('toastSlice', () => {
   beforeEach(() => {
@@ -47,7 +43,7 @@ describe('toastSlice', () => {
     store.dispatch(showToast({ message: 'Two' }));
     const [first] = store.getState().toast.queue;
     store.dispatch(dismissToast(first.id));
-    expect(store.getState().toast.queue.map((t) => t.message)).toEqual(['Two']);
+    expect(store.getState().toast.queue.map(t => t.message)).toEqual(['Two']);
   });
 });
 

@@ -10,9 +10,9 @@ import {
   ProgressBar,
   ScreenContainer,
   useTheme,
-} from '../../../components';
-import { PALETTE, RADIUS, SPACING } from '../../../constants';
-import type { VocabGrade } from '../../../types';
+} from '@components';
+import { PALETTE, RADIUS, SPACING } from '@constants';
+import type { VocabGrade } from '@models';
 import { useVocabularyReview } from './useVocabularyReview';
 
 /** Recall buttons map to SM-2 grades. */
@@ -80,12 +80,18 @@ export const Review: React.FC = () => {
             </AppText>
             <AppText variant="bodyMd" color="textSecondary" style={styles.body}>
               {reviewedCount > 0
-                ? `You reviewed ${reviewedCount} word${reviewedCount === 1 ? '' : 's'}. Cards you found hard will come back sooner.`
+                ? `You reviewed ${reviewedCount} word${
+                    reviewedCount === 1 ? '' : 's'
+                  }. Cards you found hard will come back sooner.`
                 : 'New words appear here as you practise, and reviews are scheduled automatically.'}
             </AppText>
           </Card>
           {stats ? <StatsCard stats={stats} /> : null}
-          <Button title="Start another session" onPress={restart} style={styles.section} />
+          <Button
+            title="Start another session"
+            onPress={restart}
+            style={styles.section}
+          />
         </>
       ) : (
         <>
@@ -98,7 +104,12 @@ export const Review: React.FC = () => {
           {/* Flashcard */}
           <Card style={styles.cardFace}>
             {card.isNew ? (
-              <View style={[styles.pill, { backgroundColor: theme.colors.primaryContainer }]}>
+              <View
+                style={[
+                  styles.pill,
+                  { backgroundColor: theme.colors.primaryContainer },
+                ]}
+              >
                 <AppText variant="labelSm" color="primary">
                   NEW WORD
                 </AppText>
@@ -111,7 +122,9 @@ export const Review: React.FC = () => {
 
             {card.cefrLevel || card.lexicalField ? (
               <AppText variant="labelSm" color="textMuted" align="center">
-                {[card.cefrLevel, card.lexicalField].filter(Boolean).join(' · ')}
+                {[card.cefrLevel, card.lexicalField]
+                  .filter(Boolean)
+                  .join(' · ')}
               </AppText>
             ) : null}
 
@@ -145,15 +158,22 @@ export const Review: React.FC = () => {
 
           {isRevealed ? (
             <>
-              <AppText variant="labelMd" color="textSecondary" style={styles.gradeLabel}>
+              <AppText
+                variant="labelMd"
+                color="textSecondary"
+                style={styles.gradeLabel}
+              >
                 How well did you recall it?
               </AppText>
               <View style={styles.gradeRow}>
-                {GRADES.map((option) => (
+                {GRADES.map(option => (
                   <Pressable
                     key={option.label}
                     onPress={() => grade(option.grade)}
-                    style={[styles.gradeButton, { backgroundColor: option.color }]}
+                    style={[
+                      styles.gradeButton,
+                      { backgroundColor: option.color },
+                    ]}
                   >
                     <AppText variant="labelMd" color="textInverse">
                       {option.label}
@@ -163,7 +183,11 @@ export const Review: React.FC = () => {
               </View>
             </>
           ) : (
-            <Button title="Show definition" onPress={reveal} style={styles.section} />
+            <Button
+              title="Show definition"
+              onPress={reveal}
+              style={styles.section}
+            />
           )}
         </>
       )}
@@ -172,7 +196,12 @@ export const Review: React.FC = () => {
 };
 
 const StatsCard: React.FC<{
-  stats: { totalItems: number; started: number; dueNow: number; mastered: number };
+  stats: {
+    totalItems: number;
+    started: number;
+    dueNow: number;
+    mastered: number;
+  };
 }> = ({ stats }) => (
   <Card style={styles.section}>
     <AppText variant="titleLg" style={styles.body}>
@@ -183,7 +212,7 @@ const StatsCard: React.FC<{
       { label: 'Started', value: stats.started },
       { label: 'Due now', value: stats.dueNow },
       { label: 'Mastered', value: stats.mastered },
-    ].map((row) => (
+    ].map(row => (
       <View key={row.label} style={styles.statRow}>
         <AppText variant="bodyMd">{row.label}</AppText>
         <AppText variant="labelMd" color="primary">

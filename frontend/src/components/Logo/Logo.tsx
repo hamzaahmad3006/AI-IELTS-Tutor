@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Svg, { Path, Rect } from 'react-native-svg';
-import { PALETTE } from '../../constants';
+import { PALETTE } from '@constants';
 
 interface LogoProps {
   size?: number;

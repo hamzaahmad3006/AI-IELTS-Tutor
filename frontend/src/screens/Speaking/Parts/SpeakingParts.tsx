@@ -13,8 +13,8 @@ import {
   QuestionNavigator,
   ScreenContainer,
   SkeletonCard,
-} from '../../../components';
-import { getBandColor, SPACING } from '../../../constants';
+} from '@components';
+import { getBandColor, SPACING } from '@constants';
 import { useSpeakingParts } from './useSpeakingParts';
 
 export const SpeakingParts: React.FC = () => {
@@ -76,7 +76,9 @@ export const SpeakingParts: React.FC = () => {
               variant="displayLg"
               style={{ color: getBandColor(result.overallBand ?? 0) }}
             >
-              {result.overallBand !== null ? result.overallBand.toFixed(1) : '—'}
+              {result.overallBand !== null
+                ? result.overallBand.toFixed(1)
+                : '—'}
             </AppText>
             {result.overallBand !== null ? (
               <BandBadge band={result.overallBand} />
@@ -88,7 +90,11 @@ export const SpeakingParts: React.FC = () => {
             </AppText>
           ) : null}
         </Card>
-        <Button title="Continue" onPress={continueAfterResult} style={styles.section} />
+        <Button
+          title="Continue"
+          onPress={continueAfterResult}
+          style={styles.section}
+        />
       </ScreenContainer>
     );
   }
@@ -110,7 +116,7 @@ export const SpeakingParts: React.FC = () => {
 
       <QuestionNavigator
         answered={set.questions.map(
-          (q) => (answers[q.id] ?? '').trim().length > 0,
+          q => (answers[q.id] ?? '').trim().length > 0,
         )}
         currentIndex={index}
         onSelect={goTo}
@@ -175,7 +181,11 @@ const Header: React.FC<{ part: number; topic: string; onBack: () => void }> = ({
   onBack,
 }) => (
   <View style={styles.header}>
-    <Pressable onPress={onBack} accessibilityRole="button" accessibilityLabel="Back">
+    <Pressable
+      onPress={onBack}
+      accessibilityRole="button"
+      accessibilityLabel="Back"
+    >
       <Icon name="back" size={22} color="primary" />
     </Pressable>
     <View style={styles.headerText}>

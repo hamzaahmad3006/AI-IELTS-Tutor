@@ -45,7 +45,7 @@ const toastSlice = createSlice({
       reducer(state, action: PayloadAction<Toast>): void {
         // Collapse repeats: a failing screen that retries three times should
         // not stack three identical bars.
-        if (state.queue.some((t) => t.message === action.payload.message)) {
+        if (state.queue.some(t => t.message === action.payload.message)) {
           return;
         }
         state.queue.push(action.payload);
@@ -62,7 +62,7 @@ const toastSlice = createSlice({
       },
     },
     dismissToast(state, action: PayloadAction<string>): void {
-      state.queue = state.queue.filter((t) => t.id !== action.payload);
+      state.queue = state.queue.filter(t => t.id !== action.payload);
     },
     clearToasts(state): void {
       state.queue = [];

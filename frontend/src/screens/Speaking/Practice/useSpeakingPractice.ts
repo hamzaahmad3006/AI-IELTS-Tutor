@@ -8,13 +8,13 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { speakingApi } from '../../../api';
+import { speakingApi } from '@api';
 import type {
   CueCard,
   RootStackParamList,
   SpeakingResult,
   SpeakingPart,
-} from '../../../types';
+} from '@models';
 
 type Nav = NativeStackNavigationProp<RootStackParamList>;
 
@@ -86,7 +86,7 @@ export const useSpeakingPractice = (): UseSpeakingPracticeResult => {
   const loadCueCard = useCallback((): void => {
     speakingApi
       .getCueCard()
-      .then((card) => {
+      .then(card => {
         setCueCard(card);
         setSecondsLeft(card.prepSeconds);
       })
@@ -105,7 +105,7 @@ export const useSpeakingPractice = (): UseSpeakingPracticeResult => {
       return;
     }
     intervalRef.current = setInterval(() => {
-      setSecondsLeft((prev) => (prev > 0 ? prev - 1 : 0));
+      setSecondsLeft(prev => (prev > 0 ? prev - 1 : 0));
     }, 1000);
     return () => {
       if (intervalRef.current) {
@@ -132,7 +132,7 @@ export const useSpeakingPractice = (): UseSpeakingPracticeResult => {
         part: 2,
         durationSec: Math.max(0, cueCard.speakSeconds - secondsLeft),
       })
-      .then((res) => {
+      .then(res => {
         setResult(res);
         setPhase('scored');
       })

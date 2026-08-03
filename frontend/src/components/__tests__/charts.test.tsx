@@ -90,7 +90,7 @@ describe('RadarChart', () => {
   it('renders with every axis unmeasured', () => {
     render(
       <RadarChart
-        axes={axes.map((a) => ({ ...a, value: null }))}
+        axes={axes.map(a => ({ ...a, value: null }))}
         testID="empty-radar"
       />,
     );

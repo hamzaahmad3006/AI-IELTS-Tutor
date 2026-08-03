@@ -1,15 +1,10 @@
 /** Themed text input with label + error state. */
 
 import React, { useState } from 'react';
-import {
-  StyleSheet,
-  TextInput,
-  View,
-  type TextInputProps,
-} from 'react-native';
+import { StyleSheet, TextInput, View, type TextInputProps } from 'react-native';
 import { AppText } from '../AppText/AppText';
 import { useTheme } from '../theme/useTheme';
-import { LAYOUT, RADIUS, SPACING } from '../../constants';
+import { LAYOUT, RADIUS, SPACING } from '@constants';
 
 interface InputProps extends TextInputProps {
   label: string;
@@ -56,11 +51,11 @@ export const Input: React.FC<InputProps> = ({
           },
           style,
         ]}
-        onFocus={(e) => {
+        onFocus={e => {
           setFocused(true);
           onFocus?.(e);
         }}
-        onBlur={(e) => {
+        onBlur={e => {
           setFocused(false);
           onBlur?.(e);
         }}

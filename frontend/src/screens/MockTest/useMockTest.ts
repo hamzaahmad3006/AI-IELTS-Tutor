@@ -3,14 +3,14 @@
 import { useCallback, useState } from 'react';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { mockTestApi } from '../../api';
-import { useCountdown, type TimerState } from '../../components';
+import { mockTestApi } from '@api';
+import { useCountdown, type TimerState } from '@components';
 import type {
   IeltsModule,
   MockResult,
   MockTest,
   RootStackParamList,
-} from '../../types';
+} from '@models';
 
 type Nav = NativeStackNavigationProp<RootStackParamList>;
 
@@ -54,10 +54,12 @@ export const useMockTest = (): UseMockTestResult => {
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [sectionIndex, setSectionIndex] = useState<number>(0);
-  const [readingAnswers, setReadingAnswers] = useState<Record<string, string>>({});
-  const [listeningAnswers, setListeningAnswers] = useState<Record<string, string>>(
+  const [readingAnswers, setReadingAnswers] = useState<Record<string, string>>(
     {},
   );
+  const [listeningAnswers, setListeningAnswers] = useState<
+    Record<string, string>
+  >({});
   const [writingText, setWritingText] = useState<string>('');
   const [speakingText, setSpeakingText] = useState<string>('');
   const [result, setResult] = useState<MockResult | null>(null);
@@ -72,7 +74,7 @@ export const useMockTest = (): UseMockTestResult => {
     setError(null);
     mockTestApi
       .start()
-      .then((data) => {
+      .then(data => {
         setTest(data);
         setSectionIndex(0);
         setStage('sitting');
@@ -96,7 +98,7 @@ export const useMockTest = (): UseMockTestResult => {
         writingText: writingText.trim() || null,
         speakingText: speakingText.trim() || null,
       })
-      .then((data) => {
+      .then(data => {
         setResult(data);
         setStage('result');
       })
@@ -111,7 +113,7 @@ export const useMockTest = (): UseMockTestResult => {
       submit();
       return;
     }
-    setSectionIndex((i) => i + 1);
+    setSectionIndex(i => i + 1);
     countdown.reset();
   }, [isLastSection, submit, countdown]);
 
@@ -129,9 +131,9 @@ export const useMockTest = (): UseMockTestResult => {
     writingText,
     speakingText,
     setReadingAnswer: (id, value) =>
-      setReadingAnswers((prev) => ({ ...prev, [id]: value })),
+      setReadingAnswers(prev => ({ ...prev, [id]: value })),
     setListeningAnswer: (id, value) =>
-      setListeningAnswers((prev) => ({ ...prev, [id]: value })),
+      setListeningAnswers(prev => ({ ...prev, [id]: value })),
     setWritingText,
     setSpeakingText,
     secondsLeft: countdown.secondsLeft,

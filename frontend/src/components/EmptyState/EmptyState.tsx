@@ -14,7 +14,7 @@ import { StyleSheet, View } from 'react-native';
 import { AppText } from '../AppText/AppText';
 import { Button } from '../Button/Button';
 import { Icon } from '../Icon/Icon';
-import { SPACING, type IconName, type ThemeColors } from '../../constants';
+import { SPACING, type IconName, type ThemeColors } from '@constants';
 
 export type EmptyStateVariant = 'empty' | 'error' | 'offline';
 
@@ -32,12 +32,11 @@ interface EmptyStateProps {
 const DEFAULTS: Record<
   EmptyStateVariant,
   { icon: IconName; color: keyof ThemeColors }
-> =
-  {
-    empty: { icon: 'sparkle', color: 'primary' },
-    error: { icon: 'info', color: 'error' },
-    offline: { icon: 'info', color: 'warning' },
-  };
+> = {
+  empty: { icon: 'sparkle', color: 'primary' },
+  error: { icon: 'info', color: 'error' },
+  offline: { icon: 'info', color: 'warning' },
+};
 
 export const EmptyState: React.FC<EmptyStateProps> = ({
   variant = 'empty',

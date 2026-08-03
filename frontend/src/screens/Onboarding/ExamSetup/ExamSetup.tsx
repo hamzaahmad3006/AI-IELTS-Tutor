@@ -10,9 +10,9 @@ import {
   Icon,
   ScreenContainer,
   useTheme,
-} from '../../../components';
-import { APP_CONFIG, RADIUS, SPACING } from '../../../constants';
-import type { ExamType, ProficiencyLevel } from '../../../types';
+} from '@components';
+import { APP_CONFIG, RADIUS, SPACING } from '@constants';
+import type { ExamType, ProficiencyLevel } from '@models';
 import { STUDY_TIME_OPTIONS, useExamSetup } from './useExamSetup';
 
 const EXAM_TYPES: Array<{ value: ExamType; label: string; hint: string }> = [
@@ -27,7 +27,6 @@ const LEVELS: Array<{ value: ProficiencyLevel; label: string }> = [
 ];
 
 export const ExamSetup: React.FC = () => {
-  const theme = useTheme();
   const {
     step,
     totalSteps,
@@ -72,15 +71,15 @@ export const ExamSetup: React.FC = () => {
         Set up your plan
       </AppText>
       <AppText variant="bodyMd" color="textSecondary" style={styles.subtitle}>
-        Targeting Band {targetBand.toFixed(1)} — a few details so your AI tutor can
-        personalize your practice.
+        Targeting Band {targetBand.toFixed(1)} — a few details so your AI tutor
+        can personalize your practice.
       </AppText>
 
       {/* Exam type */}
       <AppText variant="titleLg" style={styles.sectionTitle}>
         Which test?
       </AppText>
-      {EXAM_TYPES.map((item) => (
+      {EXAM_TYPES.map(item => (
         <SelectRow
           key={item.value}
           label={item.label}
@@ -95,7 +94,7 @@ export const ExamSetup: React.FC = () => {
         Your current English level
       </AppText>
       <View style={styles.chipRow}>
-        {LEVELS.map((item) => (
+        {LEVELS.map(item => (
           <Chip
             key={item.value}
             label={item.label}
@@ -110,7 +109,7 @@ export const ExamSetup: React.FC = () => {
         Daily study time
       </AppText>
       <View style={styles.chipRow}>
-        {STUDY_TIME_OPTIONS.map((minutes) => (
+        {STUDY_TIME_OPTIONS.map(minutes => (
           <Chip
             key={minutes}
             label={`${minutes} min`}
@@ -127,9 +126,7 @@ export const ExamSetup: React.FC = () => {
       <Card style={styles.dateCard}>
         <View style={styles.dateRow}>
           <View>
-            <AppText variant="bodyMd">
-              {examDate ?? 'Not decided yet'}
-            </AppText>
+            <AppText variant="bodyMd">{examDate ?? 'Not decided yet'}</AppText>
             <AppText variant="labelSm" color="textSecondary">
               {/* Optional on purpose: many learners book the test later, and
                   blocking onboarding on a date they do not have would stall
@@ -178,8 +175,14 @@ export const ExamSetup: React.FC = () => {
         disabled={!canSubmit}
         style={styles.submit}
       />
-      <AppText variant="labelSm" color="textMuted" align="center" style={styles.footnote}>
-        Estimated band scores are for practice and are not official IELTS results.
+      <AppText
+        variant="labelSm"
+        color="textMuted"
+        align="center"
+        style={styles.footnote}
+      >
+        Estimated band scores are for practice and are not official IELTS
+        results.
       </AppText>
       <DatePickerSheet
         visible={dateSheetOpen}
@@ -221,11 +224,20 @@ const SelectRow: React.FC<{
           <View
             style={[
               styles.radio,
-              { borderColor: selected ? theme.colors.primary : theme.colors.outline },
+              {
+                borderColor: selected
+                  ? theme.colors.primary
+                  : theme.colors.outline,
+              },
             ]}
           >
             {selected ? (
-              <View style={[styles.radioDot, { backgroundColor: theme.colors.primary }]} />
+              <View
+                style={[
+                  styles.radioDot,
+                  { backgroundColor: theme.colors.primary },
+                ]}
+              />
             ) : null}
           </View>
         </View>
@@ -251,7 +263,10 @@ const Chip: React.FC<{
         },
       ]}
     >
-      <AppText variant="labelMd" color={selected ? 'textInverse' : 'textPrimary'}>
+      <AppText
+        variant="labelMd"
+        color={selected ? 'textInverse' : 'textPrimary'}
+      >
         {label}
       </AppText>
     </Pressable>
@@ -280,7 +295,9 @@ const ConsentRow: React.FC<{
               styles.checkbox,
               {
                 backgroundColor: checked ? theme.colors.accent : 'transparent',
-                borderColor: checked ? theme.colors.accent : theme.colors.outlineVariant,
+                borderColor: checked
+                  ? theme.colors.accent
+                  : theme.colors.outlineVariant,
               },
             ]}
           >

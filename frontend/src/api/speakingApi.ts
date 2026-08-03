@@ -3,7 +3,9 @@
 import { apiClient, toApiProblem } from './client';
 import { API_CONFIG } from './config';
 import { ENDPOINTS } from './endpoints';
-import { MOCK_SPEAKING_RESULT, MOCK_SPEAKING_SESSION ,
+import {
+  MOCK_SPEAKING_RESULT,
+  MOCK_SPEAKING_SESSION,
   MOCK_SPEAKING_QUESTIONS,
 } from './mock/fixtures';
 import type {
@@ -17,7 +19,7 @@ import type {
 } from '../types';
 
 const delay = (ms: number): Promise<void> =>
-  new Promise((resolve) => setTimeout(resolve, ms));
+  new Promise(resolve => setTimeout(resolve, ms));
 
 const MOCK_CUE_CARD: CueCard = {
   id: 'cc_mock_1',
@@ -42,9 +44,12 @@ export const speakingApi = {
       return MOCK_CUE_CARD;
     }
     try {
-      const { data } = await apiClient.get<CueCard>(ENDPOINTS.speaking.cueCards, {
-        params: difficulty ? { difficulty } : undefined,
-      });
+      const { data } = await apiClient.get<CueCard>(
+        ENDPOINTS.speaking.cueCards,
+        {
+          params: difficulty ? { difficulty } : undefined,
+        },
+      );
       return data;
     } catch (error) {
       throw toApiProblem(error);

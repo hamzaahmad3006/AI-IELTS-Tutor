@@ -83,7 +83,7 @@ apiClient.interceptors.request.use(
 
 // On 401, refresh the access token once (single-flight) and retry the request.
 apiClient.interceptors.response.use(
-  (response) => response,
+  response => response,
   async (error: AxiosError): Promise<unknown> => {
     const original = error.config as RetryableConfig | undefined;
     const status = error.response?.status;
@@ -93,7 +93,13 @@ apiClient.interceptors.response.use(
       url.includes('/auth/register') ||
       url.includes('/auth/refresh');
 
-    if (status === 401 && original && !original._retry && !isAuthPath && refreshHandler) {
+    if (
+      status === 401 &&
+      original &&
+      !original._retry &&
+      !isAuthPath &&
+      refreshHandler
+    ) {
       original._retry = true;
       if (!refreshInFlight) {
         refreshInFlight = refreshHandler().finally(() => {

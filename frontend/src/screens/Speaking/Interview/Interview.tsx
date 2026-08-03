@@ -3,15 +3,9 @@
 import React from 'react';
 import { ActivityIndicator, Pressable, StyleSheet, View } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
-import {
-  AppText,
-  Card,
-  Icon,
-  ScreenContainer,
-  useTheme,
-} from '../../../components';
-import { PALETTE, RADIUS, SPACING } from '../../../constants';
-import type { TranscriptEntry, TranscriptToken } from '../../../types';
+import { AppText, Card, Icon, ScreenContainer, useTheme } from '@components';
+import { PALETTE, RADIUS, SPACING } from '@constants';
+import type { TranscriptEntry, TranscriptToken } from '@models';
 import { useInterview } from './useInterview';
 
 export const Interview: React.FC = () => {
@@ -32,7 +26,11 @@ export const Interview: React.FC = () => {
       <ScreenContainer>
         <View style={styles.loader}>
           <ActivityIndicator size="large" color={theme.colors.primary} />
-          <AppText variant="bodyMd" color="textSecondary" style={styles.connecting}>
+          <AppText
+            variant="bodyMd"
+            color="textSecondary"
+            style={styles.connecting}
+          >
             Connecting to your AI examiner...
           </AppText>
         </View>
@@ -50,7 +48,12 @@ export const Interview: React.FC = () => {
         <AppText variant="titleLg" color="primary">
           Speaking · Part {session.part}
         </AppText>
-        <View style={[styles.timer, { backgroundColor: theme.colors.primaryContainer }]}>
+        <View
+          style={[
+            styles.timer,
+            { backgroundColor: theme.colors.primaryContainer },
+          ]}
+        >
           <Icon name="timer" size={16} color="error" />
           <AppText variant="labelMd" style={styles.timerText}>
             {elapsedLabel}
@@ -59,10 +62,20 @@ export const Interview: React.FC = () => {
       </View>
 
       {/* Examiner prompt */}
-      <AppText variant="headlineMd" color="primary" align="center" style={styles.examiner}>
+      <AppText
+        variant="headlineMd"
+        color="primary"
+        align="center"
+        style={styles.examiner}
+      >
         {session.examinerName}
       </AppText>
-      <AppText variant="bodyLg" color="textSecondary" align="center" style={styles.prompt}>
+      <AppText
+        variant="bodyLg"
+        color="textSecondary"
+        align="center"
+        style={styles.prompt}
+      >
         {session.currentPrompt}
       </AppText>
 
@@ -71,11 +84,20 @@ export const Interview: React.FC = () => {
         <View style={styles.transcriptHead}>
           <View style={styles.transcriptTitle}>
             <Icon name="speaking" size={18} color="accent" />
-            <AppText variant="labelMd" color="textSecondary" style={styles.transcriptLabel}>
+            <AppText
+              variant="labelMd"
+              color="textSecondary"
+              style={styles.transcriptLabel}
+            >
               LIVE TRANSCRIPT
             </AppText>
           </View>
-          <View style={[styles.confidence, { backgroundColor: PALETTE.tealContainer }]}>
+          <View
+            style={[
+              styles.confidence,
+              { backgroundColor: PALETTE.tealContainer },
+            ]}
+          >
             <AppText variant="labelSm" style={styles.confidenceText}>
               Confidence Boost: {session.confidenceBoost}%
             </AppText>
@@ -83,7 +105,7 @@ export const Interview: React.FC = () => {
         </View>
 
         <View style={styles.transcriptBody}>
-          {session.transcript.map((entry) => (
+          {session.transcript.map(entry => (
             <TranscriptLine key={entry.id} entry={entry} />
           ))}
         </View>
@@ -100,7 +122,11 @@ export const Interview: React.FC = () => {
           >
             <Icon name="mic" size={24} color={isMuted ? 'error' : 'primary'} />
           </View>
-          <AppText variant="labelSm" color="textSecondary" style={styles.controlLabel}>
+          <AppText
+            variant="labelSm"
+            color="textSecondary"
+            style={styles.controlLabel}
+          >
             {isMuted ? 'Unmute' : 'Mute'}
           </AppText>
         </Pressable>
@@ -110,12 +136,21 @@ export const Interview: React.FC = () => {
             colors={[PALETTE.teal400, PALETTE.teal600]}
             style={styles.mainControl}
           >
-            <Icon name={isPaused ? 'play' : 'pause'} size={30} color="textInverse" />
+            <Icon
+              name={isPaused ? 'play' : 'pause'}
+              size={30}
+              color="textInverse"
+            />
           </LinearGradient>
         </Pressable>
 
         <Pressable style={styles.sideControl} onPress={endCall}>
-          <View style={[styles.controlCircle, { backgroundColor: theme.colors.errorHighlight }]}>
+          <View
+            style={[
+              styles.controlCircle,
+              { backgroundColor: theme.colors.errorHighlight },
+            ]}
+          >
             <Icon name="end-call" size={24} color="error" />
           </View>
           <AppText variant="labelSm" color="error" style={styles.controlLabel}>
@@ -132,15 +167,17 @@ const TranscriptLine: React.FC<{ entry: TranscriptEntry }> = ({ entry }) => {
   if (entry.speaker === 'examiner') {
     return (
       <AppText variant="bodyLg" color="textMuted" style={styles.examinerLine}>
-        {entry.tokens.map((t) => t.text).join('')}
+        {entry.tokens.map(t => t.text).join('')}
       </AppText>
     );
   }
   if (!entry.isFinal) {
     return (
-      <View style={[styles.pendingLine, { borderLeftColor: theme.colors.primary }]}>
+      <View
+        style={[styles.pendingLine, { borderLeftColor: theme.colors.primary }]}
+      >
         <AppText variant="bodyLg" color="primary">
-          {entry.tokens.map((t) => t.text).join('')}
+          {entry.tokens.map(t => t.text).join('')}
         </AppText>
       </View>
     );
@@ -158,7 +195,10 @@ const TokenSpan: React.FC<{ token: TranscriptToken }> = ({ token }) => {
   const theme = useTheme();
   if (token.kind === 'strong') {
     return (
-      <AppText variant="bodyLg" style={{ backgroundColor: PALETTE.tealContainer }}>
+      <AppText
+        variant="bodyLg"
+        style={{ backgroundColor: PALETTE.tealContainer }}
+      >
         {token.text}
       </AppText>
     );

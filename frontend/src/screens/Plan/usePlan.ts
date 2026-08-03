@@ -3,9 +3,9 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { plannerApi } from '../../api';
-import { showToast, useAppDispatch } from '../../redux';
-import type { PlanTask, RootStackParamList, StudyPlan } from '../../types';
+import { plannerApi } from '@api';
+import { showToast, useAppDispatch } from '@redux';
+import type { PlanTask, RootStackParamList, StudyPlan } from '@models';
 
 type Nav = NativeStackNavigationProp<RootStackParamList>;
 
@@ -36,7 +36,7 @@ export const usePlan = (): UsePlanResult => {
     let active = true;
     plannerApi
       .getPlan()
-      .then((data) => {
+      .then(data => {
         if (active) {
           setPlan(data);
         }
@@ -61,12 +61,14 @@ export const usePlan = (): UsePlanResult => {
     setError(null);
     plannerApi
       .generate()
-      .then((data) => {
+      .then(data => {
         setPlan(data);
         setActiveWeek(1);
         dispatch(showToast({ message: 'Study plan ready.', tone: 'success' }));
       })
-      .catch(() => setError('Could not build a plan. Complete onboarding first.'))
+      .catch(() =>
+        setError('Could not build a plan. Complete onboarding first.'),
+      )
       .finally(() => setIsGenerating(false));
   }, [dispatch]);
 
@@ -75,11 +77,11 @@ export const usePlan = (): UsePlanResult => {
       const next = !task.isDone;
       // Optimistic: ticking a task must feel instant. The request still runs,
       // and a failure rolls the tick back rather than leaving a lie on screen.
-      setPlan((current) =>
+      setPlan(current =>
         current
           ? {
               ...current,
-              tasks: current.tasks.map((t) =>
+              tasks: current.tasks.map(t =>
                 t.id === task.id ? { ...t, isDone: next } : t,
               ),
               completedCount: current.completedCount + (next ? 1 : -1),
@@ -87,11 +89,11 @@ export const usePlan = (): UsePlanResult => {
           : current,
       );
       plannerApi.setTaskDone(task.id, next).catch(() => {
-        setPlan((current) =>
+        setPlan(current =>
           current
             ? {
                 ...current,
-                tasks: current.tasks.map((t) =>
+                tasks: current.tasks.map(t =>
                   t.id === task.id ? { ...t, isDone: task.isDone } : t,
                 ),
                 completedCount: current.completedCount + (next ? -1 : 1),
@@ -118,7 +120,7 @@ export const usePlan = (): UsePlanResult => {
     weeks,
     activeWeek,
     setActiveWeek,
-    tasksForWeek: (plan?.tasks ?? []).filter((t) => t.week === activeWeek),
+    tasksForWeek: (plan?.tasks ?? []).filter(t => t.week === activeWeek),
     generate,
     toggleTask,
     onBack: () => navigation.goBack(),

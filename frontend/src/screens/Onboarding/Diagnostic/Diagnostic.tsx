@@ -12,9 +12,9 @@ import {
   ScreenContainer,
   SkeletonCard,
   useTheme,
-} from '../../../components';
-import { getBandColor, RADIUS, SPACING } from '../../../constants';
-import type { DiagnosticQuestion, DiagnosticResult } from '../../../types';
+} from '@components';
+import { getBandColor, RADIUS, SPACING } from '@constants';
+import type { DiagnosticQuestion, DiagnosticResult } from '@models';
 import { STEP_LABELS, STEPS, useDiagnostic } from './useDiagnostic';
 
 export const Diagnostic: React.FC = () => {
@@ -109,12 +109,12 @@ export const Diagnostic: React.FC = () => {
               {set.reading.body}
             </AppText>
           </Card>
-          {set.reading.questions.map((question) => (
+          {set.reading.questions.map(question => (
             <QuestionBlock
               key={question.id}
               question={question}
               value={readingAnswers[question.id]}
-              onChange={(value) => setReadingAnswer(question.id, value)}
+              onChange={value => setReadingAnswer(question.id, value)}
             />
           ))}
         </>
@@ -134,12 +134,12 @@ export const Diagnostic: React.FC = () => {
               and it will simply not be estimated.
             </AppText>
           </Card>
-          {set.listening.questions.map((question) => (
+          {set.listening.questions.map(question => (
             <QuestionBlock
               key={question.id}
               question={question}
               value={listeningAnswers[question.id]}
-              onChange={(value) => setListeningAnswer(question.id, value)}
+              onChange={value => setListeningAnswer(question.id, value)}
             />
           ))}
         </>
@@ -213,7 +213,7 @@ const QuestionBlock: React.FC<{
     <Card style={styles.section} testID={`diagnostic-q-${question.id}`}>
       <AppText variant="bodyMd">{question.prompt}</AppText>
       {question.options ? (
-        question.options.map((option) => {
+        question.options.map(option => {
           const selected = value === option;
           return (
             <Pressable
@@ -325,11 +325,12 @@ const ResultView: React.FC<{
       <AppText variant="labelMd" color="textSecondary">
         BY MODULE
       </AppText>
-      {result.baselines.map((baseline) => (
+      {result.baselines.map(baseline => (
         <View key={baseline.module} style={styles.baselineRow}>
           <View style={styles.grow}>
             <AppText variant="bodyMd">
-              {baseline.module.charAt(0).toUpperCase() + baseline.module.slice(1)}
+              {baseline.module.charAt(0).toUpperCase() +
+                baseline.module.slice(1)}
             </AppText>
             <AppText variant="labelSm" color="textMuted">
               {baseline.detail}
@@ -339,7 +340,9 @@ const ResultView: React.FC<{
             variant="labelMd"
             style={{
               color:
-                baseline.band !== null ? getBandColor(baseline.band) : undefined,
+                baseline.band !== null
+                  ? getBandColor(baseline.band)
+                  : undefined,
             }}
             color={baseline.band === null ? 'textMuted' : undefined}
           >

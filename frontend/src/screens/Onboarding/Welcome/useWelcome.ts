@@ -5,8 +5,8 @@ import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { NativeScrollEvent, NativeSyntheticEvent } from 'react-native';
 import { ScrollView } from 'react-native';
-import type { IconName } from '../../../constants';
-import type { OnboardingStackParamList } from '../../../types';
+import type { IconName } from '@constants';
+import type { OnboardingStackParamList } from '@models';
 
 type Nav = NativeStackNavigationProp<OnboardingStackParamList>;
 

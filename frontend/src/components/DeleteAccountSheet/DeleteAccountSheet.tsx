@@ -8,12 +8,12 @@
  */
 
 import React from 'react';
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet } from 'react-native';
 import { AppText } from '../AppText/AppText';
 import { BottomSheet } from '../BottomSheet/BottomSheet';
 import { Button } from '../Button/Button';
 import { Input } from '../Input/Input';
-import { SPACING } from '../../constants';
+import { SPACING } from '@constants';
 
 const CONFIRM_WORD = 'DELETE';
 

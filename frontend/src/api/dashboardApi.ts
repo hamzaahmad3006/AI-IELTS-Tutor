@@ -7,7 +7,7 @@ import { MOCK_DASHBOARD } from './mock/fixtures';
 import type { DashboardData } from '../types';
 
 const delay = (ms: number): Promise<void> =>
-  new Promise((resolve) => setTimeout(resolve, ms));
+  new Promise(resolve => setTimeout(resolve, ms));
 
 export const dashboardApi = {
   async getOverview(): Promise<DashboardData> {

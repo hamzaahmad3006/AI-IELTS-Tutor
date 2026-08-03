@@ -13,13 +13,9 @@ import {
   ProgressBar,
   ScreenContainer,
   useTheme,
-} from '../../../components';
-import { getBandColor, RADIUS, SPACING } from '../../../constants';
-import type {
-  ExamType,
-  WritingCriteriaScore,
-  WritingResult,
-} from '../../../types';
+} from '@components';
+import { getBandColor, RADIUS, SPACING } from '@constants';
+import type { ExamType, WritingCriteriaScore, WritingResult } from '@models';
 import { useWriting } from './useWriting';
 
 const CRITERIA: Array<{ key: keyof WritingCriteriaScore; label: string }> = [
@@ -45,7 +41,7 @@ const TaskSelector: React.FC<{
       PAPER
     </AppText>
     <View style={styles.chipRow}>
-      {EXAM_LABELS.map((option) => (
+      {EXAM_LABELS.map(option => (
         <Chip
           key={option.value}
           label={option.label}
@@ -56,11 +52,15 @@ const TaskSelector: React.FC<{
       ))}
     </View>
 
-    <AppText variant="labelMd" color="textSecondary" style={styles.selectorLabel}>
+    <AppText
+      variant="labelMd"
+      color="textSecondary"
+      style={styles.selectorLabel}
+    >
       TASK
     </AppText>
     <View style={styles.chipRow}>
-      {[1, 2].map((task) => (
+      {[1, 2].map(task => (
         <Chip
           key={task}
           // Task 1 differs by paper: a report in Academic, a letter in General.
@@ -138,7 +138,9 @@ export const Practice: React.FC = () => {
   } = useWriting();
 
   if (result) {
-    return <ResultView result={result} onTryAnother={tryAnother} onBack={onBack} />;
+    return (
+      <ResultView result={result} onTryAnother={tryAnother} onBack={onBack} />
+    );
   }
 
   return (
@@ -251,7 +253,11 @@ const ResultView: React.FC<{
                     {value.toFixed(1)}
                   </AppText>
                 </View>
-                <ProgressBar progress={value / 9} fillColor={color} height={6} />
+                <ProgressBar
+                  progress={value / 9}
+                  fillColor={color}
+                  height={6}
+                />
               </View>
             );
           })}
@@ -280,7 +286,11 @@ const ResultView: React.FC<{
         </Card>
       ) : null}
 
-      <Button title="Write another" onPress={onTryAnother} style={styles.section} />
+      <Button
+        title="Write another"
+        onPress={onTryAnother}
+        style={styles.section}
+      />
     </ScreenContainer>
   );
 };
@@ -289,7 +299,6 @@ const Header: React.FC<{ title: string; onBack: () => void }> = ({
   title,
   onBack,
 }) => {
-  const theme = useTheme();
   return (
     <View style={styles.header}>
       <Pressable onPress={onBack} hitSlop={8}>
@@ -311,7 +320,12 @@ const styles = StyleSheet.create({
     paddingVertical: SPACING.md,
   },
   headerSpacer: { width: 24 },
-  chipRow: { flexDirection: 'row', flexWrap: 'wrap', gap: SPACING.sm, marginTop: SPACING.sm },
+  chipRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: SPACING.sm,
+    marginTop: SPACING.sm,
+  },
   chip: {
     paddingVertical: SPACING.sm,
     paddingHorizontal: SPACING.md,

@@ -15,12 +15,9 @@ import {
   Input,
   ScreenContainer,
   useTheme,
-} from '../../../components';
-import { getBandColor, RADIUS, SPACING } from '../../../constants';
-import type {
-  PracticeQuestion,
-  ReadingPerQuestionResult,
-} from '../../../types';
+} from '@components';
+import { getBandColor, RADIUS, SPACING } from '@constants';
+import type { PracticeQuestion, ReadingPerQuestionResult } from '@models';
 import { useReading } from './useReading';
 
 export const Practice: React.FC = () => {
@@ -87,7 +84,11 @@ export const Practice: React.FC = () => {
           <ResultRow key={pq.questionId} index={index} pq={pq} />
         ))}
 
-        <Button title="Try another passage" onPress={tryAnother} style={styles.section} />
+        <Button
+          title="Try another passage"
+          onPress={tryAnother}
+          style={styles.section}
+        />
       </ScreenContainer>
     );
   }
@@ -96,10 +97,10 @@ export const Practice: React.FC = () => {
   // Matching-headings questions share one heading bank, so they are rendered
   // together rather than repeating the same five options four times.
   const matchingQuestions = passage.questions.filter(
-    (q) => q.type === 'matching_headings',
+    q => q.type === 'matching_headings',
   );
   const standardQuestions = passage.questions.filter(
-    (q) => q.type !== 'matching_headings',
+    q => q.type !== 'matching_headings',
   );
 
   return (
@@ -144,24 +145,28 @@ export const Practice: React.FC = () => {
       {matchingQuestions.length > 0 ? (
         <MatchingHeadings
           headings={matchingQuestions[0].options ?? []}
-          slots={matchingQuestions.map((q) => ({
+          slots={matchingQuestions.map(q => ({
             id: q.id,
             // The paragraph is named in the prompt; the slot only needs that.
-            label: q.prompt.replace(/^Choose the best heading for /, '').replace(/\.$/, ''),
+            label: q.prompt
+              .replace(/^Choose the best heading for /, '')
+              .replace(/\.$/, ''),
           }))}
           assignments={Object.fromEntries(
-            matchingQuestions.map((q) => [
+            matchingQuestions.map(q => [
               q.id,
               typeof answers[q.id] === 'string'
                 ? (answers[q.id] as string)
                 : undefined,
             ]),
           )}
-          onAssign={(questionId, heading) => setAnswer(questionId, heading ?? '')}
+          onAssign={(questionId, heading) =>
+            setAnswer(questionId, heading ?? '')
+          }
         />
       ) : null}
 
-      {standardQuestions.map((q) => {
+      {standardQuestions.map(q => {
         // Numbering follows the passage, not this filtered list, so the
         // navigator and the cards agree when both kinds are present.
         const questionIndex = passage.questions.indexOf(q);
@@ -173,7 +178,7 @@ export const Practice: React.FC = () => {
             value={answers[q.id]}
             isCurrent={questionIndex === currentIndex}
             onFocus={() => goToQuestion(questionIndex)}
-            onChange={(value) => setAnswer(q.id, value)}
+            onChange={value => setAnswer(q.id, value)}
           />
         );
       })}
@@ -229,15 +234,11 @@ const QuestionCard: React.FC<{
       ]}
       testID={`question-card-${index + 1}`}
     >
-      <AppText
-        variant="bodyMd"
-        style={styles.qPrompt}
-        onPress={onFocus}
-      >
+      <AppText variant="bodyMd" style={styles.qPrompt} onPress={onFocus}>
         {index + 1}. {question.prompt}
       </AppText>
       {question.options ? (
-        question.options.map((option) => {
+        question.options.map(option => {
           const selected = value === option;
           return (
             <Pressable
@@ -258,11 +259,20 @@ const QuestionCard: React.FC<{
               <View
                 style={[
                   styles.radio,
-                  { borderColor: selected ? theme.colors.primary : theme.colors.outline },
+                  {
+                    borderColor: selected
+                      ? theme.colors.primary
+                      : theme.colors.outline,
+                  },
                 ]}
               >
                 {selected ? (
-                  <View style={[styles.radioDot, { backgroundColor: theme.colors.primary }]} />
+                  <View
+                    style={[
+                      styles.radioDot,
+                      { backgroundColor: theme.colors.primary },
+                    ]}
+                  />
                 ) : null}
               </View>
               <AppText variant="bodyMd" style={styles.optionLabel}>
@@ -309,7 +319,8 @@ const ResultRow: React.FC<{ index: number; pq: ReadingPerQuestionResult }> = ({
           />
         </View>
         <AppText variant="labelMd" color={pq.correct ? 'success' : 'error'}>
-          {pq.correct ? 'Correct' : 'Incorrect'}
+          {/* The row never said which question it was about. */}
+          {`Q${index + 1} · ${pq.correct ? 'Correct' : 'Incorrect'}`}
         </AppText>
       </View>
       <AppText variant="bodySm" color="textSecondary" style={styles.resultLine}>
@@ -366,7 +377,11 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
   },
-  resultHead: { flexDirection: 'row', alignItems: 'center', marginBottom: SPACING.xs },
+  resultHead: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: SPACING.xs,
+  },
   resultIcon: {
     width: 28,
     height: 28,

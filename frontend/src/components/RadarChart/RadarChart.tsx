@@ -7,9 +7,15 @@
 
 import React from 'react';
 import { View } from 'react-native';
-import Svg, { Circle, G, Line, Polygon, Text as SvgText } from 'react-native-svg';
+import Svg, {
+  Circle,
+  G,
+  Line,
+  Polygon,
+  Text as SvgText,
+} from 'react-native-svg';
 import { useTheme } from '../theme/useTheme';
-import { FONT_SIZE } from '../../constants';
+import { FONT_SIZE } from '@constants';
 
 export interface RadarAxis {
   label: string;
@@ -74,13 +80,13 @@ export const RadarChart: React.FC<RadarChartProps> = ({
     .map((axis, i) => pointAt(i, bandFraction(axis.value, maxBand)).join(','))
     .join(' ');
 
-  const hasAnyValue = axes.some((axis) => axis.value !== null);
+  const hasAnyValue = axes.some(axis => axis.value !== null);
 
   return (
     <View testID={testID}>
       <Svg width={size} height={size}>
         {/* Concentric guide rings */}
-        {RINGS.map((ring) => (
+        {RINGS.map(ring => (
           <Polygon
             key={`ring-${ring}`}
             points={axes.map((_, i) => pointAt(i, ring).join(',')).join(' ')}

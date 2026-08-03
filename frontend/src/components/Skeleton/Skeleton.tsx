@@ -8,7 +8,7 @@
 import React from 'react';
 import { Animated, StyleSheet, View, type ViewStyle } from 'react-native';
 import { useTheme } from '../theme/useTheme';
-import { RADIUS, SPACING } from '../../constants';
+import { RADIUS, SPACING } from '@constants';
 
 interface SkeletonProps {
   width?: ViewStyle['width'];

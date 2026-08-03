@@ -8,7 +8,11 @@ import {
   type MatchingSlot,
 } from '../MatchingHeadings/MatchingHeadings';
 
-const HEADINGS = ['Why ice stayed local', 'A trade in natural ice', 'A distractor'];
+const HEADINGS = [
+  'Why ice stayed local',
+  'A trade in natural ice',
+  'A distractor',
+];
 const SLOTS: MatchingSlot[] = [
   { id: 'q1', label: 'Paragraph A' },
   { id: 'q2', label: 'Paragraph B' },
@@ -30,7 +34,7 @@ const setup = (assignments: Record<string, string | undefined> = {}) => {
 describe('MatchingHeadings', () => {
   it('lists every heading and every paragraph slot', () => {
     setup();
-    HEADINGS.forEach((heading) => {
+    HEADINGS.forEach(heading => {
       expect(screen.getByTestId(`heading-${heading}`)).toBeTruthy();
     });
     expect(screen.getByTestId('slot-q1')).toBeTruthy();
@@ -41,7 +45,9 @@ describe('MatchingHeadings', () => {
     const { onAssign } = setup();
     fireEvent.press(screen.getByTestId(`heading-${HEADINGS[0]}`));
     // The hint changes so the two-step interaction is discoverable.
-    expect(screen.getByText('Now tap the paragraph it belongs to.')).toBeTruthy();
+    expect(
+      screen.getByText('Now tap the paragraph it belongs to.'),
+    ).toBeTruthy();
 
     fireEvent.press(screen.getByTestId('slot-q1'));
     expect(onAssign).toHaveBeenCalledWith('q1', HEADINGS[0]);
@@ -80,7 +86,7 @@ describe('MatchingHeadings', () => {
           slots={SLOTS}
           assignments={assignments}
           onAssign={(id, heading) =>
-            setAssignments((prev) => ({ ...prev, [id]: heading ?? undefined }))
+            setAssignments(prev => ({ ...prev, [id]: heading ?? undefined }))
           }
         />
       );

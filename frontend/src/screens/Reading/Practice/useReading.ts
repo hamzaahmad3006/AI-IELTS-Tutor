@@ -3,8 +3,8 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { readingApi } from '../../../api';
-import { useCountdown, type TimerState } from '../../../components';
+import { readingApi } from '@api';
+import { useCountdown, type TimerState } from '@components';
 import type {
   AnswerMap,
   AnswerValue,
@@ -12,7 +12,7 @@ import type {
   ReadingPassage,
   ReadingResult,
   RootStackParamList,
-} from '../../../types';
+} from '@models';
 
 type Nav = NativeStackNavigationProp<RootStackParamList>;
 
@@ -73,19 +73,22 @@ export const useReading = (): UseReadingResult => {
     void loadPassage();
   }, [loadPassage]);
 
-  const setDifficulty = useCallback((value: Difficulty): void => {
-    // Answers belong to the old item, so they are cleared rather than carried
-    // onto whatever content the new level returns.
-    setDifficultyState(value);
-    setAnswers({});
-    setResult(null);
-    setCurrentIndex(0);
-    countdown.reset();
-  }, [countdown]);
+  const setDifficulty = useCallback(
+    (value: Difficulty): void => {
+      // Answers belong to the old item, so they are cleared rather than carried
+      // onto whatever content the new level returns.
+      setDifficultyState(value);
+      setAnswers({});
+      setResult(null);
+      setCurrentIndex(0);
+      countdown.reset();
+    },
+    [countdown],
+  );
 
   const setAnswer = useCallback(
     (questionId: string, value: AnswerValue): void => {
-      setAnswers((prev) => ({ ...prev, [questionId]: value }));
+      setAnswers(prev => ({ ...prev, [questionId]: value }));
     },
     [],
   );
@@ -98,7 +101,7 @@ export const useReading = (): UseReadingResult => {
     setError(null);
     readingApi
       .submit({ passageId: passage.id, answers })
-      .then((res) => setResult(res))
+      .then(res => setResult(res))
       .catch(() => setError('Submission failed. Please try again.'))
       .finally(() => setIsSubmitting(false));
   }, [passage, answers]);
@@ -124,7 +127,7 @@ export const useReading = (): UseReadingResult => {
     difficulty,
     setDifficulty,
     answeredFlags: (passage?.questions ?? []).map(
-      (question) => answers[question.id] !== undefined,
+      question => answers[question.id] !== undefined,
     ),
     currentIndex,
     goToQuestion: setCurrentIndex,

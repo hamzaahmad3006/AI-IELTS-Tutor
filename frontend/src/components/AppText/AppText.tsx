@@ -3,7 +3,7 @@
 import React from 'react';
 import { StyleSheet, Text, type TextProps, type TextStyle } from 'react-native';
 import { useTheme } from '../theme/useTheme';
-import type { TypographyVariant, ThemeColors } from '../../constants';
+import type { TypographyVariant, ThemeColors } from '@constants';
 
 type ColorToken = keyof ThemeColors;
 

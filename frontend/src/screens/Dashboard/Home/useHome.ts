@@ -3,17 +3,13 @@
 import { useCallback, useEffect } from 'react';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import {
-  fetchDashboardThunk,
-  useAppDispatch,
-  useAppSelector,
-} from '../../../redux';
+import { fetchDashboardThunk, useAppDispatch, useAppSelector } from '@redux';
 import type {
   DashboardData,
   IeltsModule,
   LoadingStatus,
   RootStackParamList,
-} from '../../../types';
+} from '@models';
 
 type Nav = NativeStackNavigationProp<RootStackParamList>;
 
@@ -29,7 +25,7 @@ interface UseHomeResult {
 export const useHome = (): UseHomeResult => {
   const dispatch = useAppDispatch();
   const navigation = useNavigation<Nav>();
-  const { data, status, error } = useAppSelector((state) => state.dashboard);
+  const { data, status, error } = useAppSelector(state => state.dashboard);
 
   useEffect(() => {
     if (status === 'idle') {

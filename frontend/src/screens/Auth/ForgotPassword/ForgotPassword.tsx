@@ -2,14 +2,8 @@
 
 import React from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
-import {
-  AppText,
-  Button,
-  Icon,
-  Input,
-  ScreenContainer,
-} from '../../../components';
-import { SPACING } from '../../../constants';
+import { AppText, Button, Icon, Input, ScreenContainer } from '@components';
+import { SPACING } from '@constants';
 import { useForgotPassword } from './useForgotPassword';
 
 export const ForgotPassword: React.FC = () => {

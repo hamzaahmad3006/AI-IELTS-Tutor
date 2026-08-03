@@ -9,8 +9,8 @@ import {
   Logo,
   ScreenContainer,
   useTheme,
-} from '../../../components';
-import { SPACING } from '../../../constants';
+} from '@components';
+import { SPACING } from '@constants';
 import { useWelcome } from './useWelcome';
 
 export const Welcome: React.FC = () => {
@@ -22,7 +22,7 @@ export const Welcome: React.FC = () => {
     <ScreenContainer>
       <View
         style={styles.root}
-        onLayout={(event) => onWidth(event.nativeEvent.layout.width)}
+        onLayout={event => onWidth(event.nativeEvent.layout.width)}
       >
         <View style={styles.header}>
           <Logo size={40} />
@@ -47,7 +47,7 @@ export const Welcome: React.FC = () => {
           style={styles.pager}
           testID="welcome-pager"
         >
-          {slides.map((slide) => (
+          {slides.map(slide => (
             <View key={slide.title} style={styles.slideWrap}>
               <View style={styles.slide} testID={`welcome-slide-${slide.icon}`}>
                 <View

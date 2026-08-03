@@ -3,13 +3,13 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { meApi } from '../../../api';
+import { meApi } from '@api';
 import type {
   AdaptiveDifficultyItem,
   IeltsModule,
   Recommendation,
   RootStackParamList,
-} from '../../../types';
+} from '@models';
 
 type Nav = NativeStackNavigationProp<RootStackParamList>;
 

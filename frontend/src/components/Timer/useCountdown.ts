@@ -42,7 +42,7 @@ export const useCountdown = (allowanceSeconds: number): Countdown => {
       return;
     }
     intervalRef.current = setInterval(() => {
-      setSecondsLeft((previous) => {
+      setSecondsLeft(previous => {
         if (previous <= 1) {
           setState('expired');
           return 0;

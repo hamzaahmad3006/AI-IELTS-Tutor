@@ -17,7 +17,7 @@ import { Pressable, StyleSheet, View } from 'react-native';
 import { AppText } from '../AppText/AppText';
 import { Card } from '../Card/Card';
 import { useTheme } from '../theme/useTheme';
-import { RADIUS, SPACING } from '../../constants';
+import { RADIUS, SPACING } from '@constants';
 
 export interface MatchingSlot {
   /** Question id the assignment is recorded against. */
@@ -43,16 +43,18 @@ export const MatchingHeadings: React.FC<MatchingHeadingsProps> = ({
   testID,
 }) => {
   const theme = useTheme();
-  const [pendingHeading, setPendingHeading] = React.useState<string | null>(null);
+  const [pendingHeading, setPendingHeading] = React.useState<string | null>(
+    null,
+  );
 
   const ownerOf = (heading: string): string | undefined =>
-    slots.find((slot) => assignments[slot.id] === heading)?.id;
+    slots.find(slot => assignments[slot.id] === heading)?.id;
 
   // Only unplaced headings are rendered, so this always receives a free one.
   // Tapping the same heading twice cancels, rather than trapping the user in a
   // pending state with no way out.
   const chooseHeading = (heading: string): void => {
-    setPendingHeading((current) => (current === heading ? null : heading));
+    setPendingHeading(current => (current === heading ? null : heading));
   };
 
   const chooseSlot = (slotId: string): void => {
@@ -67,7 +69,7 @@ export const MatchingHeadings: React.FC<MatchingHeadingsProps> = ({
     setPendingHeading(null);
   };
 
-  const unplaced = headings.filter((heading) => !ownerOf(heading));
+  const unplaced = headings.filter(heading => !ownerOf(heading));
 
   return (
     <View testID={testID ?? 'matching-headings'}>
@@ -88,7 +90,7 @@ export const MatchingHeadings: React.FC<MatchingHeadingsProps> = ({
         ) : null}
 
         <View style={styles.headingList}>
-          {unplaced.map((heading) => {
+          {unplaced.map(heading => {
             const isPending = pendingHeading === heading;
             return (
               <Pressable
@@ -117,7 +119,7 @@ export const MatchingHeadings: React.FC<MatchingHeadingsProps> = ({
         </View>
       </Card>
 
-      {slots.map((slot) => {
+      {slots.map(slot => {
         const assigned = assignments[slot.id];
         return (
           <Pressable
@@ -136,8 +138,8 @@ export const MatchingHeadings: React.FC<MatchingHeadingsProps> = ({
                 borderColor: assigned
                   ? theme.colors.primary
                   : pendingHeading
-                    ? theme.colors.accent
-                    : theme.colors.outlineVariant,
+                  ? theme.colors.accent
+                  : theme.colors.outlineVariant,
                 borderStyle: assigned ? 'solid' : 'dashed',
                 backgroundColor: theme.colors.card,
               },

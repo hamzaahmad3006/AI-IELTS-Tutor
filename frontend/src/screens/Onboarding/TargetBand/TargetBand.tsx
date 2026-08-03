@@ -10,9 +10,9 @@ import {
   Icon,
   ScreenContainer,
   useTheme,
-} from '../../../components';
-import { getBandColor, RADIUS, SPACING } from '../../../constants';
-import { APP_CONFIG } from '../../../constants';
+} from '@components';
+import { getBandColor, RADIUS, SPACING } from '@constants';
+import { APP_CONFIG } from '@constants';
 import { useTargetBand } from './useTargetBand';
 
 export const TargetBand: React.FC = () => {
@@ -108,23 +108,29 @@ export const TargetBand: React.FC = () => {
 
         {/* AI recommendation */}
         <View
-          style={[
-            styles.recommend,
-            { backgroundColor: theme.colors.cardAlt },
-          ]}
+          style={[styles.recommend, { backgroundColor: theme.colors.cardAlt }]}
         >
           <Icon name="info" size={20} color="primary" />
           <View style={styles.recommendText}>
             <AppText variant="labelMd" color="textPrimary">
               AI Recommendation
             </AppText>
-            <AppText variant="bodySm" color="textSecondary" style={styles.recommendBody}>
+            <AppText
+              variant="bodySm"
+              color="textSecondary"
+              style={styles.recommendBody}
+            >
               {recommendation}
             </AppText>
           </View>
         </View>
 
-        <Button title="Next" icon="arrow-right" onPress={onNext} style={styles.next} />
+        <Button
+          title="Next"
+          icon="arrow-right"
+          onPress={onNext}
+          style={styles.next}
+        />
         <Pressable onPress={onSkip} style={styles.skip}>
           <AppText variant="labelMd" color="textMuted" align="center">
             I'm not sure yet
@@ -149,7 +155,12 @@ const styles = StyleSheet.create({
     marginBottom: SPACING.md,
   },
   dots: { flexDirection: 'row' },
-  dot: { width: 34, height: 6, borderRadius: RADIUS.pill, marginRight: SPACING.xs },
+  dot: {
+    width: 34,
+    height: 6,
+    borderRadius: RADIUS.pill,
+    marginRight: SPACING.xs,
+  },
   card: { marginBottom: SPACING.lg },
   subtitle: { marginTop: SPACING.sm, marginBottom: SPACING.lg },
   circleWrap: { alignItems: 'center', marginVertical: SPACING.md },

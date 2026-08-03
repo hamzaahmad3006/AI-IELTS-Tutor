@@ -6,7 +6,7 @@ import {
   logoutThunk,
   refreshThunk,
 } from '../slices/authSlice';
-import type { AuthResponse, AuthState } from '../../types';
+import type { AuthResponse, AuthState } from '@models';
 
 const initialState: AuthState = {
   user: null,
@@ -48,7 +48,9 @@ describe('authSlice', () => {
   });
 
   it('surfaces a login failure without authenticating', () => {
-    const pending = authReducer(initialState, { type: loginThunk.pending.type });
+    const pending = authReducer(initialState, {
+      type: loginThunk.pending.type,
+    });
     expect(pending.isBootstrapping).toBe(true);
 
     const state = authReducer(pending, {
@@ -67,7 +69,11 @@ describe('authSlice', () => {
     });
     const rotated: AuthResponse = {
       ...authResponse,
-      tokens: { ...authResponse.tokens, accessToken: 'access-2', refreshToken: 'refresh-2' },
+      tokens: {
+        ...authResponse.tokens,
+        accessToken: 'access-2',
+        refreshToken: 'refresh-2',
+      },
     };
     const state = authReducer(authed, {
       type: refreshThunk.fulfilled.type,

@@ -3,8 +3,8 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { speakingApi } from '../../../api';
-import type { RootStackParamList, SpeakingSession } from '../../../types';
+import { speakingApi } from '@api';
+import type { RootStackParamList, SpeakingSession } from '@models';
 
 type Nav = NativeStackNavigationProp<RootStackParamList>;
 
@@ -57,7 +57,7 @@ export const useInterview = (): UseInterviewResult => {
       return;
     }
     intervalRef.current = setInterval(() => {
-      setElapsed((prev) => prev + 1);
+      setElapsed(prev => prev + 1);
     }, 1000);
     return () => {
       if (intervalRef.current) {
@@ -67,11 +67,11 @@ export const useInterview = (): UseInterviewResult => {
   }, [isLoading, isPaused]);
 
   const toggleMute = useCallback((): void => {
-    setIsMuted((prev) => !prev);
+    setIsMuted(prev => !prev);
   }, []);
 
   const togglePause = useCallback((): void => {
-    setIsPaused((prev) => !prev);
+    setIsPaused(prev => !prev);
   }, []);
 
   const endCall = useCallback((): void => {

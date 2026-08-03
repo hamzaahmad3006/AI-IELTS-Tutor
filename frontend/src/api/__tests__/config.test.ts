@@ -11,8 +11,10 @@ describe('API_CONFIG.useMock', () => {
     jest.resetModules();
     // __DEV__ is a global injected by the React Native runtime.
     (globalThis as unknown as { __DEV__: boolean }).__DEV__ = dev;
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    return require('../config').API_CONFIG as { useMock: boolean; baseUrl: string };
+    return require('../config').API_CONFIG as {
+      useMock: boolean;
+      baseUrl: string;
+    };
   };
 
   const originalDev = (globalThis as unknown as { __DEV__: boolean }).__DEV__;

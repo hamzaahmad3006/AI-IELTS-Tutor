@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { listeningApi } from '../../../api';
+import { listeningApi } from '@api';
 import type {
   AnswerMap,
   AnswerValue,
@@ -11,7 +11,7 @@ import type {
   ListeningClip,
   ListeningResult,
   RootStackParamList,
-} from '../../../types';
+} from '@models';
 
 type Nav = NativeStackNavigationProp<RootStackParamList>;
 
@@ -82,14 +82,14 @@ export const useListening = (): UseListeningResult => {
   const canPlay = playMode === 'practice' || playsUsed < 1;
 
   const togglePlayback = useCallback((): void => {
-    setIsPlaying((prev) => {
+    setIsPlaying(prev => {
       if (prev) {
         return false;
       }
       if (playMode === 'exam' && playsUsed >= 1) {
         return false;
       }
-      setPlaysUsed((used) => used + 1);
+      setPlaysUsed(used => used + 1);
       return true;
     });
   }, [playMode, playsUsed]);
@@ -116,7 +116,7 @@ export const useListening = (): UseListeningResult => {
 
   const setAnswer = useCallback(
     (questionId: string, value: AnswerValue): void => {
-      setAnswers((prev) => ({ ...prev, [questionId]: value }));
+      setAnswers(prev => ({ ...prev, [questionId]: value }));
     },
     [],
   );
@@ -129,7 +129,7 @@ export const useListening = (): UseListeningResult => {
     setError(null);
     listeningApi
       .submit({ audioId: clip.id, answers })
-      .then((res) => setResult(res))
+      .then(res => setResult(res))
       .catch(() => setError('Submission failed. Please try again.'))
       .finally(() => setIsSubmitting(false));
   }, [clip, answers]);

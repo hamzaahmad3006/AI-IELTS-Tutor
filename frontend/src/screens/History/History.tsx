@@ -11,9 +11,9 @@ import {
   Icon,
   ScreenContainer,
   useTheme,
-} from '../../components';
-import { getBandColor, RADIUS, SPACING } from '../../constants';
-import type { IeltsModule } from '../../types';
+} from '@components';
+import { getBandColor, RADIUS, SPACING } from '@constants';
+import type { IeltsModule } from '@models';
 import { useHistory, type HistoryRow } from './useHistory';
 
 const MODULES: Array<{ value: IeltsModule; label: string }> = [
@@ -63,7 +63,7 @@ export const History: React.FC = () => {
 
       {/* Module switcher */}
       <View style={styles.tabs}>
-        {MODULES.map((item) => {
+        {MODULES.map(item => {
           const selected = module === item.value;
           return (
             <Pressable
@@ -100,8 +100,7 @@ export const History: React.FC = () => {
           <LineChart
             series={[
               {
-                label:
-                  MODULES.find((m) => m.value === module)?.label ?? module,
+                label: MODULES.find(m => m.value === module)?.label ?? module,
                 color: theme.colors.primary,
                 values: trendBands,
               },
@@ -126,14 +125,18 @@ export const History: React.FC = () => {
       ) : rows.length === 0 ? (
         <Card style={styles.section} backgroundToken="cardAlt">
           <AppText variant="titleLg">No attempts yet</AppText>
-          <AppText variant="bodyMd" color="textSecondary" style={styles.emptyBody}>
-            Complete a {module} practice session and it will appear here with your
-            band and score.
+          <AppText
+            variant="bodyMd"
+            color="textSecondary"
+            style={styles.emptyBody}
+          >
+            Complete a {module} practice session and it will appear here with
+            your band and score.
           </AppText>
         </Card>
       ) : (
         <>
-          {rows.map((row) => (
+          {rows.map(row => (
             <HistoryCard key={row.attemptId} row={row} />
           ))}
           {hasMore ? (

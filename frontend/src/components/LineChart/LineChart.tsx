@@ -12,7 +12,7 @@ import { View } from 'react-native';
 import Svg, { Circle, G, Line, Path, Text as SvgText } from 'react-native-svg';
 import { AppText } from '../AppText/AppText';
 import { useTheme } from '../theme/useTheme';
-import { FONT_SIZE, SPACING } from '../../constants';
+import { FONT_SIZE, SPACING } from '@constants';
 
 export interface LineSeries {
   label: string;
@@ -55,21 +55,22 @@ export const LineChart: React.FC<LineChartProps> = ({
 
   /** Evenly spaced along x: the axis is attempt order, not wall-clock time. */
   const xFor = (index: number, count: number): number =>
-    PADDING.left + (count <= 1 ? plotWidth / 2 : (plotWidth * index) / (count - 1));
+    PADDING.left +
+    (count <= 1 ? plotWidth / 2 : (plotWidth * index) / (count - 1));
 
-  const drawn = series.filter((s) => s.values.length > 0);
+  const drawn = series.filter(s => s.values.length > 0);
   const hasData = drawn.length > 0;
 
   return (
     <View testID={testID}>
       <View
-        onLayout={(event) => setWidth(event.nativeEvent.layout.width)}
+        onLayout={event => setWidth(event.nativeEvent.layout.width)}
         style={{ height }}
       >
         {width > 0 && (
           <Svg width={width} height={height}>
             {/* Gridlines + band labels */}
-            {GRID_BANDS.filter((b) => b >= minBand && b <= maxBand).map((band) => (
+            {GRID_BANDS.filter(b => b >= minBand && b <= maxBand).map(band => (
               <G key={`grid-${band}`}>
                 <Line
                   x1={PADDING.left}
@@ -91,7 +92,7 @@ export const LineChart: React.FC<LineChartProps> = ({
               </G>
             ))}
 
-            {drawn.map((s) => {
+            {drawn.map(s => {
               const count = s.values.length;
               const path = s.values
                 .map(
@@ -142,7 +143,7 @@ export const LineChart: React.FC<LineChartProps> = ({
             marginTop: SPACING.sm,
           }}
         >
-          {drawn.map((s) => (
+          {drawn.map(s => (
             <View
               key={s.label}
               style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}

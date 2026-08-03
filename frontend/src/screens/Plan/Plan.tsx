@@ -12,9 +12,9 @@ import {
   ScreenContainer,
   SkeletonCard,
   useTheme,
-} from '../../components';
-import { RADIUS, SPACING } from '../../constants';
-import type { PlanTask } from '../../types';
+} from '@components';
+import { RADIUS, SPACING } from '@constants';
+import type { PlanTask } from '@models';
 import { usePlan } from './usePlan';
 
 export const Plan: React.FC = () => {
@@ -83,7 +83,11 @@ export const Plan: React.FC = () => {
   return (
     <ScreenContainer scroll>
       <View style={styles.header}>
-        <Pressable onPress={onBack} accessibilityRole="button" accessibilityLabel="Back">
+        <Pressable
+          onPress={onBack}
+          accessibilityRole="button"
+          accessibilityLabel="Back"
+        >
           <Icon name="back" size={22} color="primary" />
         </Pressable>
         <AppText variant="titleLg" style={styles.grow}>
@@ -101,13 +105,17 @@ export const Plan: React.FC = () => {
           fillColor={theme.colors.primary}
           style={styles.progress}
         />
-        <AppText variant="bodySm" color="textSecondary" style={styles.rationale}>
+        <AppText
+          variant="bodySm"
+          color="textSecondary"
+          style={styles.rationale}
+        >
           {plan.rationale}
         </AppText>
       </Card>
 
       <View style={styles.weekRow}>
-        {weeks.map((week) => {
+        {weeks.map(week => {
           const selected = week === activeWeek;
           return (
             <Pressable
@@ -140,7 +148,7 @@ export const Plan: React.FC = () => {
         })}
       </View>
 
-      {tasksForWeek.map((task) => (
+      {tasksForWeek.map(task => (
         <TaskRow key={task.id} task={task} onToggle={() => toggleTask(task)} />
       ))}
 

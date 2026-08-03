@@ -1,8 +1,8 @@
 /** Dashboard slice with async fetch thunk. */
 
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import { dashboardApi } from '../../api';
-import type { ApiProblem, AsyncState, DashboardData } from '../../types';
+import { dashboardApi } from '@api';
+import type { ApiProblem, AsyncState, DashboardData } from '@models';
 
 type DashboardSliceState = AsyncState<DashboardData>;
 
@@ -28,9 +28,9 @@ const dashboardSlice = createSlice({
   name: 'dashboard',
   initialState,
   reducers: {},
-  extraReducers: (builder) => {
+  extraReducers: builder => {
     builder
-      .addCase(fetchDashboardThunk.pending, (state) => {
+      .addCase(fetchDashboardThunk.pending, state => {
         state.status = 'loading';
         state.error = null;
       })

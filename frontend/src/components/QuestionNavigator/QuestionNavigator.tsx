@@ -12,7 +12,7 @@ import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { AppText } from '../AppText/AppText';
 import { Card } from '../Card/Card';
 import { useTheme } from '../theme/useTheme';
-import { RADIUS, SPACING } from '../../constants';
+import { RADIUS, SPACING } from '@constants';
 
 interface QuestionNavigatorProps {
   /** One entry per question, in order. */
@@ -29,7 +29,7 @@ export const QuestionNavigator: React.FC<QuestionNavigatorProps> = ({
   testID,
 }) => {
   const theme = useTheme();
-  const remaining = answered.filter((done) => !done).length;
+  const remaining = answered.filter(done => !done).length;
 
   return (
     <Card style={styles.card} testID={testID ?? 'question-navigator'}>
@@ -37,10 +37,12 @@ export const QuestionNavigator: React.FC<QuestionNavigatorProps> = ({
         <AppText variant="labelMd" color="textSecondary">
           QUESTIONS
         </AppText>
-        <AppText variant="labelSm" color="textMuted" testID="navigator-remaining">
-          {remaining === 0
-            ? 'All answered'
-            : `${remaining} left`}
+        <AppText
+          variant="labelSm"
+          color="textMuted"
+          testID="navigator-remaining"
+        >
+          {remaining === 0 ? 'All answered' : `${remaining} left`}
         </AppText>
       </View>
 
@@ -64,14 +66,12 @@ export const QuestionNavigator: React.FC<QuestionNavigatorProps> = ({
               style={[
                 styles.dot,
                 {
-                  backgroundColor: done
-                    ? theme.colors.primary
-                    : 'transparent',
+                  backgroundColor: done ? theme.colors.primary : 'transparent',
                   borderColor: isCurrent
                     ? theme.colors.accent
                     : done
-                      ? theme.colors.primary
-                      : theme.colors.outline,
+                    ? theme.colors.primary
+                    : theme.colors.outline,
                   borderWidth: isCurrent ? 2 : 1,
                 },
               ]}
