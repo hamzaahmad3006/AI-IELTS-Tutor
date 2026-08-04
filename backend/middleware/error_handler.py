@@ -2,12 +2,17 @@
 
 from __future__ import annotations
 
+import logging
+
 from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
+from core.errors import AppError, code_for_status, type_for_code
 from core.rate_limit import RateLimitExceeded
+
+logger = logging.getLogger("api.error")
 
 
 def _correlation_id(request: Request) -> str:
@@ -15,6 +20,24 @@ def _correlation_id(request: Request) -> str:
 
 
 def register_exception_handlers(app: FastAPI) -> None:
+    @app.exception_handler(AppError)
+    async def app_error_handler(request: Request, exc: AppError) -> JSONResponse:
+        # 5xx means the failure is ours; log it with enough context to trace,
+        # while the client still gets a stable code rather than a bare 500.
+        if exc.status >= 500:
+            logger.error(
+                "domain error",
+                extra={
+                    "code": exc.code,
+                    "path": request.url.path,
+                    "status": exc.status,
+                },
+            )
+        return JSONResponse(
+            status_code=exc.status,
+            content=exc.to_problem(_correlation_id(request)),
+        )
+
     @app.exception_handler(RateLimitExceeded)
     async def rate_limit_handler(
         request: Request, exc: RateLimitExceeded
@@ -22,7 +45,7 @@ def register_exception_handlers(app: FastAPI) -> None:
         return JSONResponse(
             status_code=429,
             content={
-                "type": "https://errors.aitutor.app/rate_limited",
+                "type": type_for_code("rate_limited"),
                 "title": "Too many requests. Please slow down.",
                 "status": 429,
                 "code": "rate_limited",
@@ -38,15 +61,21 @@ def register_exception_handlers(app: FastAPI) -> None:
     async def http_exception_handler(
         request: Request, exc: StarletteHTTPException
     ) -> JSONResponse:
+        # Bare HTTPExceptions - raised by FastAPI itself for unmatched routes,
+        # and by call sites not yet migrated - get a code derived from the
+        # status. Far more useful than one blanket "http_error", which left
+        # clients string-matching the title to tell errors apart.
+        code = code_for_status(exc.status_code)
         return JSONResponse(
             status_code=exc.status_code,
             content={
-                "type": "about:blank",
+                "type": type_for_code(code),
                 "title": str(exc.detail),
                 "status": exc.status_code,
-                "code": "http_error",
+                "code": code,
                 "correlationId": _correlation_id(request),
             },
+            headers=getattr(exc, "headers", None),
         )
 
     @app.exception_handler(RequestValidationError)
@@ -56,7 +85,7 @@ def register_exception_handlers(app: FastAPI) -> None:
         return JSONResponse(
             status_code=422,
             content={
-                "type": "https://errors.aitutor.app/validation",
+                "type": type_for_code("validation"),
                 "title": "Validation failed",
                 "status": 422,
                 "code": "validation",
@@ -72,10 +101,14 @@ def register_exception_handlers(app: FastAPI) -> None:
     async def unhandled_exception_handler(
         request: Request, exc: Exception
     ) -> JSONResponse:
+        # The exception text is never returned: it can carry connection
+        # strings, SQL fragments or user data. The correlation id is how a
+        # report is tied back to the logged traceback.
+        logger.exception("unhandled exception", extra={"path": request.url.path})
         return JSONResponse(
             status_code=500,
             content={
-                "type": "about:blank",
+                "type": type_for_code("internal_error"),
                 "title": "Internal server error",
                 "status": 500,
                 "code": "internal_error",

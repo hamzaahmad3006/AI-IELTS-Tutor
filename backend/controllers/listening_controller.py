@@ -13,10 +13,17 @@ from models.content import AudioClip, ListeningQuestion
 from models.listening import ListeningAttempt
 from models.user import User
 
+from db.repository import OwnedRepository
+
 from .adaptive_controller import resolve_difficulty
+
 from .base import CamelModel
 from .grading import is_correct
 from .weakness_controller import WeaknessService
+
+#: Ownership-checked reads. Returns 404 rather than 403 for someone
+#: else's row, so an id cannot be confirmed by a stranger.
+_attempts = OwnedRepository(ListeningAttempt, label="Attempt")
 
 
 # ---------- Schemas ----------
@@ -459,11 +466,7 @@ class ListeningController:
     async def get_attempt(
         cls, session: AsyncSession, user: User, attempt_id: str
     ) -> ListeningResultResponse:
-        attempt = await session.get(ListeningAttempt, attempt_id)
-        if attempt is None or attempt.user_id != user.id:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND, detail="Attempt not found"
-            )
+        attempt = await _attempts.get_owned(session, attempt_id, user.id)
         questions = await cls._questions(session, attempt.audio_id)
         _, per_question = cls._grade(questions, attempt.answers)
         return ListeningResultResponse(

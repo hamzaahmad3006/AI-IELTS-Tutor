@@ -2,7 +2,7 @@
 
 Everything **not yet completed** to finish the project, organized by area. Checked = done, unchecked = remaining. Use this as the living backlog.
 
-> **Status as of PR #68** — **128 of 192 checklist items done (~67%)**. Weighted by
+> **Status as of PR #69** — **130 of 192 checklist items done (~68%)**. Weighted by
 > effort it is further along than that, since the backend and data layer are largely
 > complete while most remaining items are large features (live voice, deployment) or
 > are blocked on native modules.
@@ -227,7 +227,11 @@ Everything **not yet completed** to finish the project, organized by area. Check
 - [x] Pydantic `Settings` (env-driven config) + `.env` loading
 - [x] Async SQLAlchemy engine + session (Supabase PostgreSQL / SQLite dev)
 - [x] Alembic migrations setup (async env) + initial schema migration (users, refresh_tokens, learner_profiles) — extend as new models land
-- [ ] Repository layer (base + per-aggregate repos)
+- [x] Repository layer — `OwnedRepository.get_owned` replaces the fetch-then-check
+      ownership dance that was written out six times. Each copy had to remember to
+      return 404 rather than 403, because 403 confirms a row exists to someone who
+      should not know. Deliberately thin: controllers still write their own
+      queries where the query is the interesting part
 - [x] Service/use-case logic + dependency injection (auth) — extend to other domains
 - [x] Unit-of-Work / transaction handling (request-scoped commit/rollback)
 - [x] Structured logging + correlation propagation — single-line JSON logs, the
@@ -237,7 +241,10 @@ Everything **not yet completed** to finish the project, organized by area. Check
 - [x] Rate limiting (in-memory fixed-window on auth + AI endpoints, 429 problem+json + Retry-After) — [ ] Redis backing for multi-instance
 - [ ] Redis integration (cache + queue)
 - [ ] Background job runner (Celery/arq) + task definitions
-- [ ] Full exception taxonomy + handlers (extend current RFC 7807)
+- [x] Exception taxonomy — `core/errors.py` with stable machine-readable codes and
+      real `type` URIs. Every error used to collapse to `code: "http_error"`, so a
+      client could only tell them apart by string-matching the title. Bare
+      HTTPExceptions now derive a code from their status, so nothing is opaque
 
 ---
 

@@ -70,18 +70,57 @@ def run() -> None:
             json={"fullName": "Real User", "email": "real@example.com", "password": "StrongPass123"},
         )
         assert r.status_code == 409, r.text
-        _assert_problem(r.json(), 409, "http_error")
+        # Specific rather than a blanket code: a client can branch on
+        # "already_exists" without string-matching the title.
+        _assert_problem(r.json(), 409, "already_exists")
 
         # Missing bearer token on a protected route -> problem
         r = client.get("/v1/analytics/overview", headers=h)
         assert r.status_code in (401, 403), r.text
-        _assert_problem(r.json(), r.status_code, "http_error")
+        # Bare HTTPExceptions still get a code derived from the status, so
+        # nothing falls back to an opaque "http_error".
+        _assert_problem(
+            r.json(),
+            r.status_code,
+            "unauthenticated" if r.status_code == 401 else "forbidden",
+        )
 
         # Correlation id is generated when the client does not send one
         r = client.post("/v1/auth/register", json={"fullName": "X", "email": "bad", "password": "short"})
         assert r.status_code == 422
         assert r.headers.get("X-Correlation-Id")  # server-generated
         assert r.json()["correlationId"]
+
+        # `h` above carries only a correlation id, so an authenticated call
+        # needs a real token.
+        login = client.post(
+            "/v1/auth/login",
+            json={"email": "real@example.com", "password": "StrongPass123"},
+        ).json()
+        # Correlation id included too: _assert_problem checks it echoes back.
+        auth = {
+            "Authorization": f"Bearer {login['tokens']['accessToken']}",
+            "X-Correlation-Id": CID,
+        }
+
+        # An unknown id is a plain 404 with a specific code. It is also what a
+        # row owned by somebody else returns, so an id cannot be probed for
+        # existence.
+        missing = client.get("/v1/writing/attempts/does-not-exist", headers=auth)
+        assert missing.status_code == 404, missing.text
+        _assert_problem(missing.json(), 404, "not_found")
+
+        # Every problem carries a resolvable type URI, never "about:blank",
+        # which by itself tells a client nothing.
+        for body in (
+            client.post(
+                "/v1/auth/login",
+                json={"email": "nobody@example.com", "password": "StrongPass123"},
+            ).json(),
+            missing.json(),
+        ):
+            assert body["type"].startswith("https://errors.aitutor.app/"), body
+            assert body["code"] and body["code"] != "http_error", body
 
     print("ERRORS/VALIDATION SMOKE TEST PASSED")
 

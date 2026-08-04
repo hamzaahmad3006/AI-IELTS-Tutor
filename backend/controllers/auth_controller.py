@@ -21,6 +21,7 @@ from core.security import (
     verify_password,
 )
 from core.validation import validate_email, validate_password
+from core.errors import AlreadyExistsError
 from models.user import RefreshToken, User
 
 from .base import CamelModel
@@ -120,10 +121,7 @@ class AuthController:
             select(User).where(User.email == payload.email.lower())
         )
         if existing is not None:
-            raise HTTPException(
-                status_code=status.HTTP_409_CONFLICT,
-                detail="An account with this email already exists",
-            )
+            raise AlreadyExistsError("An account with this email already exists")
         user = User(
             email=payload.email.lower(),
             password_hash=hash_password(payload.password),

@@ -18,6 +18,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from ai.orchestrator import AIOrchestrator, ScoringError
 from core.band_mapping import listening_band, reading_band
 from core.cefr import band_to_cefr, cefr_description
+from core.errors import ContentUnavailableError
 from core.predictor import round_half
 from models.content import AudioClip, ListeningQuestion, Passage, Question
 from models.profile import LearnerProfile
@@ -145,10 +146,7 @@ class DiagnosticController:
             .limit(1)
         )
         if passage is None or clip is None or prompt is None:
-            raise HTTPException(
-                status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-                detail="Diagnostic content is not available yet",
-            )
+            raise ContentUnavailableError("Diagnostic content is not available yet")
 
         reading_questions = (
             await session.execute(

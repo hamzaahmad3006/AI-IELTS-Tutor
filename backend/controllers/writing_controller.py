@@ -14,9 +14,16 @@ from models.attempt import WritingAttempt
 from models.user import User
 from models.writing_prompt import WritingPrompt
 
+from db.repository import OwnedRepository
+
 from .ai_usage_controller import record_ai_interaction
+
 from .base import CamelModel
 from .weakness_controller import WeaknessService, criteria_below_threshold
+
+#: Ownership-checked reads. Returns 404 rather than 403 for someone
+#: else's row, so an id cannot be confirmed by a stranger.
+_attempts = OwnedRepository(WritingAttempt, label="Attempt")
 
 
 class WritingSubmitRequest(CamelModel):
@@ -330,11 +337,5 @@ class WritingController:
     async def get(
         session: AsyncSession, user: User, attempt_id: str
     ) -> WritingResultResponse:
-        attempt = await session.scalar(
-            select(WritingAttempt).where(WritingAttempt.id == attempt_id)
-        )
-        if attempt is None or attempt.user_id != user.id:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND, detail="Attempt not found"
-            )
+        attempt = await _attempts.get_owned(session, attempt_id, user.id)
         return _to_response(attempt)
