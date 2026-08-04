@@ -14,6 +14,10 @@ from controllers.admin_users_controller import (
     AdminUserPage,
     UserUpdateRequest,
 )
+from controllers.admin_overview_controller import (
+    AdminOverview,
+    AdminOverviewController,
+)
 from controllers.ai_usage_controller import AIUsageController, AIUsageResponse
 from controllers.pagination import DEFAULT_LIMIT
 from db.session import get_db
@@ -24,6 +28,11 @@ router = APIRouter(prefix="/admin", tags=["admin"])
 
 AdminUser = Annotated[User, Depends(require_roles("admin", "super_admin"))]
 DbSession = Annotated[AsyncSession, Depends(get_db)]
+
+
+@router.get("/overview", response_model=AdminOverview)
+async def overview(current: AdminUser, session: DbSession) -> AdminOverview:
+    return await AdminOverviewController.overview(session)
 
 
 @router.get("/ai-usage", response_model=AIUsageResponse)

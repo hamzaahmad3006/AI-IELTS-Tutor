@@ -2,14 +2,14 @@
 
 Everything **not yet completed** to finish the project, organized by area. Checked = done, unchecked = remaining. Use this as the living backlog.
 
-> **Status as of PR #70** — **132 of 192 checklist items done (~69%)**. Weighted by
+> **Status as of PR #71** — **134 of 192 checklist items done (~70%)**. Weighted by
 > effort it is further along than that, since the backend and data layer are largely
 > complete while most remaining items are large features (live voice, deployment) or
 > are blocked on native modules.
 > **Running on real infrastructure:** live Supabase PostgreSQL 17.6 and the real Groq
 > API, verified on a physical Android phone — register → onboarding → dashboard → all
 > four practice modules → progress → coach → profile → logout.
-> **Verified by:** 26 backend smoke suites, a 13-step E2E user-journey check, 170
+> **Verified by:** 27 backend smoke suites, a 13-step E2E user-journey check, 170
 > frontend tests, ESLint at zero warnings, Prettier, `tsc --noEmit`, and a Docker image
 > build — all gated in CI on every push.
 > **Biggest remaining:** the live voice (LiveKit) pipeline, native audio playback,
@@ -294,7 +294,11 @@ Everything **not yet completed** to finish the project, organized by area. Check
 - [x] Groq provider adapter (OpenAI-compatible via httpx)
 - [x] Adaptive difficulty resolver (recent-band → easy/medium/hard, wired into Reading/Listening delivery) + weakness-driven recommendations (`/me/adaptive-difficulty`, `/me/recommendations`)
 - [x] AI orchestrator (Writing scoring) — [ ] full multi-task routing policy
-- [ ] Prompt registry (versioned templates) per module — partial (Writing rubric prompt exists)
+- [x] Prompt registry — every prompt has an id and a version, and the version is
+      written onto each `ai_interactions` row. Change a rubric's wording and the
+      bands it produces shift; without a recorded version, last month's 6.5 and
+      today's 6.5 are quietly different measurements. Rows written before the
+      registry stay null rather than being backfilled with a version they never used
 - [x] Rubric-as-code scoring schemas (Writing + Speaking)
 - [x] Structured-output validation (Pydantic) — [ ] bounded self-repair
 - [x] AI weakness memory: record from scored attempts (rising severity + decay), `GET /me/weaknesses` by priority — [ ] semantic (pgvector) retriever
@@ -322,7 +326,10 @@ Everything **not yet completed** to finish the project, organized by area. Check
 
 ## 9. Admin Panel (not started)
 
-- [ ] Admin auth + dashboard overview (KPIs)
+- [x] Admin dashboard overview — `GET /admin/overview`, RBAC-guarded (a learner
+      gets 403). Users, onboarded, active learners last week, attempts per module,
+      mock tests, active plans, AI calls/tokens/cost/failures, and the live prompt
+      versions. Every figure is a straight count over real rows; nothing estimated
 - [x] User management: list (paginated + search), suspend/reactivate, role assignment (privileged roles super-admin-gated), audit-logged
 - [x] Content management: reading passages + questions CRUD (audit-logged, RBAC content_editor/admin) — [ ] audio, cue cards, writing prompts, vocabulary, grammar lessons; versioning
 - [ ] Platform analytics & reports

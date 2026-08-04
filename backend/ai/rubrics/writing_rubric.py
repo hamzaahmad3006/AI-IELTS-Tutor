@@ -5,6 +5,7 @@ model is constrained to emit structured JSON only."""
 
 from __future__ import annotations
 
+from ai.prompts.registry import PromptTemplate, register
 from ai.provider import Message
 
 WRITING_CRITERIA = (
@@ -63,3 +64,16 @@ def build_writing_messages(
         {"role": "system", "content": system},
         {"role": "user", "content": essay},
     ]
+
+
+#: Registered so every score records which prompt version produced it.
+#: Bump the version whenever the wording changes in a way that could move
+#: bands - that is what makes older scores identifiable as a different basis.
+WRITING_PROMPT = register(
+    PromptTemplate(
+        id="writing.score",
+        version="1.0.0",
+        description="IELTS Writing Task 1/2 scoring against the four criteria.",
+        build=build_writing_messages,
+    )
+)

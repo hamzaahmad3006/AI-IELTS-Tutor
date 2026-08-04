@@ -28,3 +28,7 @@ class AIInteraction(Base, TimestampMixin):
     latency_ms: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
     cost_usd: Mapped[float] = mapped_column(Float, default=0.0, nullable=False)
     status: Mapped[str] = mapped_column(String(16), default="ok", nullable=False)
+    #: Which prompt produced this call. Null for rows written before the
+    #: registry existed - those genuinely have no known version.
+    prompt_id: Mapped[str | None] = mapped_column(String(60), nullable=True)
+    prompt_version: Mapped[str | None] = mapped_column(String(20), nullable=True)
