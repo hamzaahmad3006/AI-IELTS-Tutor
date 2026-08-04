@@ -5,7 +5,7 @@ from __future__ import annotations
 import uuid
 from datetime import datetime
 
-from sqlalchemy import Boolean, DateTime, ForeignKey, String
+from sqlalchemy import Boolean, DateTime, ForeignKey, Index, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from db.base import Base, TimestampMixin
@@ -33,6 +33,9 @@ class User(Base, TimestampMixin):
 
 class RefreshToken(Base, TimestampMixin):
     __tablename__ = "refresh_tokens"
+
+    # The retention sweep scans by expiry across all users.
+    __table_args__ = (Index("ix_refresh_tokens_expires", "expires_at"),)
 
     id: Mapped[str] = mapped_column(String(32), primary_key=True, default=_uuid)
     user_id: Mapped[str] = mapped_column(
