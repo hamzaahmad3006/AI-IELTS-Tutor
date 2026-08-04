@@ -19,6 +19,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from core.config import get_settings
 from core.logging import configure_logging
 from db.session import init_models, seed_admin
+from core.metrics import MetricsMiddleware
 from middleware import CorrelationIdMiddleware, register_exception_handlers
 from routes import api_router
 from routes.health import router as health_router
@@ -57,6 +58,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 app.add_middleware(CorrelationIdMiddleware)
+# Outermost of the two, so the duration it records includes the time spent
+# in every other middleware -- which is what a latency alert should fire on.
+app.add_middleware(MetricsMiddleware)
 
 register_exception_handlers(app)
 

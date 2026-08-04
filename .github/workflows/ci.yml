@@ -157,7 +157,18 @@ jobs:
             fi
             sleep 2
           done
+          # Readiness and metrics are checked in the container too, not only
+          # under TestClient: both depend on middleware order and on a real
+          # database connection, and neither is exercised by /health.
+          curl -fsS http://localhost:8000/ready > /tmp/ready.json || true
+          curl -fsS http://localhost:8000/metrics > /tmp/metrics.txt || true
           echo "--- container logs ---"; docker logs api | tail -30
           docker rm -f api > /dev/null
           if [ -z "$ok" ]; then echo "health check failed"; exit 1; fi
           grep -q '"status":"ok"' /tmp/health.json
+          grep -q '"ready":true' /tmp/ready.json
+          grep -q '"name":"database"' /tmp/ready.json
+          grep -q 'http_requests_total' /tmp/metrics.txt
+          # The route label must be a template. If a raw path ever appears here
+          # the cardinality guard has regressed.
+          grep -q 'route="/ready"' /tmp/metrics.txt

@@ -8,6 +8,7 @@ from sqlalchemy import case, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from ai.provider import LLMResult
+from core.metrics import record_ai_call
 from models.ai_interaction import AIInteraction
 
 from .base import CamelModel
@@ -31,6 +32,19 @@ async def record_ai_interaction(
     status: str = "ok",
 ) -> None:
     """Persist one AI call. Flushed together with the caller's transaction."""
+    cost = _estimate_cost(usage.provider, usage.total_tokens)
+
+    # Mirrored into Prometheus as well as the table: the row is the record of
+    # truth and survives a restart, but spend is something you want to be
+    # alerted on within a minute rather than discover on an invoice.
+    record_ai_call(
+        provider=usage.provider,
+        feature=feature,
+        status=status,
+        tokens=usage.total_tokens,
+        cost_usd=cost,
+    )
+
     session.add(
         AIInteraction(
             user_id=user_id,
@@ -41,7 +55,7 @@ async def record_ai_interaction(
             completion_tokens=usage.completion_tokens,
             total_tokens=usage.total_tokens,
             latency_ms=usage.latency_ms,
-            cost_usd=_estimate_cost(usage.provider, usage.total_tokens),
+            cost_usd=cost,
             status=status,
             # Stamped by the orchestrator from the registry, so a score can
             # always be traced to the prompt revision that produced it.
