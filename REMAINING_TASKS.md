@@ -2,14 +2,14 @@
 
 Everything **not yet completed** to finish the project, organized by area. Checked = done, unchecked = remaining. Use this as the living backlog.
 
-> **Status as of PR #73** — **139 of 195 checklist items done (~71%)**. Weighted by
+> **Status as of PR #74** — **141 of 196 checklist items done (~72%)**. Weighted by
 > effort it is further along than that, since the backend and data layer are largely
 > complete while most remaining items are large features (live voice, deployment) or
 > are blocked on native modules.
 > **Running on real infrastructure:** live Supabase PostgreSQL 17.6 and the real Groq
 > API, verified on a physical Android phone — register → onboarding → dashboard → all
 > four practice modules → progress → coach → profile → logout.
-> **Verified by:** 30 backend smoke suites, a 13-step E2E user-journey check, 170
+> **Verified by:** 31 backend smoke suites, a 13-step E2E user-journey check, 170
 > frontend tests, ESLint at zero warnings, Prettier, `tsc --noEmit`, and a Docker image
 > build — all gated in CI on every push.
 > **Biggest remaining:** the live voice (LiveKit) pipeline, native audio playback,
@@ -371,8 +371,9 @@ Everything **not yet completed** to finish the project, organized by area. Check
 - [x] Dockerfile (api, multi-stage, non-root) + docker-compose (API + Postgres) + CI image build & health check — [ ] worker/voice images
 - [ ] Environment configs (dev/staging/prod)
 - [x] CI: backend compile + Alembic up/down + smoke suites on every push/PR (GitHub Actions) — [ ] frontend typecheck/build, lint, deploy stages
-- [ ] Observability: metrics (Prometheus), tracing (OpenTelemetry), dashboards + alerts
-- [ ] Health/readiness probes wired to real dependencies
+- [x] Observability: Prometheus metrics at `/metrics` (request count/latency/in-flight + AI calls, tokens, estimated spend)
+- [ ] Observability: tracing (OpenTelemetry), dashboards + alerts
+- [x] Health/readiness probes wired to real dependencies — `/ready` returns 503 when Postgres is unreachable; `/health` stays liveness-only
 - [ ] Kubernetes manifests / Helm (future)
 - [ ] Secrets management integration
 - [ ] Crash reporting (Sentry) + analytics events
