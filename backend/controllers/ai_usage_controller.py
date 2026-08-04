@@ -43,6 +43,10 @@ async def record_ai_interaction(
             latency_ms=usage.latency_ms,
             cost_usd=_estimate_cost(usage.provider, usage.total_tokens),
             status=status,
+            # Stamped by the orchestrator from the registry, so a score can
+            # always be traced to the prompt revision that produced it.
+            prompt_id=usage.meta.get("promptId"),
+            prompt_version=usage.meta.get("promptVersion"),
         )
     )
 

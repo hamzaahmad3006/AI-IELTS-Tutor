@@ -5,9 +5,10 @@ from __future__ import annotations
 
 from pydantic import BaseModel, Field
 
+import ai.prompts  # noqa: F401  (registers the templates)
+from ai.prompts.registry import PromptTemplate, build as build_prompt
 from ai.provider import LLMProvider, LLMResult
-from ai.rubrics.speaking_rubric import build_speaking_messages
-from ai.rubrics.writing_rubric import build_writing_messages, round_ielts
+from ai.rubrics.writing_rubric import round_ielts
 
 
 class WritingScore(BaseModel):
@@ -44,6 +45,12 @@ class SpeakingScore(BaseModel):
     issues: list[ScoreIssue] = Field(default_factory=list)
 
 
+def _stamp(result: LLMResult, template: PromptTemplate) -> None:
+    """Record which prompt produced this call, alongside provider and model."""
+    result.meta["promptId"] = template.id
+    result.meta["promptVersion"] = template.version
+
+
 class ScoringError(Exception):
     """Raised when the provider output cannot be parsed into a valid score."""
 
@@ -55,7 +62,12 @@ class AIOrchestrator:
     async def score_writing(
         self, *, essay: str, task_type: int, weakness_summary: str = ""
     ) -> tuple[WritingScore, LLMResult]:
-        messages = build_writing_messages(essay, task_type, weakness_summary)
+        messages, template = build_prompt(
+            "writing.score",
+            essay=essay,
+            task_type=task_type,
+            weakness_summary=weakness_summary,
+        )
         result = await self._provider.complete(
             messages=messages, json_object=True, temperature=0.2, max_tokens=1200
         )
@@ -81,12 +93,18 @@ class AIOrchestrator:
             )
             / 4.0
         )
+        _stamp(result, template)
         return score, result
 
     async def score_speaking(
         self, *, transcript: str, part: int | None = None, weakness_summary: str = ""
     ) -> tuple[SpeakingScore, LLMResult]:
-        messages = build_speaking_messages(transcript, part, weakness_summary)
+        messages, template = build_prompt(
+            "speaking.score",
+            transcript=transcript,
+            part=part,
+            weakness_summary=weakness_summary,
+        )
         result = await self._provider.complete(
             messages=messages, json_object=True, temperature=0.2, max_tokens=800
         )
@@ -111,4 +129,5 @@ class AIOrchestrator:
             )
             / 4.0
         )
+        _stamp(result, template)
         return score, result

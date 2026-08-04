@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from ai.prompts.registry import PromptTemplate, register
 from ai.provider import Message
 
 SPEAKING_CRITERIA = (
@@ -59,3 +60,16 @@ def build_speaking_messages(
         {"role": "system", "content": system},
         {"role": "user", "content": transcript},
     ]
+
+
+#: Version 1.1.0 rather than 1.0.0: the `issues` field was added to the schema,
+#: which changes what the model returns. Scores from before that point came
+#: from a prompt that never asked for quoted evidence.
+SPEAKING_PROMPT = register(
+    PromptTemplate(
+        id="speaking.score",
+        version="1.1.0",
+        description="IELTS Speaking scoring plus quoted transcript issues.",
+        build=build_speaking_messages,
+    )
+)
