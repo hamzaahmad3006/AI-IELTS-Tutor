@@ -7,13 +7,18 @@ from __future__ import annotations
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from core.adaptive import (
+    CONCRETE_DIFFICULTIES,
+    HISTORY_WINDOW,
+    ema,
+    level_for,
+    resolve_level,
+)
 from models.user import User
 
 from .analytics_controller import MODULES, _module_points
 from .base import CamelModel
 from .weakness_controller import WeaknessService
-
-CONCRETE_DIFFICULTIES = ("easy", "medium", "hard")
 
 # Human guidance for a weakness tag -> (title, action).
 _TAG_GUIDANCE: dict[str, tuple[str, str]] = {
@@ -66,17 +71,24 @@ async def resolve_difficulty(
     Returns (difficulty, recent_band, rationale).
     """
     points = await _module_points(session, user_id, module)
-    bands = [b for _, b in points][-5:]
+    bands = [b for _, b in points][-HISTORY_WINDOW:]
     if not bands:
         return "medium", None, "No history yet; starting at medium."
-    avg = sum(bands) / len(bands)
-    if avg < 5.0:
-        difficulty = "easy"
-    elif avg <= 6.5:
-        difficulty = "medium"
-    else:
-        difficulty = "hard"
-    return difficulty, round(avg, 1), f"Recent average band {avg:.1f} maps to {difficulty}."
+
+    # The level currently in force is the one the history *before* this attempt
+    # implies. Deriving it beats storing it: no extra column to keep in sync,
+    # and the answer stays correct if attempts are backfilled or deleted.
+    prior_score = ema(bands[:-1])
+    current = level_for(prior_score) if prior_score is not None else None
+
+    # Only a weakness in this module should hold back this module's level.
+    weaknesses = await WeaknessService.list_for_user(session, user_id)
+    module_severities = [
+        w.severity for w in weaknesses.items if w.module == module
+    ]
+    top_severity = max(module_severities, default=0.0)
+
+    return resolve_level(bands, current=current, top_severity=top_severity)
 
 
 class AdaptiveController:

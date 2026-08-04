@@ -3,8 +3,13 @@
 from __future__ import annotations
 
 import os
+import sys
+from pathlib import Path
 
 os.environ.setdefault("DATABASE_URL", "sqlite+aiosqlite:///./test_ratelimit.db")
+
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+import tests._env  # noqa: E402,F401  (pins AI_PROVIDER=mock before settings load)
 # Enable limiting with a low login limit so the breach is quick to trigger.
 os.environ["RATE_LIMIT_ENABLED"] = "true"
 os.environ["RATE_LIMIT_LOGIN_PER_MIN"] = "3"

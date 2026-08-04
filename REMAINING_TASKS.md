@@ -2,14 +2,14 @@
 
 Everything **not yet completed** to finish the project, organized by area. Checked = done, unchecked = remaining. Use this as the living backlog.
 
-> **Status as of PR #71** — **134 of 192 checklist items done (~70%)**. Weighted by
+> **Status as of PR #72** — **135 of 193 checklist items done (~70%)**. Weighted by
 > effort it is further along than that, since the backend and data layer are largely
 > complete while most remaining items are large features (live voice, deployment) or
 > are blocked on native modules.
 > **Running on real infrastructure:** live Supabase PostgreSQL 17.6 and the real Groq
 > API, verified on a physical Android phone — register → onboarding → dashboard → all
 > four practice modules → progress → coach → profile → logout.
-> **Verified by:** 27 backend smoke suites, a 13-step E2E user-journey check, 170
+> **Verified by:** 28 backend smoke suites, a 13-step E2E user-journey check, 170
 > frontend tests, ESLint at zero warnings, Prettier, `tsc --noEmit`, and a Docker image
 > build — all gated in CI on every push.
 > **Biggest remaining:** the live voice (LiveKit) pipeline, native audio playback,
@@ -302,11 +302,11 @@ Everything **not yet completed** to finish the project, organized by area. Check
 - [x] Rubric-as-code scoring schemas (Writing + Speaking)
 - [x] Structured-output validation (Pydantic) — [ ] bounded self-repair
 - [x] AI weakness memory: record from scored attempts (rising severity + decay), `GET /me/weaknesses` by priority — [ ] semantic (pgvector) retriever
-- [ ] Adaptive difficulty controller (EMA + severity decay)
+- [x] Adaptive difficulty controller (EMA + severity decay)
 - [x] Band predictor (transparent heuristic: weekly velocity + projection + confidence)
 - [ ] Question/passage/audio generation
 - [x] AI usage logging: `ai_interactions` table (provider/model/tokens/latency/cost) written on every scoring call
-- [ ] Offline eval harness (gold-set MAE gate)
+- [x] Offline eval harness (gold-set MAE gate)
 - [ ] Future adapters scaffolding (LangGraph / CrewAI / AutoGen / OpenAI / Gemini / Claude)
 
 ---
