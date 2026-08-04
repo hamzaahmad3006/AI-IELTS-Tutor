@@ -5,7 +5,7 @@ from __future__ import annotations
 import uuid
 from typing import Any
 
-from sqlalchemy import JSON, Float, ForeignKey, Integer, String
+from sqlalchemy import Float, ForeignKey, Index, Integer, JSON, String
 from sqlalchemy.orm import Mapped, mapped_column
 
 from db.base import Base, TimestampMixin
@@ -17,6 +17,11 @@ def _uuid() -> str:
 
 class ReadingAttempt(Base, TimestampMixin):
     __tablename__ = "reading_attempts"
+
+    # Serves "this user's rows, in time order" without a sort step.
+    __table_args__ = (
+        Index("ix_reading_attempts_user_created", "user_id", "created_at"),
+    )
 
     id: Mapped[str] = mapped_column(String(32), primary_key=True, default=_uuid)
     user_id: Mapped[str] = mapped_column(

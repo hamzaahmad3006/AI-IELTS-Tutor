@@ -41,6 +41,29 @@ def run() -> None:
         assert body["status"] == 429
         assert "correlationId" in body
 
+        # Correct credentials do not buy a way past the limiter. If they did,
+        # the limit would only slow down people who type accurately -- which is
+        # the opposite of what a brute-force defence is for, since the attacker
+        # stops exactly when they start typing accurately.
+        client.post(
+            "/v1/auth/register",
+            json={
+                "fullName": "Rate Limited",
+                "email": "ratelimited@example.com",
+                "password": "StrongPass123",
+            },
+        )
+        r = client.post(
+            "/v1/auth/login",
+            json={"email": "ratelimited@example.com", "password": "StrongPass123"},
+        )
+        assert r.status_code == 429, r.status_code
+
+        # The limiter is scoped, not global: exhausting login must not take the
+        # rest of the API down with it. A defence that becomes a self-inflicted
+        # outage gets switched off in production.
+        assert client.get("/health").status_code == 200
+
     print("RATE LIMIT SMOKE TEST PASSED")
 
 

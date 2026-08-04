@@ -5,7 +5,7 @@ from __future__ import annotations
 import uuid
 from datetime import datetime, timezone
 
-from sqlalchemy import Boolean, DateTime, Float, ForeignKey, Integer, String, UniqueConstraint
+from sqlalchemy import Boolean, DateTime, Float, ForeignKey, Index, Integer, String, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column
 
 from db.base import Base, TimestampMixin
@@ -22,6 +22,7 @@ def _utcnow() -> datetime:
 class Weakness(Base, TimestampMixin):
     __tablename__ = "weaknesses"
     __table_args__ = (
+        Index("ix_weaknesses_user_resolved", "user_id", "resolved"),
         UniqueConstraint("user_id", "module", "tag", name="uq_weakness_user_module_tag"),
     )
 

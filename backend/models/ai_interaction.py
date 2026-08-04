@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import uuid
 
-from sqlalchemy import Float, Integer, String
+from sqlalchemy import Float, Index, Integer, String
 from sqlalchemy.orm import Mapped, mapped_column
 
 from db.base import Base, TimestampMixin
@@ -16,6 +16,12 @@ def _uuid() -> str:
 
 class AIInteraction(Base, TimestampMixin):
     __tablename__ = "ai_interactions"
+
+    # Serves "this user's rows, in time order" without a sort step.
+    __table_args__ = (
+        Index("ix_ai_interactions_user_created", "user_id", "created_at"),
+        Index("ix_ai_interactions_created", "created_at"),
+    )
 
     id: Mapped[str] = mapped_column(String(32), primary_key=True, default=_uuid)
     user_id: Mapped[str | None] = mapped_column(String(32), index=True, nullable=True)
