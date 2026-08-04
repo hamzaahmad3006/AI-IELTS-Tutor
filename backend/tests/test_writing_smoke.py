@@ -4,8 +4,13 @@ provider, so no Groq key is required)."""
 from __future__ import annotations
 
 import os
+import sys
+from pathlib import Path
 
 os.environ.setdefault("DATABASE_URL", "sqlite+aiosqlite:///./test_writing.db")
+
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+import tests._env  # noqa: E402,F401  (pins AI_PROVIDER=mock before settings load)
 
 from fastapi.testclient import TestClient  # noqa: E402
 

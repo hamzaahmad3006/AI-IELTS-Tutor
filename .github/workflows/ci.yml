@@ -45,6 +45,16 @@ jobs:
       - name: Smoke test suites
         run: python tests/run_smoke.py
 
+      # Runs against the mock provider, so this does not measure model accuracy
+      # and the thresholds are deliberately wide. What it catches is a scoring
+      # path that has broken or drifted hard: a prompt edit that stops parsing,
+      # rounding that silently disappears, a scorer that collapses to a
+      # constant. Tightening these would only pin the stub's own behaviour.
+      - name: Scoring eval (mock provider)
+        env:
+          DATABASE_URL: sqlite+aiosqlite:///./ci_evals.db
+        run: python -m evals --max-mae 1.5 --max-bias 1.0
+
   journey:
     name: E2E user journey (live API)
     runs-on: ubuntu-latest

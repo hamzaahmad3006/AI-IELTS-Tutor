@@ -3,8 +3,13 @@
 from __future__ import annotations
 
 import os
+import sys
+from pathlib import Path
 
 os.environ.setdefault("DATABASE_URL", "sqlite+aiosqlite:///./test_errors.db")
+
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+import tests._env  # noqa: E402,F401  (pins AI_PROVIDER=mock before settings load)
 # This suite exercises validation, not rate limiting (it registers repeatedly).
 os.environ.setdefault("RATE_LIMIT_ENABLED", "false")
 
