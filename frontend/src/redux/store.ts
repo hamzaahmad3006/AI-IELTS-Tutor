@@ -17,6 +17,7 @@ import { onboardingReducer } from './slices/onboardingSlice';
 import { dashboardReducer } from './slices/dashboardSlice';
 import { themeReducer } from './slices/themeSlice';
 import { toastReducer } from './slices/toastSlice';
+import { offlineReducer } from './slices/offlineSlice';
 
 const rootReducer = combineReducers({
   auth: authReducer,
@@ -24,12 +25,15 @@ const rootReducer = combineReducers({
   dashboard: dashboardReducer,
   theme: themeReducer,
   toast: toastReducer,
+  offline: offlineReducer,
 });
 
 const persistConfig = {
   key: 'root',
   storage: AsyncStorage,
-  whitelist: ['auth', 'theme'], // only persist auth session + theme mode
+  // `offline` is persisted because a queue that empties on restart would
+  // silently discard the very work it exists to protect.
+  whitelist: ['auth', 'theme', 'offline'],
 };
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

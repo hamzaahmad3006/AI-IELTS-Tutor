@@ -10,14 +10,23 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { NavigationContainer } from '@react-navigation/native';
 import { Provider } from 'react-redux';
 import { PersistGate } from 'redux-persist/integration/react';
-import { store, persistor, refreshThunk, logout, showToast } from './src/redux';
+import {
+  store,
+  persistor,
+  refreshThunk,
+  logout,
+  showToast,
+  connectivityChanged,
+  drainQueue,
+} from './src/redux';
 import {
   setAuthTokenProvider,
   setAuthFailureHandler,
+  setConnectivityReporter,
   setErrorReporter,
   setRefreshHandler,
 } from './src/api';
-import { ErrorBoundary, ToastHost } from './src/components';
+import { ErrorBoundary, OfflineBanner, ToastHost } from './src/components';
 import { RootNavigator } from './src/AppNavigation';
 import { PALETTE } from './src/constants';
 
@@ -58,6 +67,19 @@ setErrorReporter(message => {
   store.dispatch(showToast({ message, tone: 'error' }));
 });
 
+// Connectivity is inferred from whether requests land. When it comes back and
+// something is queued, replay it — that is the only reliable moment to know
+// the server is reachable without a native connectivity API.
+setConnectivityReporter(isOffline => {
+  const wasOffline = store.getState().offline.isOffline;
+  if (wasOffline !== isOffline) {
+    store.dispatch(connectivityChanged(isOffline));
+  }
+  if (!isOffline && store.getState().offline.queue.length > 0) {
+    void drainQueue(store.dispatch, store.getState);
+  }
+});
+
 const Loading: React.FC = () => (
   <View style={styles.loading}>
     <ActivityIndicator size="large" color={PALETTE.indigo} />
@@ -70,6 +92,9 @@ const App: React.FC = () => (
       <PersistGate loading={<Loading />} persistor={persistor}>
         <SafeAreaProvider>
           <ErrorBoundary>
+            {/* Above the navigator so the status is visible on every screen
+                rather than only where someone remembered to add it. */}
+            <OfflineBanner />
             <NavigationContainer>
               <RootNavigator />
             </NavigationContainer>

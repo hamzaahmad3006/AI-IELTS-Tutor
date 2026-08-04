@@ -4,7 +4,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { plannerApi } from '@api';
-import { showToast, useAppDispatch } from '@redux';
+import { enqueue, showToast, useAppDispatch } from '@redux';
 import type { PlanTask, RootStackParamList, StudyPlan } from '@models';
 
 type Nav = NativeStackNavigationProp<RootStackParamList>;
@@ -88,7 +88,26 @@ export const usePlan = (): UsePlanResult => {
             }
           : current,
       );
-      plannerApi.setTaskDone(task.id, next).catch(() => {
+      plannerApi.setTaskDone(task.id, next).catch(sendError => {
+        // A request that never reached the server is not a failed edit, it is
+        // an unsent one. Queue it and keep the tick, rather than rolling back
+        // work the learner did and making them do it again.
+        const unreachable =
+          typeof sendError === 'object' &&
+          sendError !== null &&
+          (sendError as { status?: number }).status === 0;
+
+        if (unreachable) {
+          dispatch(
+            enqueue({
+              kind: 'planTask',
+              targetId: task.id,
+              payload: { isDone: next },
+            }),
+          );
+          return;
+        }
+
         setPlan(current =>
           current
             ? {

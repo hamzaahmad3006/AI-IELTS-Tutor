@@ -37,6 +37,7 @@ export {
   type TimerState,
 } from './Timer/useCountdown';
 export { ToastHost } from './Toast/ToastHost';
+export { OfflineBanner } from './OfflineBanner/OfflineBanner';
 export { BottomSheet } from './BottomSheet/BottomSheet';
 export { ConsentSheet, type ConsentValues } from './ConsentSheet/ConsentSheet';
 export {
