@@ -18,6 +18,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from controllers.analytics_controller import MODULES, _module_points
 from core.predictor import round_half
+from core.errors import NotFoundError, PreconditionError
+from db.repository import OwnedRepository
 from models.plan import PlanTask, StudyPlan
 from models.profile import LearnerProfile
 from models.user import User
@@ -26,6 +28,8 @@ from models.weakness import Weakness
 from .base import CamelModel
 
 logger = logging.getLogger("api.planner")
+
+_plans = OwnedRepository(StudyPlan, label="Study plan")
 
 MODULE_LABELS = {
     "speaking": "Speaking",
@@ -128,10 +132,7 @@ class PlannerController:
             select(LearnerProfile).where(LearnerProfile.user_id == user.id)
         )
         if profile is None:
-            raise HTTPException(
-                status_code=status.HTTP_409_CONFLICT,
-                detail="Complete onboarding before generating a plan",
-            )
+            raise PreconditionError("Complete onboarding before generating a plan")
 
         target = profile.target_band
         weeks = _weeks_until(profile.exam_date)
@@ -252,17 +253,11 @@ class PlannerController:
     ) -> PlanTaskOut:
         task = await session.scalar(select(PlanTask).where(PlanTask.id == task_id))
         if task is None:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND, detail="Task not found"
-            )
-        # Ownership is checked through the plan rather than trusting the id.
-        plan = await session.scalar(
-            select(StudyPlan).where(StudyPlan.id == task.plan_id)
-        )
-        if plan is None or plan.user_id != user.id:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND, detail="Task not found"
-            )
+            raise NotFoundError("Task not found")
+        # Ownership runs through the plan rather than trusting the task id.
+        # A plan belonging to someone else raises NotFound too, so the id is
+        # never confirmed to a stranger.
+        await _plans.get_owned(session, task.plan_id, user.id)
 
         task.is_done = done
         return PlanTaskOut(

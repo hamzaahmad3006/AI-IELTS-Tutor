@@ -19,6 +19,8 @@ from ai.orchestrator import AIOrchestrator
 from core.predictor import round_half
 from models.content import AudioClip, Passage
 from models.cue_card import CueCard
+from core.errors import AlreadySubmittedError, ContentUnavailableError
+from db.repository import OwnedRepository
 from models.mock_test import MockTest
 from models.profile import LearnerProfile
 from models.user import User
@@ -35,6 +37,8 @@ from .writing_controller import WritingController, WritingSubmitRequest
 from .writing_controller import _ensure_prompts_seeded
 
 logger = logging.getLogger("api.mock_test")
+
+_tests = OwnedRepository(MockTest, label="Mock test")
 
 MODULES = ("listening", "reading", "writing", "speaking")
 
@@ -116,10 +120,7 @@ class MockTestController:
             select(CueCard).order_by(func.random()).limit(1)
         )
         if passage is None or clip is None or prompt is None or cue_card is None:
-            raise HTTPException(
-                status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-                detail="Mock test content is not available yet",
-            )
+            raise ContentUnavailableError("Mock test content is not available yet")
 
         test = MockTest(
             user_id=user.id,
@@ -141,18 +142,9 @@ class MockTestController:
         payload: MockSubmission,
         orchestrator: AIOrchestrator,
     ) -> MockResultOut:
-        test = await session.scalar(
-            select(MockTest).where(MockTest.id == test_id)
-        )
-        if test is None or test.user_id != user.id:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND, detail="Mock test not found"
-            )
+        test = await _tests.get_owned(session, test_id, user.id)
         if test.status == "completed":
-            raise HTTPException(
-                status_code=status.HTTP_409_CONFLICT,
-                detail="This mock test has already been submitted",
-            )
+            raise AlreadySubmittedError("This mock test has already been submitted")
 
         # Each section goes through its own controller, so real attempts are
         # created and everything downstream updates.

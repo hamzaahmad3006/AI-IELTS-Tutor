@@ -16,8 +16,15 @@ from core.highlights import resolve_highlights
 from models.speaking import SpeakingAttempt
 from models.user import User
 
+from db.repository import OwnedRepository
+
 from .ai_usage_controller import record_ai_interaction
+
 from .base import CamelModel
+
+#: Ownership-checked reads. Returns 404 rather than 403 for someone
+#: else's row, so an id cannot be confirmed by a stranger.
+_attempts = OwnedRepository(SpeakingAttempt, label="Attempt")
 from .weakness_controller import WeaknessService, criteria_below_threshold
 
 
@@ -248,11 +255,5 @@ class SpeakingController:
     async def get(
         session: AsyncSession, user: User, attempt_id: str
     ) -> SpeakingResultResponse:
-        attempt = await session.scalar(
-            select(SpeakingAttempt).where(SpeakingAttempt.id == attempt_id)
-        )
-        if attempt is None or attempt.user_id != user.id:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND, detail="Attempt not found"
-            )
+        attempt = await _attempts.get_owned(session, attempt_id, user.id)
         return _to_response(attempt)
