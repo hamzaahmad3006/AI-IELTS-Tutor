@@ -2,18 +2,19 @@
 
 Everything **not yet completed** to finish the project, organized by area. Checked = done, unchecked = remaining. Use this as the living backlog.
 
-> **Status as of PR #69** — **130 of 192 checklist items done (~68%)**. Weighted by
+> **Status as of PR #70** — **132 of 192 checklist items done (~69%)**. Weighted by
 > effort it is further along than that, since the backend and data layer are largely
 > complete while most remaining items are large features (live voice, deployment) or
 > are blocked on native modules.
 > **Running on real infrastructure:** live Supabase PostgreSQL 17.6 and the real Groq
 > API, verified on a physical Android phone — register → onboarding → dashboard → all
 > four practice modules → progress → coach → profile → logout.
-> **Verified by:** 26 backend smoke suites, a 13-step E2E user-journey check, 154
+> **Verified by:** 26 backend smoke suites, a 13-step E2E user-journey check, 170
 > frontend tests, ESLint at zero warnings, Prettier, `tsc --noEmit`, and a Docker image
 > build — all gated in CI on every push.
 > **Biggest remaining:** the live voice (LiveKit) pipeline, native audio playback,
-> production deployment, and iOS — all of which need hardware or hosting to verify.
+> secure token storage, production deployment, and iOS — all of which need hardware,
+> a native rebuild, or hosting to verify.
 
 ---
 
@@ -177,9 +178,11 @@ Everything **not yet completed** to finish the project, organized by area. Check
       behind a type-DELETE confirmation. AI usage rows are anonymised rather than
       deleted so historical cost reporting stays honest, and the audit row outlives
       the account
-- [ ] Offline mode banner + sync status UI — `EmptyState variant="offline"` and the
-      network-error toast exist, but true connectivity *detection* needs
-      `@react-native-community/netinfo` (native module + rebuild)
+- [x] Offline banner + sync status — app-wide strip showing offline state and how
+      many changes are held locally. Connectivity is **inferred from whether
+      requests reach the server**, not read from the OS: a real connectivity API
+      needs `@react-native-community/netinfo`, a native module. The banner states
+      that limitation rather than implying live monitoring
 
 ---
 
@@ -213,8 +216,14 @@ Everything **not yet completed** to finish the project, organized by area. Check
 - [x] **Mock data can never reach a release build** (`useMock` is gated on `__DEV__`, guarded by a test). Dev still defaults to fixtures via `USE_MOCK_IN_DEV` — [ ] set it to false once a backend is routinely running
 - [ ] Tree-shake fixture data out of release bundles (currently ~11.5 KB / 0.66% of the bundle ships unused but is never served)
 - [x] Token refresh flow (single-flight 401 → refresh → retry; server logout via `logoutThunk`) — verified against a live backend — [ ] wire remaining screens off mock
-- [ ] Secure token storage (Keychain/Keystore) instead of plain AsyncStorage
-- [ ] Offline queue + deferred sync + conflict resolution
+- [ ] Secure token storage (Keychain/Keystore) — needs `react-native-keychain`, a
+      native module. **Not attempted**: with no device attached it could not be
+      verified, and unverified native auth code is worse than none
+- [x] Offline queue + deferred sync — writes that never reach the server are
+      queued and persisted, then replayed oldest-first when connectivity returns.
+      Conflict policy is last-write-wins **per target**, collapsed at enqueue time:
+      toggling a task on/off/on offline sends one final state, not three writes
+      that race. An exhausted item stays queued rather than being deleted
 - [ ] Push notifications / reminders integration
 - [x] Error boundary + global error handling (`ErrorBoundary` at the root; requests
       that never reach the server raise a toast, HTTP errors stay with the screen)

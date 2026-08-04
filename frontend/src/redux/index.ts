@@ -7,3 +7,5 @@ export * from './slices/onboardingSlice';
 export * from './slices/dashboardSlice';
 export * from './slices/themeSlice';
 export * from './slices/toastSlice';
+export * from './slices/offlineSlice';
+export { drainQueue, MAX_ATTEMPTS } from './offlineSync';

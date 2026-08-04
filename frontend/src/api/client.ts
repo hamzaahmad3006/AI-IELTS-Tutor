@@ -20,11 +20,14 @@ type RefreshHandler = () => Promise<string | null>;
 type AuthFailureHandler = () => void;
 /** Reports a request failure to the user (wired to the toast queue). */
 type ErrorReporter = (message: string) => void;
+/** Notified whether the last request reached the server at all. */
+type ConnectivityReporter = (isOffline: boolean) => void;
 
 let getAccessToken: TokenProvider = () => null;
 let refreshHandler: RefreshHandler | null = null;
 let authFailureHandler: AuthFailureHandler | null = null;
 let errorReporter: ErrorReporter | null = null;
+let connectivityReporter: ConnectivityReporter | null = null;
 let refreshInFlight: Promise<string | null> | null = null;
 
 export const setAuthTokenProvider = (provider: TokenProvider): void => {
@@ -61,6 +64,20 @@ export const setErrorReporter = (reporter: ErrorReporter): void => {
   errorReporter = reporter;
 };
 
+/**
+ * Wire connectivity inference (set from the app root).
+ *
+ * Connectivity is derived from whether requests reach the server, rather than
+ * read from the OS: a real connectivity API needs a native module. The
+ * trade-off is that going offline is only noticed on the next request, which
+ * the UI states rather than hides.
+ */
+export const setConnectivityReporter = (
+  reporter: ConnectivityReporter,
+): void => {
+  connectivityReporter = reporter;
+};
+
 interface RetryableConfig extends InternalAxiosRequestConfig {
   _retry?: boolean;
 }
@@ -83,7 +100,11 @@ apiClient.interceptors.request.use(
 
 // On 401, refresh the access token once (single-flight) and retry the request.
 apiClient.interceptors.response.use(
-  response => response,
+  response => {
+    // Any response at all means the server was reachable.
+    connectivityReporter?.(false);
+    return response;
+  },
   async (error: AxiosError): Promise<unknown> => {
     const original = error.config as RetryableConfig | undefined;
     const status = error.response?.status;
@@ -120,9 +141,12 @@ apiClient.interceptors.response.use(
     // API host, backend down, DNS failure. The user cannot fix that from the
     // screen they are on, so it is surfaced globally.
     if (!error.response) {
+      connectivityReporter?.(true);
       errorReporter?.(
         'No connection to the server. Check your network and try again.',
       );
+    } else {
+      connectivityReporter?.(false);
     }
     return Promise.reject(error);
   },
