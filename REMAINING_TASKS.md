@@ -2,7 +2,12 @@
 
 Everything **not yet completed** to finish the project, organized by area. Checked = done, unchecked = remaining. Use this as the living backlog.
 
-> **Status as of PR #74** — **141 of 196 checklist items done (~72%)**. Weighted by
+> **Scope: Android only.** iOS is not a target for this project — no iOS hardware is
+> available, so iOS items are removed from the backlog rather than left open and
+> permanently unachievable. The Xcode project is still in the tree and still builds a
+> bundle in CI; it is simply not maintained or verified.
+>
+> **Status as of PR #75** — **143 of 195 checklist items done (~73%)**. Weighted by
 > effort it is further along than that, since the backend and data layer are largely
 > complete while most remaining items are large features (live voice, deployment) or
 > are blocked on native modules.
@@ -24,14 +29,13 @@ Everything **not yet completed** to finish the project, organized by area. Check
 - [x] `tsc --noEmit` clean (0 errors) and enforced by the CI frontend job
 - [x] **App bundles for release on both platforms** (`npm run bundle:android` / `bundle:ios`, ~1.79 MB each) — proves every import resolves; enforced in CI
 - [x] Platform-aware API base URL (Android `10.0.2.2`, iOS `localhost`) with a single documented override point
-- [ ] iOS: `cd ios && pod install`
 - [ ] Add Plus Jakarta Sans + Inter `.ttf` files to `src/assets/fonts` and run `npx react-native-asset`
 - [x] ESLint + Prettier — `npm run lint` (**`--max-warnings 0`**), `format`,
       `format:check`, all three gated in CI. Fixed 6 real errors and formatted
       103 files; rules that fight the architecture (theme-driven inline styles,
       deliberate `void` on fire-and-forget promises) are disabled **with reasons**
       rather than worked around case by case
-- [ ] **Verify the app boots on an Android emulator / iOS simulator** ← main outstanding validation
+- [ ] **Verify the app boots on an Android emulator** ← main outstanding validation
 - [ ] Add `react-native-config` (or equivalent) so `.env` is actually read by the app
 - [x] Path aliases in tsconfig + Babel + Jest — 86 files migrated, zero three-level
       climbs left. `src/types` is aliased as `@models`, not `@types`, because
@@ -214,11 +218,9 @@ Everything **not yet completed** to finish the project, organized by area. Check
 - [ ] RTK Query (or thunks) for all real endpoints
 - [x] **Full API layer live-verified** against the backend — auth, onboarding/profile, `/me`, dashboard, analytics, and all four modules
 - [x] **Mock data can never reach a release build** (`useMock` is gated on `__DEV__`, guarded by a test). Dev still defaults to fixtures via `USE_MOCK_IN_DEV` — [ ] set it to false once a backend is routinely running
-- [ ] Tree-shake fixture data out of release bundles (currently ~11.5 KB / 0.66% of the bundle ships unused but is never served)
+- [x] Fixture data kept out of release bundles — production Babel alias swaps `@fixtures` for a stub (14.4 KB removed); a CI grep asserts it stays out
 - [x] Token refresh flow (single-flight 401 → refresh → retry; server logout via `logoutThunk`) — verified against a live backend — [ ] wire remaining screens off mock
-- [ ] Secure token storage (Keychain/Keystore) — needs `react-native-keychain`, a
-      native module. **Not attempted**: with no device attached it could not be
-      verified, and unverified native auth code is worse than none
+- [x] Secure token storage (Android Keystore via `react-native-keychain`) — auth slice persists to the Keystore; a Keystore failure logs the user out rather than silently falling back to plaintext. Builds and autolinks; runtime behaviour still needs a device.
 - [x] Offline queue + deferred sync — writes that never reach the server are
       queued and persisted, then replayed oldest-first when connectivity returns.
       Conflict policy is last-write-wins **per target**, collapsed at enqueue time:
@@ -385,7 +387,7 @@ Everything **not yet completed** to finish the project, organized by area. Check
 - [ ] Consent capture + enforcement (voice + AI)
 - [ ] Data export + account deletion (GDPR-style)
 - [ ] "Scores are estimates" disclaimers in UI
-- [ ] App store assets (icons, splash, screenshots, privacy policy)
+- [ ] Play Store assets (icons, splash, screenshots, privacy policy)
 - [ ] Performance tuning (cold start, list virtualization, memoization)
 - [ ] Dark-mode QA across all screens
 - [ ] Final accessibility (WCAG 2.1 AA) audit

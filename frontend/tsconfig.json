@@ -17,6 +17,7 @@
       "@screens/*": ["src/screens/*"],
       "@assets": ["src/assets"],
       "@models": ["src/types"],
+      "@fixtures": ["src/api/mock/fixtures"],
       "@models/*": ["src/types/*"]
     }
   },

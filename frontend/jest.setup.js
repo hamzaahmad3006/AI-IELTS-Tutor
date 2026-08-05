@@ -15,3 +15,30 @@ jest.mock('react-native-linear-gradient', () => 'LinearGradient');
 jest.mock('react-native-gesture-handler', () => ({
   GestureHandlerRootView: 'GestureHandlerRootView',
 }));
+
+// react-native-keychain is a native module with no JS fallback. The mock is an
+// in-memory keychain rather than a set of jest.fn() stubs, so tests exercise
+// real round-trip behaviour -- write then read must return what was written,
+// which is the property that matters and the one a stub cannot check.
+jest.mock('react-native-keychain', () => {
+  const store = new Map();
+  return {
+    __store: store,
+    ACCESSIBLE: {
+      WHEN_UNLOCKED_THIS_DEVICE_ONLY: 'AccessibleWhenUnlockedThisDeviceOnly',
+    },
+    SECURITY_LEVEL: { SECURE_HARDWARE: 'SECURE_HARDWARE' },
+    getSecurityLevel: jest.fn(() => Promise.resolve('SECURE_HARDWARE')),
+    setGenericPassword: jest.fn((username, password, options) => {
+      store.set(options.service, { username, password });
+      return Promise.resolve(true);
+    }),
+    getGenericPassword: jest.fn(options =>
+      Promise.resolve(store.get(options.service) ?? false),
+    ),
+    resetGenericPassword: jest.fn(options => {
+      store.delete(options.service);
+      return Promise.resolve(true);
+    }),
+  };
+});

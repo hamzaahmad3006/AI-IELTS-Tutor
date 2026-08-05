@@ -7,7 +7,7 @@ import {
   MOCK_SPEAKING_RESULT,
   MOCK_SPEAKING_SESSION,
   MOCK_SPEAKING_QUESTIONS,
-} from './mock/fixtures';
+} from '@fixtures';
 import type {
   SpeakingPart,
   SpeakingQuestionSet,

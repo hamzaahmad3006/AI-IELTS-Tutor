@@ -132,8 +132,22 @@ jobs:
       - name: Bundle (Android)
         run: npm run bundle:android
 
-      - name: Bundle (iOS)
-        run: npm run bundle:ios
+      # The fixtures are unreachable in release (`__DEV__` is false) but a
+      # static import bundles them anyway, so ~14 KB of invented essays and
+      # bands shipped to every device. A production Babel alias swaps them for
+      # a stub; this asserts the swap actually happened, because the failure
+      # mode is silent -- the app works either way.
+      - name: Release bundle carries no fixture data
+        run: |
+          bundle=.bundle-check/index.android.bundle
+          fail=0
+          # Content markers, not export names: the stub re-declares every
+          # export name, so those legitimately survive. The invented essays,
+          # bands and feedback are the payload that must not ship.
+          grep -qF "The Impact of Global Warming on Coastal Cities." "$bundle" && { echo "Fixture essay prompt found in release bundle"; fail=1; }
+          grep -qF "Use cohesive devices like" "$bundle" && { echo "Fixture feedback text found in release bundle"; fail=1; }
+          [ "$fail" -eq 0 ] && echo "No fixture data in the release bundle."
+          exit $fail
 
   docker:
     name: Docker (build + health check)

@@ -8,7 +8,7 @@ import {
   MOCK_PREDICTION,
   MOCK_PROGRESS,
   MOCK_TREND,
-} from './mock/fixtures';
+} from '@fixtures';
 import type {
   InsightsResponse,
   PredictionResponse,

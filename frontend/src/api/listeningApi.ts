@@ -3,7 +3,7 @@
 import { apiClient, toApiProblem } from './client';
 import { API_CONFIG } from './config';
 import { ENDPOINTS } from './endpoints';
-import { MOCK_LISTENING_CLIP, MOCK_LISTENING_RESULT } from './mock/fixtures';
+import { MOCK_LISTENING_CLIP, MOCK_LISTENING_RESULT } from '@fixtures';
 import type {
   Difficulty,
   ListeningClip,

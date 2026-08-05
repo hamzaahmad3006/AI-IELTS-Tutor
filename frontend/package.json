@@ -25,6 +25,7 @@
     "react": "19.2.3",
     "react-native": "0.86.0",
     "react-native-gesture-handler": "^2.22.1",
+    "react-native-keychain": "^10.0.0",
     "react-native-linear-gradient": "^2.8.3",
     "react-native-safe-area-context": "^5.5.2",
     "react-native-screens": "^4.6.0",

@@ -3,7 +3,7 @@
 import { apiClient, toApiProblem } from './client';
 import { API_CONFIG } from './config';
 import { ENDPOINTS } from './endpoints';
-import { MOCK_PROFILE } from './mock/fixtures';
+import { MOCK_PROFILE } from '@fixtures';
 import type {
   OnboardingRequest,
   ProfileResponse,
