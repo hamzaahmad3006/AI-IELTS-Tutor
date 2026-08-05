@@ -69,6 +69,69 @@ def _auth(client: TestClient, email: str) -> dict[str, str]:
     return h
 
 
+def check_audio_endpoints(client: TestClient, h: dict) -> None:
+    """The Deepgram/ElevenLabs path, exercised through the mock providers.
+
+    This proves the endpoints, the limits and the error mapping. It cannot
+    prove the providers accept our request shape -- that needs one live call
+    each, and is deliberately not done here so the suite never spends quota.
+    """
+    started = client.post("/v1/interview/sessions", headers=h)
+    assert started.status_code == 201, started.text
+    session_id = started.json()["id"]
+
+    # The examiner's question, spoken. Under the mock this is silent audio, so
+    # the assertion is about the contract rather than the sound.
+    audio = client.get(f"/v1/interview/sessions/{session_id}/question-audio", headers=h)
+    assert audio.status_code == 200, audio.text
+    assert audio.headers["content-type"].startswith("audio/")
+    assert audio.headers.get("X-TTS-Provider"), "no provider recorded on the audio"
+
+    # A recorded answer advances the exam just as a typed one does.
+    before = client.get(f"/v1/interview/sessions/{session_id}", headers=h).json()
+    spoken = client.post(
+        f"/v1/interview/sessions/{session_id}/answer-audio",
+        headers=h,
+        files={"audio": ("answer.wav", b"RIFF" + bytes(512), "audio/wav")},
+    )
+    assert spoken.status_code == 200, spoken.text
+    assert spoken.json()["progress"]["answered"] == before["progress"]["answered"] + 1
+
+    # An empty recording is refused before any provider is called.
+    empty = client.post(
+        f"/v1/interview/sessions/{session_id}/answer-audio",
+        headers=h,
+        files={"audio": ("answer.wav", b"", "audio/wav")},
+    )
+    assert empty.status_code in (400, 422), empty.text
+
+    # So is an implausibly large one: an unbounded upload is both a
+    # transcription bill and a denial-of-service.
+    huge = client.post(
+        f"/v1/interview/sessions/{session_id}/answer-audio",
+        headers=h,
+        files={"audio": ("answer.wav", bytes(11 * 1024 * 1024), "audio/wav")},
+    )
+    assert huge.status_code in (400, 413, 422), huge.status_code
+
+    # Audio endpoints obey the same ownership rule as the rest of the session.
+    other = _auth(client, "interview-audio-other@example.com")
+    assert (
+        client.get(
+            f"/v1/interview/sessions/{session_id}/question-audio", headers=other
+        ).status_code
+        == 404
+    )
+    assert (
+        client.post(
+            f"/v1/interview/sessions/{session_id}/answer-audio",
+            headers=other,
+            files={"audio": ("a.wav", b"RIFF123", "audio/wav")},
+        ).status_code
+        == 404
+    )
+
+
 def run() -> None:
     with TestClient(app) as client:
         h = _auth(client, "interview@example.com")
@@ -209,6 +272,8 @@ def run() -> None:
         # An unfinished exam cannot be scored.
         early = client.post(f"/v1/interview/sessions/{fresh_id}/score", headers=h)
         assert early.status_code in (400, 422), early.text
+
+        check_audio_endpoints(client, h)
 
     print("INTERVIEW API SMOKE TEST PASSED")
 

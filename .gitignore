@@ -70,3 +70,6 @@ desktop.ini
 logs/
 tmp/
 .cache/
+
+# Synthesised TTS audio: regenerable, binary, and potentially large.
+backend/media/tts-cache/

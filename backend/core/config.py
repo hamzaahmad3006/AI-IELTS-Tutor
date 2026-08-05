@@ -33,6 +33,23 @@ class Settings(BaseSettings):
     ai_provider: str = "groq"
     groq_api_key: str = ""
 
+    # Voice: speech-to-text. Defaults to the mock so nothing bills by accident;
+    # set STT_PROVIDER=deepgram and DEEPGRAM_API_KEY in .env to enable.
+    stt_provider: str = "mock"
+    deepgram_api_key: str = ""
+    deepgram_model: str = "nova-2"
+
+    # Voice: text-to-speech. Same default, same reason.
+    tts_provider: str = "mock"
+    elevenlabs_api_key: str = ""
+    elevenlabs_voice_id: str = "21m00Tcm4TlvDq8ikWAM"
+    elevenlabs_model: str = "eleven_multilingual_v2"
+    tts_cache_dir: str = "media/tts-cache"
+    #: Monthly character ceiling, checked before each call. 0 disables it.
+    #: The free tier is 10,000/month; the default leaves headroom to notice a
+    #: problem rather than sitting exactly on the cliff edge.
+    elevenlabs_monthly_char_limit: int = 9000
+
     # Dev/demo admin (seeded on SQLite startup so the admin panel is usable).
     seed_admin_email: str = "admin@ielts.local"
     seed_admin_password: str = "AdminPass123"
