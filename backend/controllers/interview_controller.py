@@ -18,8 +18,13 @@ from datetime import datetime, timezone
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from dataclasses import dataclass
+
+from fastapi import UploadFile
+
 from ai.orchestrator import AIOrchestrator
-from core.errors import NotFoundError, ValidationError
+from ai.voice_providers import SpendLimitExceeded, build_stt, build_tts
+from core.errors import AppError, NotFoundError, ValidationError
 from core.interview import (
     CueCard as ScriptCueCard,
     Interview,
@@ -53,6 +58,11 @@ PART3_COUNT = 5
 #: can be traced to a poor transcription.
 TRANSCRIPT_SOURCES = ("android-device", "server-stt", "typed", "unknown")
 
+#: Refused above this. A 12-minute exam answer is well under a megabyte at any
+#: sane bitrate, so anything larger is a misconfigured recorder -- and an
+#: unbounded upload is both a transcription bill and a denial-of-service.
+MAX_AUDIO_BYTES = 10 * 1024 * 1024
+
 
 # ---------- Schemas ----------
 class ActionOut(CamelModel):
@@ -78,6 +88,26 @@ class InterviewSessionOut(CamelModel):
     progress: InterviewProgress
     is_complete: bool
     speaking_attempt_id: str | None = None
+
+
+@dataclass
+class QuestionAudio:
+    audio: bytes
+    mime_type: str
+    provider: str
+
+
+class VoiceUnavailableError(AppError):
+    """The audio path failed for a reason the learner can act on.
+
+    Distinct from a generic 500: "the transcription service is down" and "your
+    recording was empty" need different responses from the app, and neither is
+    a bug the learner can do anything about if it is reported as a crash.
+    """
+
+    status = 503
+    code = "voice_unavailable"
+    title = "Voice service unavailable"
 
 
 class AnswerRequest(CamelModel):
@@ -323,3 +353,74 @@ class InterviewController:
         row.completed_at = datetime.now(tz=timezone.utc)
         await session.commit()
         return result
+
+    @staticmethod
+    async def answer_with_audio(
+        session: AsyncSession, user: User, session_id: str, upload: UploadFile
+    ) -> InterviewSessionOut:
+        """Transcribe an uploaded answer, then advance the exam."""
+        row = await _sessions.get_owned(session, session_id, user.id)
+        exam = _load(row)
+        if exam.is_complete:
+            raise ValidationError("This interview has already finished")
+
+        audio = await upload.read()
+        if not audio:
+            raise ValidationError("The recording was empty")
+        if len(audio) > MAX_AUDIO_BYTES:
+            raise ValidationError(
+                f"Recording is too large ({len(audio) // 1024} KB); "
+                f"the limit is {MAX_AUDIO_BYTES // 1024} KB"
+            )
+
+        stt = build_stt()
+        try:
+            transcript = await stt.transcribe(
+                audio, mime_type=upload.content_type or "audio/wav"
+            )
+        except Exception as exc:  # noqa: BLE001 - normalise to a domain error
+            raise VoiceUnavailableError(
+                f"Could not transcribe the recording ({type(exc).__name__})"
+            ) from exc
+
+        # An unrecognisable recording still advances the exam. The alternative
+        # is a candidate stuck on one question with no way forward, which on a
+        # timed test is worse than a turn scored as silence.
+        exam.answer(transcript.text)
+        _save(row, exam)
+        row.transcript_source = (
+            "server-stt" if stt.name != "mock" else "unknown"
+        )
+        await session.commit()
+        await session.refresh(row)
+        return _to_out(row, exam)
+
+    @staticmethod
+    async def question_audio(
+        session: AsyncSession, user: User, session_id: str
+    ) -> QuestionAudio:
+        """Synthesise whatever the examiner should say right now."""
+        row = await _sessions.get_owned(session, session_id, user.id)
+        exam = _load(row)
+        action = exam.current_action()
+
+        text = action.text.strip()
+        if not text:
+            raise ValidationError("There is nothing for the examiner to say")
+
+        tts = build_tts()
+        try:
+            speech = await tts.synthesize(text)
+        except SpendLimitExceeded as exc:
+            # Surfaced rather than swallowed. The exam can still be taken by
+            # reading the question on screen, and a silent failure here would
+            # look like a broken app instead of an exhausted budget.
+            raise VoiceUnavailableError(str(exc)) from exc
+        except Exception as exc:  # noqa: BLE001
+            raise VoiceUnavailableError(
+                f"Could not synthesise the question ({type(exc).__name__})"
+            ) from exc
+
+        return QuestionAudio(
+            audio=speech.audio, mime_type=speech.mime_type, provider=speech.provider
+        )

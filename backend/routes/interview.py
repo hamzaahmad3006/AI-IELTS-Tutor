@@ -9,7 +9,7 @@ from __future__ import annotations
 
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Depends, File, Response, UploadFile, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from ai.orchestrator import AIOrchestrator
@@ -19,6 +19,7 @@ from controllers.interview_controller import (
     InterviewSessionOut,
 )
 from controllers.speaking_controller import SpeakingResultResponse
+from controllers.interview_controller import QuestionAudio
 from db.session import get_db
 from dependencies import get_current_user, get_orchestrator
 from models.user import User
@@ -76,3 +77,48 @@ async def score(
     orchestrator: Orchestrator,
 ) -> SpeakingResultResponse:
     return await InterviewController.score(session, user, orchestrator, session_id)
+
+
+@router.post("/sessions/{session_id}/answer-audio", response_model=InterviewSessionOut)
+async def answer_with_audio(
+    session_id: str,
+    session: DbSession,
+    user: CurrentUser,
+    audio: UploadFile = File(...),
+) -> InterviewSessionOut:
+    """Upload a recorded answer; the server transcribes it and advances.
+
+    Separate from the text endpoint rather than one endpoint with an optional
+    body: the failure modes are entirely different. This one can fail because
+    the audio is unreadable or the provider is down, and a client needs to tell
+    that apart from an answer the examiner simply did not accept.
+    """
+    return await InterviewController.answer_with_audio(
+        session, user, session_id, audio
+    )
+
+
+@router.get("/sessions/{session_id}/question-audio")
+async def question_audio(
+    session_id: str, session: DbSession, user: CurrentUser
+) -> Response:
+    """Speak the current question.
+
+    Returns audio bytes rather than a URL because the audio is short, already
+    cached server-side, and a signed-URL round trip would add a hop for no
+    benefit. Cached responses are marked so a client can tell a free replay
+    from a billed synthesis.
+    """
+    result: QuestionAudio = await InterviewController.question_audio(
+        session, user, session_id
+    )
+    return Response(
+        content=result.audio,
+        media_type=result.mime_type,
+        headers={
+            "X-TTS-Provider": result.provider,
+            # Long-lived: the question bank is fixed, so this byte stream will
+            # not change for this text.
+            "Cache-Control": "private, max-age=86400",
+        },
+    )
