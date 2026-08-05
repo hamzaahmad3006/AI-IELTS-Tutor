@@ -3,7 +3,7 @@
 import { apiClient, toApiProblem } from './client';
 import { API_CONFIG } from './config';
 import { ENDPOINTS } from './endpoints';
-import { MOCK_DASHBOARD } from './mock/fixtures';
+import { MOCK_DASHBOARD } from '@fixtures';
 import type { DashboardData } from '../types';
 
 const delay = (ms: number): Promise<void> =>

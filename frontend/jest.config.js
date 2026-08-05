@@ -23,6 +23,8 @@ module.exports = {
     '^@assets$': '<rootDir>/src/assets',
     '^@models$': '<rootDir>/src/types',
     '^@models/(.*)$': '<rootDir>/src/types/$1',
+    // Tests always want the real fixtures, never the release stub.
+    '^@fixtures$': '<rootDir>/src/api/mock/fixtures',
   },
   setupFiles: ['<rootDir>/jest.setup.js'],
   // These packages publish untranspiled ESM, so Babel must process them.

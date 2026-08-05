@@ -21,8 +21,31 @@ module.exports = {
           // prefix, so '@types' would also capture '@types/react' and every
           // other DefinitelyTyped package and try to resolve them inside src.
           '@models': './src/types',
+          // Development fixtures. Aliased rather than imported relatively so a
+          // production build can point the same specifier at a stub -- see the
+          // `env.production` override below.
+          '@fixtures': './src/api/mock/fixtures',
         },
       },
     ],
   ],
+  env: {
+    production: {
+      plugins: [
+        [
+          'module-resolver',
+          {
+            extensions: ['.ts', '.tsx', '.js', '.jsx', '.json'],
+            alias: {
+              // Swaps ~22 KB of invented essays and bands for a stub. The
+              // fixtures are unreachable in release anyway (`__DEV__` is
+              // false), but unreachable is not the same as unbundled: Metro
+              // builds its graph from imports, not from what runs.
+              '@fixtures': './src/api/mock/fixtures.stub',
+            },
+          },
+        ],
+      ],
+    },
+  },
 };

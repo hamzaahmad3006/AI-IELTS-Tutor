@@ -3,7 +3,7 @@
 import { apiClient, toApiProblem } from './client';
 import { API_CONFIG } from './config';
 import { ENDPOINTS } from './endpoints';
-import { MOCK_READING_PASSAGE, MOCK_READING_RESULT } from './mock/fixtures';
+import { MOCK_READING_PASSAGE, MOCK_READING_RESULT } from '@fixtures';
 import type {
   Difficulty,
   ReadingHistoryPage,

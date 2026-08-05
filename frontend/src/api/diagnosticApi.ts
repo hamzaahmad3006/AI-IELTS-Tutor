@@ -3,7 +3,7 @@
 import { apiClient, toApiProblem } from './client';
 import { API_CONFIG } from './config';
 import { ENDPOINTS } from './endpoints';
-import { MOCK_DIAGNOSTIC_RESULT, MOCK_DIAGNOSTIC_SET } from './mock/fixtures';
+import { MOCK_DIAGNOSTIC_RESULT, MOCK_DIAGNOSTIC_SET } from '@fixtures';
 import type {
   DiagnosticResult,
   DiagnosticSet,

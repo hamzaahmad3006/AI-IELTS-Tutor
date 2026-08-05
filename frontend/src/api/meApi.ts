@@ -8,7 +8,7 @@ import {
   MOCK_DATA_EXPORT,
   MOCK_RECOMMENDATIONS,
   MOCK_WEAKNESSES,
-} from './mock/fixtures';
+} from '@fixtures';
 import type {
   AdaptiveDifficultyResponse,
   DataExport,

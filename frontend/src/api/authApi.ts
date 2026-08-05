@@ -3,7 +3,7 @@
 import { apiClient, toApiProblem } from './client';
 import { API_CONFIG } from './config';
 import { ENDPOINTS } from './endpoints';
-import { MOCK_AUTH } from './mock/fixtures';
+import { MOCK_AUTH } from '@fixtures';
 import type {
   AuthenticatedUser,
   AuthResponse,

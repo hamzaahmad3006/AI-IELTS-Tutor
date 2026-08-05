@@ -3,7 +3,7 @@
 import { apiClient, toApiProblem } from './client';
 import { API_CONFIG } from './config';
 import { ENDPOINTS } from './endpoints';
-import { MOCK_WRITING_FEEDBACK, MOCK_WRITING_RESULT } from './mock/fixtures';
+import { MOCK_WRITING_FEEDBACK, MOCK_WRITING_RESULT } from '@fixtures';
 import type {
   ExamType,
   WritingFeedback,
