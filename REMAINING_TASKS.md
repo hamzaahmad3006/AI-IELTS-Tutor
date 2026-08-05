@@ -7,14 +7,14 @@ Everything **not yet completed** to finish the project, organized by area. Check
 > permanently unachievable. The Xcode project is still in the tree and still builds a
 > bundle in CI; it is simply not maintained or verified.
 >
-> **Status as of PR #75** — **143 of 195 checklist items done (~73%)**. Weighted by
+> **Status as of PR #76** — **147 of 198 checklist items done (~74%)**. Weighted by
 > effort it is further along than that, since the backend and data layer are largely
 > complete while most remaining items are large features (live voice, deployment) or
 > are blocked on native modules.
 > **Running on real infrastructure:** live Supabase PostgreSQL 17.6 and the real Groq
 > API, verified on a physical Android phone — register → onboarding → dashboard → all
 > four practice modules → progress → coach → profile → logout.
-> **Verified by:** 31 backend smoke suites, a 13-step E2E user-journey check, 170
+> **Verified by:** 33 backend smoke suites, a 13-step E2E user-journey check, 170
 > frontend tests, ESLint at zero warnings, Prettier, `tsc --noEmit`, and a Docker image
 > build — all gated in CI on every push.
 > **Biggest remaining:** the live voice (LiveKit) pipeline, native audio playback,
@@ -313,14 +313,17 @@ Everything **not yet completed** to finish the project, organized by area. Check
 
 ---
 
-## 8. Voice Pipeline (not started)
+## 8. Voice Pipeline
 
 - [ ] LiveKit server integration + room/token minting
-- [ ] Server-side voice agent (examiner loop)
-- [ ] STT provider port + adapter (streaming)
-- [ ] TTS provider port + adapter (streaming)
+- [x] Examiner loop + session orchestration — `/v1/interview/sessions` start/answer/skip-prep/score, migration 0019, transport-agnostic
+- [ ] Server-side voice agent (LiveKit-hosted examiner)
+- [x] STT provider port (`ai/voice.py`) + mock adapter — on-device Android adapter next; streaming adapter still open
+- [ ] Streaming STT adapter (server-side provider)
+- [x] TTS provider port (`ai/voice.py`) + mock adapter
+- [ ] Streaming TTS adapter (server-side provider)
 - [ ] Barge-in / VAD handling
-- [ ] Part state machine (Greeting → Part1 → Part2 → Part3 → Scoring)
+- [x] Part state machine (Greeting → Part1 → Part2 cue/prep/long-turn/follow-up → Part3 → Scoring) — `core/interview.py`, pure and unit-tested; enforces the 1-minute prep and 2-minute long turn
 - [ ] Recording storage (object store, signed URLs) + transcript alignment
 - [ ] React Native LiveKit client integration + mic/audio session handling
 

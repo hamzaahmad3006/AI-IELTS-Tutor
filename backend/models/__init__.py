@@ -14,11 +14,13 @@ from .reading import ReadingAttempt
 from .speaking import SpeakingAttempt
 from .speaking_question import SpeakingQuestion
 from .user import RefreshToken, User
+from .interview import InterviewSession
 from .vocabulary import VocabItem, VocabReview
 from .weakness import Weakness
 from .writing_prompt import WritingPrompt
 
 __all__ = [
+    "InterviewSession",
     "User",
     "RefreshToken",
     "LearnerProfile",
