@@ -7,14 +7,14 @@ Everything **not yet completed** to finish the project, organized by area. Check
 > permanently unachievable. The Xcode project is still in the tree and still builds a
 > bundle in CI; it is simply not maintained or verified.
 >
-> **Status as of PR #78** — **150 of 200 checklist items done (~75%)**. Weighted by
+> **Status as of PR #79** — **152 of 200 checklist items done (~76%)**. Weighted by
 > effort it is further along than that, since the backend and data layer are largely
 > complete while most remaining items are large features (live voice, deployment) or
 > are blocked on native modules.
 > **Running on real infrastructure:** live Supabase PostgreSQL 17.6 and the real Groq
 > API, verified on a physical Android phone — register → onboarding → dashboard → all
 > four practice modules → progress → coach → profile → logout.
-> **Verified by:** 35 backend smoke suites, a 13-step E2E user-journey check, 170
+> **Verified by:** 36 backend smoke suites, a 13-step E2E user-journey check, 170
 > frontend tests, ESLint at zero warnings, Prettier, `tsc --noEmit`, and a Docker image
 > build — all gated in CI on every push.
 > **Biggest remaining:** the live voice (LiveKit) pipeline, native audio playback,
@@ -320,11 +320,11 @@ Everything **not yet completed** to finish the project, organized by area. Check
 - [ ] Server-side voice agent (LiveKit-hosted examiner)
 - [x] STT provider port (`ai/voice.py`) + mock adapter — on-device Android adapter next; streaming adapter still open
 - [x] Deepgram STT adapter (pre-recorded) + `/answer-audio` upload endpoint
-- [ ] Streaming STT adapter (real-time, for barge-in)
+- [x] Streaming STT adapter — Deepgram WebSocket (`ai/voice_providers/deepgram_stream.py`), interim results + VAD events
 - [x] TTS provider port (`ai/voice.py`) + mock adapter
 - [x] ElevenLabs TTS adapter + `/question-audio`, with a text+voice+model cache and a pre-flight monthly character ceiling
 - [ ] Streaming TTS adapter (real-time, for barge-in)
-- [ ] Barge-in / VAD handling
+- [x] Barge-in / VAD handling — `core/turn_taking.py`, pure and unit-tested; IELTS-tuned silence thresholds and the Part 2 two-minute hard stop
 - [x] Part state machine (Greeting → Part1 → Part2 cue/prep/long-turn/follow-up → Part3 → Scoring) — `core/interview.py`, pure and unit-tested; enforces the 1-minute prep and 2-minute long turn
 - [ ] Recording storage (object store, signed URLs) + transcript alignment
 - [ ] React Native LiveKit client integration + mic/audio session handling
