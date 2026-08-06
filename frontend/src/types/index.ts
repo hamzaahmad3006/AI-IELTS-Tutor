@@ -17,4 +17,5 @@ export * from './diagnostic.types';
 export * from './planner.types';
 export * from './mockTest.types';
 export * from './navigation.types';
+export * from './interview.types';
 export * from './api.types';

@@ -34,6 +34,20 @@ export const ENDPOINTS = {
   dashboard: {
     overview: '/analytics/overview',
   },
+  // The spoken interview: a session-driven exam, distinct from the one-shot
+  // speaking attempts below.
+  interview: {
+    sessions: '/interview/sessions',
+    session: (id: string): string => `/interview/sessions/${id}`,
+    answer: (id: string): string => `/interview/sessions/${id}/answer`,
+    answerAudio: (id: string): string =>
+      `/interview/sessions/${id}/answer-audio`,
+    skipPrep: (id: string): string => `/interview/sessions/${id}/skip-prep`,
+    score: (id: string): string => `/interview/sessions/${id}/score`,
+    questionAudio: (id: string): string =>
+      `/interview/sessions/${id}/question-audio`,
+    rtcToken: (id: string): string => `/interview/sessions/${id}/rtc-token`,
+  },
   speaking: {
     sessions: '/speaking/sessions',
     cueCards: '/speaking/cue-cards',

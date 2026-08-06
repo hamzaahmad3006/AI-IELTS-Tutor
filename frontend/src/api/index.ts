@@ -14,5 +14,6 @@ export { vocabularyApi } from './vocabularyApi';
 export { grammarApi } from './grammarApi';
 export { readingApi } from './readingApi';
 export { listeningApi } from './listeningApi';
+export { interviewApi } from './interviewApi';
 export { speakingApi } from './speakingApi';
 export { writingApi } from './writingApi';

@@ -7,7 +7,7 @@ Everything **not yet completed** to finish the project, organized by area. Check
 > permanently unachievable. The Xcode project is still in the tree and still builds a
 > bundle in CI; it is simply not maintained or verified.
 >
-> **Status as of PR #80** — **154 of 201 checklist items done (~77%)**. Weighted by
+> **Status as of PR #81** — **156 of 204 checklist items done (~76%)**. Weighted by
 > effort it is further along than that, since the backend and data layer are largely
 > complete while most remaining items are large features (live voice, deployment) or
 > are blocked on native modules.
@@ -215,6 +215,7 @@ Everything **not yet completed** to finish the project, organized by area. Check
 ## 3. Frontend — State, API & Infra
 
 - [ ] Redux slices for: speaking, writing, reading, listening, planner, analytics, vocabulary, coach, offline
+- [x] Typed interview API client (`interviewApi`) driving the examiner state machine
 - [ ] RTK Query (or thunks) for all real endpoints
 - [x] **Full API layer live-verified** against the backend — auth, onboarding/profile, `/me`, dashboard, analytics, and all four modules
 - [x] **Mock data can never reach a release build** (`useMock` is gated on `__DEV__`, guarded by a test). Dev still defaults to fixtures via `USE_MOCK_IN_DEV` — [ ] set it to false once a backend is routinely running
@@ -328,7 +329,9 @@ Everything **not yet completed** to finish the project, organized by area. Check
 - [x] Barge-in / VAD handling — `core/turn_taking.py`, pure and unit-tested; IELTS-tuned silence thresholds and the Part 2 two-minute hard stop
 - [x] Part state machine (Greeting → Part1 → Part2 cue/prep/long-turn/follow-up → Part3 → Scoring) — `core/interview.py`, pure and unit-tested; enforces the 1-minute prep and 2-minute long turn
 - [ ] Recording storage (object store, signed URLs) + transcript alignment
-- [ ] React Native LiveKit client integration + mic/audio session handling
+- [x] Interview session hook (`useExaminerSession`) — server-owned phases, server-supplied countdowns, in-flight guard, re-read on failure
+- [ ] React Native recorder + mic permissions (upload path)
+- [ ] React Native LiveKit client integration (needs `@livekit/react-native`)
 
 ---
 
