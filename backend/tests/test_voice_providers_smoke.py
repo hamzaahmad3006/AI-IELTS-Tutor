@@ -13,6 +13,7 @@ actually accepts. That needs one live call each, documented in the PR.
 from __future__ import annotations
 
 import asyncio
+import base64
 import json
 import os
 import sys
@@ -296,6 +297,54 @@ def check_no_key_means_mock() -> None:
         raise AssertionError("a keyless TTS provider was constructed")
 
 
+def check_elevenlabs_streaming(cache_dir) -> None:
+    """Streaming frames, and the ceiling that still applies to them."""
+    from ai.voice_providers.elevenlabs_stream import (
+        CLOSING_MESSAGE,
+        ElevenLabsStream,
+        StreamConfig,
+        build_url,
+        opening_message,
+        parse_chunk,
+    )
+
+    url = build_url(StreamConfig())
+    assert "stream-input" in url
+    # PCM at 16 kHz is what WebRTC wants, with no client-side decode step.
+    assert "output_format=pcm_16000" in url
+
+    opening = json.loads(opening_message("Where do you live?", StreamConfig()))
+    assert opening["text"].endswith(" "), "ElevenLabs needs the trailing space"
+    assert opening["generation_config"]["chunk_length_schedule"]
+
+    # An empty string is the end-of-input marker. Without it the final chunk is
+    # never generated and the last words of every question are lost.
+    assert json.loads(CLOSING_MESSAGE)["text"] == ""
+
+    audio = b""
+    frame = json.dumps({"audio": base64.b64encode(audio).decode()})
+    assert parse_chunk(frame) == audio
+
+    # Alignment and metadata frames arrive interleaved and must not reach the
+    # speaker; a corrupt one costs a moment of audio, not the question.
+    assert parse_chunk(json.dumps({"alignment": {"chars": []}})) is None
+    assert parse_chunk(json.dumps({"audio": None})) is None
+    assert parse_chunk(json.dumps({"audio": "not-base64!!!"})) is None
+    assert parse_chunk("not json") is None
+
+    # Streaming bypasses the cache, so it must not bypass the ledger.
+    stream = ElevenLabsStream(
+        api_key="k", cache_dir=cache_dir, monthly_character_limit=10
+    )
+    assert stream.remaining_characters() == 10
+    try:
+        ElevenLabsStream(api_key="", cache_dir=cache_dir)
+    except ValueError:
+        pass
+    else:  # pragma: no cover
+        raise AssertionError("a keyless streaming provider was constructed")
+
+
 def run() -> None:
     check_deepgram_parsing()
     asyncio.run(check_deepgram_request())
@@ -306,6 +355,8 @@ def run() -> None:
         asyncio.run(check_elevenlabs_ceiling(Path(tmp) / "cache"))
     with tempfile.TemporaryDirectory() as tmp:
         check_ledger(Path(tmp))
+    with tempfile.TemporaryDirectory() as tmp:
+        check_elevenlabs_streaming(Path(tmp) / "cache")
 
     check_no_key_means_mock()
 
