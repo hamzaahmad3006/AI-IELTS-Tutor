@@ -24,7 +24,9 @@ from fastapi import UploadFile
 
 from ai.orchestrator import AIOrchestrator
 from ai.voice_providers import SpendLimitExceeded, build_stt, build_tts
+from core.config import get_settings
 from core.errors import AppError, NotFoundError, ValidationError
+from core.livekit import VideoGrant, mint_access_token, room_name_for
 from core.interview import (
     CueCard as ScriptCueCard,
     Interview,
@@ -108,6 +110,16 @@ class VoiceUnavailableError(AppError):
     status = 503
     code = "voice_unavailable"
     title = "Voice service unavailable"
+
+
+class RealtimeToken(CamelModel):
+    """Everything the phone needs to join the room, and nothing more."""
+
+    url: str
+    token: str
+    room: str
+    identity: str
+    expires_at: int
 
 
 class AnswerRequest(CamelModel):
@@ -423,4 +435,49 @@ class InterviewController:
 
         return QuestionAudio(
             audio=speech.audio, mime_type=speech.mime_type, provider=speech.provider
+        )
+
+    @staticmethod
+    async def realtime_token(
+        session: AsyncSession, user: User, session_id: str
+    ) -> RealtimeToken:
+        """Mint a LiveKit token for this learner and this interview.
+
+        Scoped tightly on purpose: one room, one identity, fifteen minutes. A
+        token that admitted the bearer to any room would let one learner listen
+        to another's exam, and rooms are named after session ids, which are not
+        secret.
+        """
+        # Ownership is checked first, so a token is only ever minted for a
+        # session the caller actually owns -- and an unknown session is a 404
+        # here exactly as it is everywhere else.
+        row = await _sessions.get_owned(session, session_id, user.id)
+
+        settings = get_settings()
+        if not settings.livekit_enabled:
+            raise VoiceUnavailableError(
+                "Real-time voice is not configured. Start LiveKit with "
+                "`docker compose up livekit` and set LIVEKIT_URL, "
+                "LIVEKIT_API_KEY and LIVEKIT_API_SECRET."
+            )
+
+        room = room_name_for(row.id)
+        minted = mint_access_token(
+            api_key=settings.livekit_api_key,
+            api_secret=settings.livekit_api_secret,
+            url=settings.livekit_client_url,
+            room=room,
+            # The user id, not the session id: LiveKit evicts participants who
+            # share an identity, which is what should happen when the same
+            # learner rejoins from a second device mid-exam.
+            identity=user.id,
+            name=user.full_name,
+            grant=VideoGrant(room=room),
+        )
+        return RealtimeToken(
+            url=minted.url,
+            token=minted.token,
+            room=minted.room,
+            identity=minted.identity,
+            expires_at=minted.expires_at,
         )

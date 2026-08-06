@@ -50,6 +50,27 @@ class Settings(BaseSettings):
     #: problem rather than sitting exactly on the cliff edge.
     elevenlabs_monthly_char_limit: int = 9000
 
+    # LiveKit (self-hosted). The dev-mode container publishes devkey/secret,
+    # which are in LiveKit's own documentation -- fine on a laptop, and an open
+    # server anywhere reachable. Generate real values before deploying.
+    livekit_url: str = ""
+    livekit_api_key: str = ""
+    livekit_api_secret: str = ""
+    #: Public URL handed to the phone. The container talks to itself as
+    #: ws://livekit:7880, but a device on the LAN cannot resolve that name, so
+    #: the address the client is told is configured separately.
+    livekit_public_url: str = ""
+
+    @property
+    def livekit_enabled(self) -> bool:
+        return bool(
+            self.livekit_url and self.livekit_api_key and self.livekit_api_secret
+        )
+
+    @property
+    def livekit_client_url(self) -> str:
+        return self.livekit_public_url or self.livekit_url
+
     # Dev/demo admin (seeded on SQLite startup so the admin panel is usable).
     seed_admin_email: str = "admin@ielts.local"
     seed_admin_password: str = "AdminPass123"
