@@ -7,7 +7,7 @@ Everything **not yet completed** to finish the project, organized by area. Check
 > permanently unachievable. The Xcode project is still in the tree and still builds a
 > bundle in CI; it is simply not maintained or verified.
 >
-> **Status as of PR #82** — **157 of 204 checklist items done (~77%)**. Weighted by
+> **Status as of PR #83** — **158 of 205 checklist items done (~77%)**. Weighted by
 > effort it is further along than that, since the backend and data layer are largely
 > complete while most remaining items are large features (live voice, deployment) or
 > are blocked on native modules.
@@ -330,6 +330,7 @@ Everything **not yet completed** to finish the project, organized by area. Check
 - [x] Part state machine (Greeting → Part1 → Part2 cue/prep/long-turn/follow-up → Part3 → Scoring) — `core/interview.py`, pure and unit-tested; enforces the 1-minute prep and 2-minute long turn
 - [ ] Recording storage (object store, signed URLs) + transcript alignment
 - [x] Interview session hook (`useExaminerSession`) — server-owned phases, server-supplied countdowns, in-flight guard, re-read on failure
+- [x] Spoken interview screen (`ExaminerInterview`) — per-phase controls, cue card, server-driven countdowns, wired into navigation
 - [x] React Native recorder + mic permissions (`src/audio/recorder.ts`, `useSpokenAnswer`) — records, uploads, releases the mic on unmount; builds and links on Android
 - [ ] React Native LiveKit client integration (needs `@livekit/react-native`)
 

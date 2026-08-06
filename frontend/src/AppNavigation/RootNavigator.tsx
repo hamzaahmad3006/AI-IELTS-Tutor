@@ -3,7 +3,7 @@
 import React from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { Splash } from '../screens/Splash/Splash';
-import { Interview } from '../screens/Speaking/Interview/Interview';
+import { ExaminerInterview } from '../screens/Speaking/Interview/ExaminerInterview';
 import { Feedback } from '../screens/Writing/Feedback/Feedback';
 import { Practice as ReadingPractice } from '../screens/Reading/Practice/Practice';
 import { Practice as WritingPractice } from '../screens/Writing/Practice/Practice';
@@ -34,7 +34,7 @@ export const RootNavigator: React.FC = () => (
     <Stack.Screen name="Main" component={MainTabNavigator} />
     <Stack.Screen
       name="SpeakingInterview"
-      component={Interview}
+      component={ExaminerInterview}
       options={{ presentation: 'fullScreenModal' }}
     />
     <Stack.Screen name="WritingFeedback" component={Feedback} />
