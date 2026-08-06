@@ -42,3 +42,32 @@ jest.mock('react-native-keychain', () => {
     }),
   };
 });
+
+// The audio recorder is a Nitro native module with no JS fallback. Mocked as a
+// small state machine rather than bare jest.fn()s so tests exercise real
+// lifecycle behaviour -- starting twice, stopping when idle -- which is where
+// the wrapper's logic actually lives.
+jest.mock('react-native-audio-recorder-player', () => {
+  let recording = false;
+  return {
+    __esModule: true,
+    default: {
+      startRecorder: jest.fn(() => {
+        recording = true;
+        return Promise.resolve('/data/user/0/app/cache/sound.m4a');
+      }),
+      stopRecorder: jest.fn(() => {
+        if (!recording) {
+          return Promise.reject(new Error('Recorder is not running'));
+        }
+        recording = false;
+        return Promise.resolve('/data/user/0/app/cache/sound.m4a');
+      }),
+      addRecordBackListener: jest.fn(),
+      removeRecordBackListener: jest.fn(),
+      __reset: () => {
+        recording = false;
+      },
+    },
+  };
+});

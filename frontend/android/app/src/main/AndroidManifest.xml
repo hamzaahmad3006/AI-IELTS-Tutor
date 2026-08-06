@@ -1,6 +1,10 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <!-- The speaking test records the candidate's answers. Requested at first
+         use rather than on launch: a microphone prompt before the learner has
+         done anything reads as an app that wants to listen to them. -->
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
 
     <application
       android:name=".MainApplication"
