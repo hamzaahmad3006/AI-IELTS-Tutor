@@ -19,7 +19,7 @@ from controllers.interview_controller import (
     InterviewSessionOut,
 )
 from controllers.speaking_controller import SpeakingResultResponse
-from controllers.interview_controller import QuestionAudio
+from controllers.interview_controller import QuestionAudio, RealtimeToken
 from db.session import get_db
 from dependencies import get_current_user, get_orchestrator
 from models.user import User
@@ -122,3 +122,15 @@ async def question_audio(
             "Cache-Control": "private, max-age=86400",
         },
     )
+
+
+@router.post("/sessions/{session_id}/rtc-token", response_model=RealtimeToken)
+async def realtime_token(
+    session_id: str, session: DbSession, user: CurrentUser
+) -> RealtimeToken:
+    """Mint a short-lived LiveKit token for this interview.
+
+    POST rather than GET because it issues a credential: a GET would land in
+    browser history, proxy logs and referrer headers.
+    """
+    return await InterviewController.realtime_token(session, user, session_id)
