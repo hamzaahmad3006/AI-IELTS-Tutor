@@ -14,6 +14,7 @@ import {
   RecorderError,
   type Recording,
 } from '../../../audio/recorder';
+import { t } from '../../../i18n';
 
 /**
  * Below this, a recording is almost certainly a mis-tap rather than an answer.
@@ -111,9 +112,7 @@ export const useSpokenAnswer = ({ onAnswer }: Options): SpokenAnswerState => {
       // Discarded locally. Uploading a mis-tap spends a transcription call to
       // be told there were no words in it.
       if (mounted.current) {
-        setError(
-          'That was too short to send. Hold the button while you speak.',
-        );
+        setError(t('error.tooShort'));
       }
       return;
     }

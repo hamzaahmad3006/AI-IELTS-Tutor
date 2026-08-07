@@ -42,6 +42,11 @@ jobs:
           alembic downgrade base
           rm -f ci_migrations.db
 
+      # Unit tests for the pure functions, where a wrong answer is silent: a
+      # band rounded the wrong way is still a plausible band.
+      - name: Unit tests
+        run: python -m pytest tests/unit -q
+
       - name: Smoke test suites
         run: python tests/run_smoke.py
 

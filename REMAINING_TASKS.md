@@ -10,14 +10,14 @@ Everything **not yet completed** to finish the project, organized by area. Check
 > permanently unachievable. The Xcode project is still in the tree and still builds a
 > bundle in CI; it is simply not maintained or verified.
 >
-> **Status as of PR #85** — **163 of 202 checklist items done (~81%)**. Weighted by
+> **Status as of PR #86** — **170 of 205 checklist items done (~83%)**. Weighted by
 > effort it is further along than that, since the backend and data layer are largely
 > complete while most remaining items are large features (live voice, deployment) or
 > are blocked on native modules.
 > **Running on real infrastructure:** live Supabase PostgreSQL 17.6 and the real Groq
 > API, verified on a physical Android phone — register → onboarding → dashboard → all
 > four practice modules → progress → coach → profile → logout.
-> **Verified by:** 38 backend smoke suites, a 13-step E2E user-journey check, 170
+> **Verified by:** 42 backend smoke suites, a 13-step E2E user-journey check, 170
 > frontend tests, ESLint at zero warnings, Prettier, `tsc --noEmit`, and a Docker image
 > build — all gated in CI on every push.
 > **Biggest remaining:** the live voice (LiveKit) pipeline, native audio playback,
@@ -231,7 +231,8 @@ Everything **not yet completed** to finish the project, organized by area. Check
       that race. An exhausted item stays queued rather than being deleted
 - [x] Error boundary + global error handling (`ErrorBoundary` at the root; requests
       that never reach the server raise a toast, HTTP errors stay with the screen)
-- [ ] Accessibility pass (labels, dynamic type, contrast) + localization (i18n) setup
+- [x] Localisation setup (`src/i18n`) + spoken accessibility labels — interview screen, recorder errors and the estimate disclaimer all read from the dictionary
+- [ ] Accessibility: dynamic type + contrast audit (needs a device)
 
 ---
 
@@ -252,8 +253,9 @@ Everything **not yet completed** to finish the project, organized by area. Check
       gets it without threading it through call signatures; it is the same id the
       client saw in `X-Correlation-Id`
 - [x] Rate limiting (in-memory fixed-window on auth + AI endpoints, 429 problem+json + Retry-After) — [ ] Redis backing for multi-instance
-- [ ] Redis integration (cache + queue)
-- [ ] Background job runner (Celery/arq) + task definitions
+- [ ] Redis integration (cache + queue) — the scheduler's lock is in Postgres, so Redis is not needed for that; revisit for caching or a real queue
+- [x] Scheduled maintenance jobs — `jobs/` with a database-backed lock, migration 0020; runs the retention sweep and weakness decay, which were written as daily jobs and never run by anything
+- [ ] Task queue (Celery/arq) — deferred: every AI call is synchronous request/response, so there is no queued work for a broker to carry. Revisit when something genuinely needs deferring.
 - [x] Exception taxonomy — `core/errors.py` with stable machine-readable codes and
       real `type` URIs. Every error used to collapse to `code: "http_error"`, so a
       client could only tell them apart by string-matching the title. Bare
@@ -353,8 +355,9 @@ Everything **not yet completed** to finish the project, organized by area. Check
 ## 10. Data & Storage
 
 - [ ] Implement full PostgreSQL schema (SRS §15) via migrations
-- [ ] Object storage (S3-compatible) for recordings/audio + signed URLs
-- [ ] Seed content scripts (passages, audio, questions, vocab, grammar)
+- [x] Object storage port + local backend with HMAC signed URLs (`core/storage.py`); recordings require a signature, public clips do not
+- [ ] S3-compatible adapter — needs a real bucket to verify against
+- [x] Seed content script (`scripts/seed_content.py`) — seeds every bank explicitly, idempotent, non-zero exit when a bank is empty so it works as a deployment gate
 - [x] Indexes on the hot query shapes (attempts, ai_interactions, refresh_tokens, weaknesses) — migration 0018
 - [x] Retention sweeps (`core/retention.py`, `scripts/run_retention.py`) — dry run by default; usage rows are anonymised before deletion so cost history survives
 - [ ] Partitioning (attempts, ai_interactions) — deferred on purpose: these tables hold thousands of rows, and partitioning an existing table means rewriting it. Revisit at millions.
@@ -367,12 +370,12 @@ Everything **not yet completed** to finish the project, organized by area. Check
 - [x] Frontend unit tests — Jest in CI (band-scale logic, auth slice, onboarding slice). `npm test` was broken (missing `@react-native/jest-preset`) and is now fixed — [ ] broaden to hooks/selectors/utils
 - [x] **Every screen has a render test** (React Native Testing Library): auth (3, incl. validation interactions), all 4 practice screens, all 5 dashboard tabs + History, plus the full app tree — 38 tests / 7 suites in CI
 - [ ] Frontend E2E — Detox
-- [ ] Backend unit tests (services, repos, validators) — pytest
+- [x] Backend unit tests (pytest) — `tests/unit`, 36 tests over rounding, error mapping and request validators; found that IELTS band rounding was half-to-even and under-scoring every `.25` average
 - [x] Backend integration smoke suites (TestClient + SQLite) for all verticals, run in isolated processes via `tests/run_smoke.py` — [ ] broaden to pytest unit tests + Postgres/testcontainers
 - [x] **E2E user-journey check** (`tests/journey/journey_check.js`) — 13 steps in the app's screen order, content-agnostic, run in CI
 - [x] Frontend typecheck gate (`tsc --noEmit`) in CI
 - [x] AI evaluation suite (rubric MAE vs gold set) — the harness in `backend/evals/`
-- [ ] Voice pipeline tests (latency budget, FSM, barge-in)
+- [x] Voice pipeline tests — FSM and barge-in in `test_turn_taking_smoke`/`test_agent_smoke`; latency budget in `test_voice_latency_smoke` (our own code's share, not simulated network time)
 - [ ] Load tests (k6/Locust) against SLOs
 - [x] Security tests (authz, injection, rate limits)
 

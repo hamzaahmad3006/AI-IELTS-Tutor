@@ -25,6 +25,12 @@ class Settings(BaseSettings):
     #: by browsers anyway.
     cors_origins: str = "*"
 
+    #: Run periodic maintenance jobs in this process. Off by default: with
+    #: several API instances every one of them would start a scheduler, and
+    #: while the database lock makes that safe, it is still N processes waking
+    #: up to do nothing. Enable it on one instance, or on a dedicated worker.
+    jobs_enabled: bool = False
+
     # Security
     jwt_secret: str = "change_me_in_production"
     jwt_alg: str = "HS256"

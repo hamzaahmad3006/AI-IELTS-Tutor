@@ -5,6 +5,8 @@ model is constrained to emit structured JSON only."""
 
 from __future__ import annotations
 
+from decimal import Decimal, ROUND_HALF_UP
+
 from ai.prompts.registry import PromptTemplate, register
 from ai.provider import Message
 
@@ -44,8 +46,20 @@ _SYSTEM_PROMPT = (
 
 
 def round_ielts(value: float) -> float:
-    """Round to the nearest 0.5 band and clamp to [0, 9]."""
-    return max(0.0, min(9.0, round(value * 2) / 2))
+    """Round to the nearest 0.5 band, half up, and clamp to [0, 9].
+
+    Half *up*, explicitly, because Python's built-in round() is half-to-even:
+    round(12.5) is 12, not 13. That made every average ending in .25 round
+    down -- 6.25 became 6.0, 5.25 became 5.0 -- while .75 rounded up correctly,
+    because 13.5 rounds to 14. The result was a scorer that quietly took half a
+    band off anyone whose four criteria averaged to a quarter.
+
+    Official IELTS rounds .25 up to the next half band and .75 up to the next
+    whole band, so half-up is the rule the exam actually uses.
+    """
+    doubled = Decimal(str(value)) * 2
+    nearest = doubled.quantize(Decimal("1"), rounding=ROUND_HALF_UP)
+    return max(0.0, min(9.0, float(nearest) / 2))
 
 
 def build_writing_messages(

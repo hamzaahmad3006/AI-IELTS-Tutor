@@ -1,17 +1,27 @@
-"""Media routes: serve listening audio.
+"""Media routes: serve stored audio.
 
-Audio lives on disk under `backend/media/` in development. In production this
-is replaced by object storage with short-lived signed URLs (SRS section 24.2);
-`AudioClip.object_key` is already the storage key, so only this resolver
-changes.
+Audio lives on disk under `backend/media/`, keyed rather than pathed, so an
+S3-compatible backend is an adapter change rather than a rewrite.
+
+Two classes of object are served here and they need different rules. Seeded
+listening clips are identical for every learner and public by nature. A
+recording of someone answering a speaking question is not, and without a
+signature `/media/<key>` is readable by anyone who can guess a key.
+
+So anything under the recordings prefix requires a valid signature, and
+everything else does not. Requiring one for seeded clips would mean minting a
+URL per clip per learner for content that is the same for all of them.
 """
 
 from __future__ import annotations
 
 from pathlib import Path
 
-from fastapi import APIRouter, HTTPException, status
+from fastapi import APIRouter, HTTPException, Query, status
 from fastapi.responses import FileResponse
+
+from core.config import get_settings
+from core.storage import RECORDINGS_PREFIX, verify
 
 router = APIRouter(prefix="/media", tags=["media"])
 
@@ -26,8 +36,31 @@ _CONTENT_TYPES = {
 
 
 @router.get("/{object_key:path}")
-async def get_media(object_key: str) -> FileResponse:
-    """Stream a media file by its storage key."""
+async def get_media(
+    object_key: str,
+    expires: int | None = Query(default=None),
+    sig: str | None = Query(default=None),
+) -> FileResponse:
+    """Stream a media file by its storage key.
+
+    Recordings require a signature; public clips do not. The check happens
+    before the file is touched, so an unsigned request for a recording cannot
+    even confirm whether the key exists.
+    """
+    if object_key.startswith(f"{RECORDINGS_PREFIX}/"):
+        if expires is None or not sig:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="This recording requires a signed link",
+            )
+        if not verify(object_key, expires, sig, get_settings().jwt_secret):
+            # One message for a bad signature and an expired one: telling them
+            # apart tells an attacker whether they got the signature right.
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="This link is invalid or has expired",
+            )
+
     candidate = (MEDIA_ROOT / object_key).resolve()
 
     # Path traversal guard: the resolved path must stay inside MEDIA_ROOT.

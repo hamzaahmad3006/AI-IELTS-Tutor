@@ -12,6 +12,7 @@ import { screen, waitFor } from '@testing-library/react-native';
 import { renderWithProviders as render } from '../../../../testUtils/renderWithProviders';
 import type { InterviewPhase, InterviewSession } from '@models';
 import { ExaminerInterview } from '../ExaminerInterview';
+import { t } from '../../../../i18n';
 
 // Every name referenced inside a jest.mock factory must be `mock`-prefixed:
 // the factories are hoisted above these declarations.
@@ -96,7 +97,7 @@ describe('ExaminerInterview', () => {
     render(<ExaminerInterview />);
 
     expect(screen.getByText('Where do you live?')).toBeTruthy();
-    expect(screen.getByLabelText('Start recording')).toBeTruthy();
+    expect(screen.getByLabelText(t('a11y.record.start'))).toBeTruthy();
     expect(screen.getByText(/Part 1/)).toBeTruthy();
   });
 
@@ -111,7 +112,7 @@ describe('ExaminerInterview', () => {
     expect(screen.getByText(/who they were/)).toBeTruthy();
     expect(screen.getByText(/what they taught/)).toBeTruthy();
     // Nothing to record yet — the examiner is still introducing the task.
-    expect(screen.queryByLabelText('Start recording')).toBeNull();
+    expect(screen.queryByLabelText(t('a11y.record.start'))).toBeNull();
   });
 
   it('offers no microphone during the silent preparation minute', () => {
@@ -124,8 +125,8 @@ describe('ExaminerInterview', () => {
 
     // A record button here would invite the candidate to answer a question
     // they have not been asked yet.
-    expect(screen.queryByLabelText('Start recording')).toBeNull();
-    expect(screen.getByText('Start speaking now')).toBeTruthy();
+    expect(screen.queryByLabelText(t('a11y.record.start'))).toBeNull();
+    expect(screen.getByText(t('interview.startEarly'))).toBeTruthy();
     expect(screen.getByText('1:00')).toBeTruthy();
   });
 
@@ -137,7 +138,7 @@ describe('ExaminerInterview', () => {
     mockSecondsLeft = 95;
     render(<ExaminerInterview />);
 
-    expect(screen.getByLabelText('Start recording')).toBeTruthy();
+    expect(screen.getByLabelText(t('a11y.record.start'))).toBeTruthy();
     expect(screen.getByText('1:35')).toBeTruthy();
   });
 
