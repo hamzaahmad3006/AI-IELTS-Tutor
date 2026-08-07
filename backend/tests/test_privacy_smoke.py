@@ -29,6 +29,44 @@ def _reading_attempt(client: TestClient, headers: dict[str, str]) -> None:
     )
 
 
+def check_every_owned_table_is_covered() -> None:
+    """No model with a user_id may be missing from the export/delete list.
+
+    This is the bug that already happened: study plans, mock tests and
+    interview sessions were added after the privacy controller was written, and
+    were silently excluded from both. An export that omits your spoken
+    transcripts is not a data export, and a deletion that leaves them behind is
+    not a deletion.
+
+    Reflecting over the metadata rather than listing the tables by hand is the
+    point -- a hand-written list would need the same update it is checking for.
+    """
+    from controllers.privacy_controller import _OWNED
+    from db.base import Base
+    from models.ai_interaction import AIInteraction
+    from models.user import RefreshToken, User
+
+    covered = {model for _, model in _OWNED}
+    # Handled explicitly rather than through the loop, each for its own reason:
+    # the user row goes last, tokens are credentials not content, AI usage is
+    # anonymised rather than deleted so cost history stays honest, and plan
+    # tasks are keyed by plan rather than by user.
+    handled_elsewhere = {User, RefreshToken, AIInteraction}
+
+    missing = []
+    for mapper in Base.registry.mappers:
+        model = mapper.class_
+        if model in covered or model in handled_elsewhere:
+            continue
+        if "user_id" in {c.key for c in mapper.column_attrs}:
+            missing.append(model.__name__)
+
+    assert not missing, (
+        f"models keyed by user_id but absent from privacy handling: {missing}. "
+        "Add them to _OWNED so they are both exported and deleted."
+    )
+
+
 def run() -> None:
     with TestClient(app) as client:
         client.post(
@@ -118,6 +156,8 @@ def run() -> None:
             },
         )
         assert again.status_code == 201, again.text
+
+    check_every_owned_table_is_covered()
 
     print("PRIVACY SMOKE TEST PASSED")
 

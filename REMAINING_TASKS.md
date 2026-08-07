@@ -395,7 +395,7 @@ Everything **not yet completed** to finish the project, organized by area. Check
 ## 13. Compliance & Polish
 
 - [x] Consent capture + enforcement (voice + AI) — `core/consent.py`; AI scoring and audio upload both refuse without it, revocation applies on the next request
-- [ ] Data export + account deletion (GDPR-style)
+- [x] Data export + account deletion (GDPR-style) — now covers study plans, mock tests, interview transcripts and plan tasks; a metadata-reflecting test fails when a new `user_id` table is not covered
 - [x] "Scores are estimates" disclaimers in UI — `EstimateNote` next to every reported band
 - [ ] Play Store assets (icons, splash, screenshots, privacy policy)
 - [ ] Performance tuning (cold start, list virtualization, memoization)
