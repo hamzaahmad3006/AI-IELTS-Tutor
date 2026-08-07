@@ -25,6 +25,9 @@ module.exports = {
     '^@models/(.*)$': '<rootDir>/src/types/$1',
     // Tests always want the real fixtures, never the release stub.
     '^@fixtures$': '<rootDir>/src/api/mock/fixtures',
+    // .env is inlined by Babel at build time; the test runner has no
+    // build step, so it gets an empty module and the code's defaults.
+    '^@env$': '<rootDir>/src/testUtils/envStub.ts',
   },
   setupFiles: ['<rootDir>/jest.setup.js'],
   // These packages publish untranspiled ESM, so Babel must process them.

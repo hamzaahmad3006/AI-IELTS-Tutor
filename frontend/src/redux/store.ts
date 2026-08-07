@@ -19,6 +19,15 @@ import { dashboardReducer } from './slices/dashboardSlice';
 import { themeReducer } from './slices/themeSlice';
 import { toastReducer } from './slices/toastSlice';
 import { offlineReducer } from './slices/offlineSlice';
+import {
+  coachReducer,
+  insightsReducer,
+  plannerReducer,
+  progressReducer,
+  trendReducer,
+  vocabularyReducer,
+  weaknessReducer,
+} from './slices/contentSlices';
 
 /**
  * Credentials go to the Keystore; everything else stays in AsyncStorage.
@@ -42,6 +51,15 @@ const rootReducer = combineReducers({
   theme: themeReducer,
   toast: toastReducer,
   offline: offlineReducer,
+  // Cached server reads. Not persisted: they are copies of data the server
+  // owns, and a stale cache survived across a restart is worse than a fetch.
+  progress: progressReducer,
+  trend: trendReducer,
+  insights: insightsReducer,
+  planner: plannerReducer,
+  vocabulary: vocabularyReducer,
+  weakness: weaknessReducer,
+  coach: coachReducer,
 });
 
 const persistConfig = {

@@ -34,9 +34,27 @@ const resolver = aliases => [
   },
 ];
 
+// Reads .env at build time and inlines the values, so there is no native
+// module and no Gradle change — the alternative, react-native-config, needs
+// both and would have to be re-linked on every clean build.
+//
+// Inlined means baked into the bundle: these are addresses and feature flags,
+// never secrets. An API key here would ship inside the APK, where anyone can
+// read it. Secrets stay on the backend.
+const dotenv = [
+  'module:react-native-dotenv',
+  {
+    moduleName: '@env',
+    path: '.env',
+    // Missing .env is not an error: a fresh clone should build, and
+    // src/api/config.ts supplies defaults for everything.
+    allowUndefined: true,
+  },
+];
+
 module.exports = {
   presets: ['module:@react-native/babel-preset'],
-  plugins: [resolver(ALIASES)],
+  plugins: [resolver(ALIASES), dotenv],
   env: {
     production: {
       plugins: [
@@ -48,6 +66,10 @@ module.exports = {
           ...ALIASES,
           '@fixtures': './src/api/mock/fixtures.stub',
         }),
+        // Repeated, not inherited: an `env` block replaces the plugin list
+        // rather than merging with it, which is exactly how the aliases were
+        // lost from release builds once already.
+        dotenv,
       ],
     },
   },

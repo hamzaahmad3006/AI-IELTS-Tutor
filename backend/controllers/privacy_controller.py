@@ -24,6 +24,9 @@ from models.reading import ReadingAttempt
 from models.speaking import SpeakingAttempt
 from models.user import RefreshToken, User
 from models.vocabulary import VocabReview
+from models.interview import InterviewSession
+from models.mock_test import MockTest
+from models.plan import PlanTask, StudyPlan
 from models.weakness import Weakness
 
 from .base import CamelModel
@@ -47,8 +50,18 @@ def _row_to_dict(row: object) -> dict[str, Any]:
     }
 
 
-#: Tables owned by a learner. Order matters for deletion only in that the user
-#: row goes last; the rest have no interdependencies.
+#: Every table keyed by user_id.
+#:
+#: This list is the definition of "everything we hold about you" for both the
+#: export and the deletion, so a table missing from it is silently excluded
+#: from both -- exported data that is incomplete, and deleted data that is not
+#: deleted. Three tables added after this controller was written (study plans,
+#: mock tests, interview sessions) were exactly that, and interview sessions
+#: hold spoken transcripts, which is about as personal as this app gets.
+#:
+#: There is a test that reflects over the ORM metadata and fails when a model
+#: with a user_id column is not listed here, so the next table added cannot be
+#: forgotten the same way.
 _OWNED = (
     ("profile", LearnerProfile),
     ("writingAttempts", WritingAttempt),
@@ -57,6 +70,9 @@ _OWNED = (
     ("listeningAttempts", ListeningAttempt),
     ("weaknesses", Weakness),
     ("vocabReviews", VocabReview),
+    ("studyPlans", StudyPlan),
+    ("mockTests", MockTest),
+    ("interviewSessions", InterviewSession),
 )
 
 
@@ -91,6 +107,17 @@ class PrivacyController:
                 else serialised
             )
 
+        # Plan tasks hang off plans rather than the user, so the loop above
+        # misses them -- and they are the actual study content, not metadata.
+        plan_tasks = await session.scalars(
+            select(PlanTask).where(
+                PlanTask.plan_id.in_(
+                    select(StudyPlan.id).where(StudyPlan.user_id == user.id)
+                )
+            )
+        )
+        export["planTasks"] = [_row_to_dict(row) for row in plan_tasks]
+
         # Credentials are never exported: a password hash is not useful to the
         # learner and re-exposing it widens the blast radius of a leaked export.
         logger.info(
@@ -114,6 +141,19 @@ class PrivacyController:
         """Erase the learner and everything belonging to them."""
         user_id = user.id
         removed: dict[str, int] = {}
+
+        # Plan tasks are keyed by plan_id, not user_id, so they are not caught
+        # by the loop below. Removed first, while their parent plans still
+        # exist to identify them -- afterwards there is nothing left to join on
+        # and the rows are orphaned rather than deleted.
+        result = await session.execute(
+            delete(PlanTask).where(
+                PlanTask.plan_id.in_(
+                    select(StudyPlan.id).where(StudyPlan.user_id == user_id)
+                )
+            )
+        )
+        removed["planTasks"] = result.rowcount or 0
 
         for key, model in _OWNED:
             result = await session.execute(

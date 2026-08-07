@@ -2,12 +2,15 @@
 
 Everything **not yet completed** to finish the project, organized by area. Checked = done, unchecked = remaining. Use this as the living backlog.
 
+> **Out of scope: notifications and reminders.** Not wanted for this product, so
+> the items are removed rather than left permanently open.
+>
 > **Scope: Android only.** iOS is not a target for this project — no iOS hardware is
 > available, so iOS items are removed from the backlog rather than left open and
 > permanently unachievable. The Xcode project is still in the tree and still builds a
 > bundle in CI; it is simply not maintained or verified.
 >
-> **Status as of PR #84** — **160 of 205 checklist items done (~78%)**. Weighted by
+> **Status as of PR #85** — **163 of 202 checklist items done (~81%)**. Weighted by
 > effort it is further along than that, since the backend and data layer are largely
 > complete while most remaining items are large features (live voice, deployment) or
 > are blocked on native modules.
@@ -36,7 +39,7 @@ Everything **not yet completed** to finish the project, organized by area. Check
       deliberate `void` on fire-and-forget promises) are disabled **with reasons**
       rather than worked around case by case
 - [ ] **Verify the app boots on an Android emulator** ← main outstanding validation
-- [ ] Add `react-native-config` (or equivalent) so `.env` is actually read by the app
+- [x] `.env` read by the app — `react-native-dotenv` (pure Babel, no native module); `API_HOST` overrides Metro detection, which is the case that breaks release builds on a real phone
 - [x] Path aliases in tsconfig + Babel + Jest — 86 files migrated, zero three-level
       climbs left. `src/types` is aliased as `@models`, not `@types`, because
       module-resolver matches by prefix and would capture `@types/react`
@@ -170,7 +173,6 @@ Everything **not yet completed** to finish the project, organized by area. Check
       rebuild that cannot be verified on iOS here
 - [x] Replan on exam-date change — rebuilds only if a plan already exists, so it
       never creates one for someone who never asked
-- [ ] Notification & reminder scheduling
 - [ ] Real time-on-task across all four modules — needs the client to submit
       elapsed time per attempt (schema + API change); only Speaking records it today
 - [x] Consent management — reachable any time from Profile, both consents
@@ -214,7 +216,7 @@ Everything **not yet completed** to finish the project, organized by area. Check
 
 ## 3. Frontend — State, API & Infra
 
-- [ ] Redux slices for: speaking, writing, reading, listening, planner, analytics, vocabulary, coach, offline
+- [x] Redux slices — `createAsyncSlice` factory plus progress, trend, insights, planner, vocabulary, weakness and coach; auth and offline stay hand-written because they own real behaviour
 - [x] Typed interview API client (`interviewApi`) driving the examiner state machine
 - [ ] RTK Query (or thunks) for all real endpoints
 - [x] **Full API layer live-verified** against the backend — auth, onboarding/profile, `/me`, dashboard, analytics, and all four modules
@@ -227,7 +229,6 @@ Everything **not yet completed** to finish the project, organized by area. Check
       Conflict policy is last-write-wins **per target**, collapsed at enqueue time:
       toggling a task on/off/on offline sends one final state, not three writes
       that race. An exhausted item stays queued rather than being deleted
-- [ ] Push notifications / reminders integration
 - [x] Error boundary + global error handling (`ErrorBoundary` at the root; requests
       that never reach the server raise a toast, HTTP errors stay with the screen)
 - [ ] Accessibility pass (labels, dynamic type, contrast) + localization (i18n) setup
@@ -287,7 +288,6 @@ Everything **not yet completed** to finish the project, organized by area. Check
 - [x] Analytics: progress + band prediction + **real dashboard overview** (greeting, streak, prediction, module levels, recommendations) — [ ] insights
 - [x] Vocabulary SRS endpoints (`/vocabulary/review`, `/grade`, `/stats`) with an SM-2 scheduler
 - [x] Grammar lesson endpoints (`/grammar/lessons`, `/grammar/lessons/{id}`) with weakness-based recommendation
-- [ ] Notifications / reminders
 
 ---
 
@@ -381,7 +381,7 @@ Everything **not yet completed** to finish the project, organized by area. Check
 ## 12. DevOps / Infra
 
 - [x] Dockerfile (api, multi-stage, non-root) + docker-compose (API + Postgres) + CI image build & health check — [ ] worker/voice images
-- [ ] Environment configs (dev/staging/prod)
+- [x] Environment configs (dev/staging/prod) — `core/environment.py`; staging and production refuse to boot on published defaults, wildcard CORS, SQLite or a disabled limiter, and docs are dev-only
 - [x] CI: backend compile + Alembic up/down + smoke suites on every push/PR (GitHub Actions) — [ ] frontend typecheck/build, lint, deploy stages
 - [x] Observability: Prometheus metrics at `/metrics` (request count/latency/in-flight + AI calls, tokens, estimated spend)
 - [ ] Observability: tracing (OpenTelemetry), dashboards + alerts
@@ -395,7 +395,7 @@ Everything **not yet completed** to finish the project, organized by area. Check
 ## 13. Compliance & Polish
 
 - [x] Consent capture + enforcement (voice + AI) — `core/consent.py`; AI scoring and audio upload both refuse without it, revocation applies on the next request
-- [ ] Data export + account deletion (GDPR-style)
+- [x] Data export + account deletion (GDPR-style) — now covers study plans, mock tests, interview transcripts and plan tasks; a metadata-reflecting test fails when a new `user_id` table is not covered
 - [x] "Scores are estimates" disclaimers in UI — `EstimateNote` next to every reported band
 - [ ] Play Store assets (icons, splash, screenshots, privacy policy)
 - [ ] Performance tuning (cold start, list virtualization, memoization)

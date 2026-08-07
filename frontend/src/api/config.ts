@@ -12,8 +12,22 @@
  */
 
 import { NativeModules, Platform } from 'react-native';
+import {
+  API_BASE_URL as ENV_BASE_URL,
+  API_HOST as ENV_HOST,
+  API_PORT as ENV_PORT,
+  USE_MOCK as ENV_USE_MOCK,
+} from '@env';
 
-const DEV_PORT = 8000;
+const DEFAULT_PORT = 8000;
+
+/** A .env value, or undefined when unset or blank. */
+const fromEnv = (value: string | undefined): string | undefined => {
+  const trimmed = value?.trim();
+  return trimmed ? trimmed : undefined;
+};
+
+const DEV_PORT = Number(fromEnv(ENV_PORT) ?? DEFAULT_PORT) || DEFAULT_PORT;
 
 /** Fallback host per platform when the Metro URL cannot be read. */
 const FALLBACK_HOST = Platform.select({
@@ -68,11 +82,22 @@ const metroHost = (): string | null => {
 const devHost = (): string => metroHost() ?? FALLBACK_HOST;
 
 /**
- * Set this to target a deployed environment, e.g.
- *   const API_BASE_URL = 'https://api.aitutor.app/v1';
- * Leave null in development to use the auto-detected host above.
+ * Explicit base URL, from .env.
+ *
+ * Highest precedence, because someone who wrote a full URL into .env meant it.
+ * Everything below is a guess, however good.
  */
-const API_BASE_URL: string | null = null;
+const API_BASE_URL: string | null = fromEnv(ENV_BASE_URL) ?? null;
+
+/**
+ * Explicit host, from .env.
+ *
+ * Beats Metro detection, which is right almost always and wrong in the one
+ * case that matters most: a release build installed on a phone, where there is
+ * no Metro server to detect and the fallback is an emulator alias the device
+ * cannot reach.
+ */
+const configuredHost = (): string => fromEnv(ENV_HOST) ?? devHost();
 
 /**
  * Serve typed local fixtures instead of calling the backend.
@@ -80,7 +105,7 @@ const API_BASE_URL: string | null = null;
  * Set to false to develop against the real API (see backend/README.md to start
  * it). This only applies in development — see `useMock` below.
  */
-const USE_MOCK_IN_DEV = false;
+const USE_MOCK_IN_DEV = fromEnv(ENV_USE_MOCK) === 'true';
 
 /**
  * Unit tests always use fixtures - there is no backend in the test runner.
@@ -99,7 +124,7 @@ const isTest =
 const useMock = __DEV__ && (USE_MOCK_IN_DEV || isTest);
 
 export const API_CONFIG = {
-  baseUrl: API_BASE_URL ?? `http://${devHost()}:${DEV_PORT}/v1`,
+  baseUrl: API_BASE_URL ?? `http://${configuredHost()}:${DEV_PORT}/v1`,
   timeoutMs: 30000,
   version: 'v1',
   useMock,
