@@ -10,14 +10,14 @@ Everything **not yet completed** to finish the project, organized by area. Check
 > permanently unachievable. The Xcode project is still in the tree and still builds a
 > bundle in CI; it is simply not maintained or verified.
 >
-> **Status as of PR #85** — **163 of 202 checklist items done (~81%)**. Weighted by
+> **Status as of PR #86** — **165 of 203 checklist items done (~81%)**. Weighted by
 > effort it is further along than that, since the backend and data layer are largely
 > complete while most remaining items are large features (live voice, deployment) or
 > are blocked on native modules.
 > **Running on real infrastructure:** live Supabase PostgreSQL 17.6 and the real Groq
 > API, verified on a physical Android phone — register → onboarding → dashboard → all
 > four practice modules → progress → coach → profile → logout.
-> **Verified by:** 38 backend smoke suites, a 13-step E2E user-journey check, 170
+> **Verified by:** 40 backend smoke suites, a 13-step E2E user-journey check, 170
 > frontend tests, ESLint at zero warnings, Prettier, `tsc --noEmit`, and a Docker image
 > build — all gated in CI on every push.
 > **Biggest remaining:** the live voice (LiveKit) pipeline, native audio playback,
@@ -252,8 +252,9 @@ Everything **not yet completed** to finish the project, organized by area. Check
       gets it without threading it through call signatures; it is the same id the
       client saw in `X-Correlation-Id`
 - [x] Rate limiting (in-memory fixed-window on auth + AI endpoints, 429 problem+json + Retry-After) — [ ] Redis backing for multi-instance
-- [ ] Redis integration (cache + queue)
-- [ ] Background job runner (Celery/arq) + task definitions
+- [ ] Redis integration (cache + queue) — the scheduler's lock is in Postgres, so Redis is not needed for that; revisit for caching or a real queue
+- [x] Scheduled maintenance jobs — `jobs/` with a database-backed lock, migration 0020; runs the retention sweep and weakness decay, which were written as daily jobs and never run by anything
+- [ ] Task queue (Celery/arq) — deferred: every AI call is synchronous request/response, so there is no queued work for a broker to carry. Revisit when something genuinely needs deferring.
 - [x] Exception taxonomy — `core/errors.py` with stable machine-readable codes and
       real `type` URIs. Every error used to collapse to `code: "http_error"`, so a
       client could only tell them apart by string-matching the title. Bare

@@ -10,6 +10,8 @@ Run:  uvicorn main:app --reload --port 8000
 
 from __future__ import annotations
 
+import asyncio
+import logging
 from contextlib import asynccontextmanager
 from collections.abc import AsyncIterator
 
@@ -21,12 +23,18 @@ from core.logging import configure_logging
 from db.session import init_models, seed_admin
 from core.metrics import MetricsMiddleware
 from core.environment import enforce
+from db.session import SessionLocal
+from jobs.definitions import JOBS
+from jobs.scheduler import scheduler_loop
 from middleware import CorrelationIdMiddleware, register_exception_handlers
 from routes import api_router
 from routes.health import router as health_router
 from routes.media import router as media_router
 
 API_V1_PREFIX = "/v1"
+
+
+logger = logging.getLogger("api")
 
 
 @asynccontextmanager
@@ -40,7 +48,29 @@ async def lifespan(_: FastAPI) -> AsyncIterator[None]:
     if get_settings().is_sqlite:
         await init_models()
         await seed_admin()
-    yield
+
+    # Started as a task rather than awaited, so a scheduler that is busy or
+    # wedged cannot stop the API from serving requests.
+    stop = asyncio.Event()
+    task: asyncio.Task | None = None
+    if get_settings().jobs_enabled:
+        task = asyncio.create_task(
+            scheduler_loop(SessionLocal, JOBS, stop=stop)
+        )
+        logger.info("scheduler started", extra={"jobs": [j.name for j in JOBS]})
+
+    try:
+        yield
+    finally:
+        stop.set()
+        if task is not None:
+            # Awaited on the way out so a job mid-flight finishes its write
+            # rather than being cut off between claim and record, which would
+            # leave the job looking permanently in-progress and never re-run.
+            try:
+                await asyncio.wait_for(task, timeout=10)
+            except (asyncio.TimeoutError, asyncio.CancelledError):
+                task.cancel()
 
 
 _settings = get_settings()

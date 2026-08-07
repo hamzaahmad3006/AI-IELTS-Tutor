@@ -15,12 +15,14 @@ from .speaking import SpeakingAttempt
 from .speaking_question import SpeakingQuestion
 from .user import RefreshToken, User
 from .interview import InterviewSession
+from .job_run import JobRun
 from .vocabulary import VocabItem, VocabReview
 from .weakness import Weakness
 from .writing_prompt import WritingPrompt
 
 __all__ = [
     "InterviewSession",
+    "JobRun",
     "User",
     "RefreshToken",
     "LearnerProfile",
