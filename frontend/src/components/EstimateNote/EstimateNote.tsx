@@ -19,17 +19,15 @@ import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import { AppText } from '../AppText/AppText';
 import { SPACING } from '@constants';
+import { t } from '../../i18n';
 
 interface EstimateNoteProps {
   /** 'full' for result screens, 'short' where space is tight. */
   variant?: 'full' | 'short';
 }
 
-export const ESTIMATE_TEXT_FULL =
-  'This is an AI estimate to guide your practice, not an official IELTS score. ' +
-  'Only a certified examiner can give you a real band.';
-
-export const ESTIMATE_TEXT_SHORT = 'AI estimate — not an official IELTS score.';
+export const ESTIMATE_TEXT_FULL = t('score.estimateFull');
+export const ESTIMATE_TEXT_SHORT = t('score.estimateShort');
 
 export const EstimateNote: React.FC<EstimateNoteProps> = ({
   variant = 'full',

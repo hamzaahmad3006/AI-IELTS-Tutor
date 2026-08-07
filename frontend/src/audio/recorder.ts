@@ -18,6 +18,7 @@
 
 import { PermissionsAndroid, Platform } from 'react-native';
 import AudioRecorderPlayer from 'react-native-audio-recorder-player';
+import { t } from '../i18n';
 
 /** Android's recorder produces AAC in an MP4 container. */
 export const RECORDING_MIME_TYPE = 'audio/mp4';
@@ -119,8 +120,8 @@ export class InterviewRecorder {
     if (permission !== 'granted') {
       throw new RecorderError(
         permission === 'blocked'
-          ? 'Microphone access is blocked. Enable it in Settings to record your answers.'
-          : 'Microphone access is needed to record your answer.',
+          ? t('error.microphoneBlocked')
+          : t('error.microphoneNeeded'),
       );
     }
 

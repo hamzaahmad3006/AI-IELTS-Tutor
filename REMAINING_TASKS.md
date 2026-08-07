@@ -231,7 +231,8 @@ Everything **not yet completed** to finish the project, organized by area. Check
       that race. An exhausted item stays queued rather than being deleted
 - [x] Error boundary + global error handling (`ErrorBoundary` at the root; requests
       that never reach the server raise a toast, HTTP errors stay with the screen)
-- [ ] Accessibility pass (labels, dynamic type, contrast) + localization (i18n) setup
+- [x] Localisation setup (`src/i18n`) + spoken accessibility labels — interview screen, recorder errors and the estimate disclaimer all read from the dictionary
+- [ ] Accessibility: dynamic type + contrast audit (needs a device)
 
 ---
 

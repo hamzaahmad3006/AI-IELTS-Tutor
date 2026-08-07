@@ -25,20 +25,12 @@ import {
 } from '@components';
 import { RADIUS, SPACING } from '@constants';
 import type { InterviewPhase } from '@models';
+import { t } from '../../../i18n';
 import { useExaminerSession } from './useExaminerSession';
 import { useSpokenAnswer } from './useSpokenAnswer';
 
-const PHASE_LABEL: Record<InterviewPhase, string> = {
-  greeting: 'Introduction',
-  part1: 'Part 1 · Interview',
-  part2_cue: 'Part 2 · Task card',
-  part2_prep: 'Part 2 · Preparation',
-  part2_speaking: 'Part 2 · Long turn',
-  part2_followup: 'Part 2 · Follow-up',
-  part3: 'Part 3 · Discussion',
-  scoring: 'Finishing up',
-  complete: 'Complete',
-};
+const phaseLabel = (phase: InterviewPhase): string =>
+  t(`interview.phase.${phase}` as Parameters<typeof t>[0]);
 
 const formatClock = (seconds: number): string => {
   const m = Math.floor(seconds / 60);
@@ -85,10 +77,13 @@ export const ExaminerInterview: React.FC = () => {
         <View style={styles.centred}>
           <ActivityIndicator size="large" color={theme.colors.primary} />
           <AppText variant="bodyMd" color="textSecondary" style={styles.gap}>
-            {exam.error ?? 'Preparing your speaking test…'}
+            {exam.error ?? t('interview.preparing')}
           </AppText>
           {exam.error ? (
-            <Button title="Try again" onPress={() => void exam.start()} />
+            <Button
+              title={t('interview.retry')}
+              onPress={() => void exam.start()}
+            />
           ) : null}
         </View>
       </ScreenContainer>
@@ -100,7 +95,7 @@ export const ExaminerInterview: React.FC = () => {
       <ScreenContainer>
         <View style={styles.centred}>
           <AppText variant="titleLg" color="primary">
-            Speaking test complete
+            {t('interview.complete')}
           </AppText>
           <BandBadge band={result.overallBand ?? 0} display="value" />
           <EstimateNote />
@@ -124,7 +119,7 @@ export const ExaminerInterview: React.FC = () => {
     <ScreenContainer>
       <View style={styles.header}>
         <AppText variant="labelMd" color="textSecondary">
-          {PHASE_LABEL[session.phase]}
+          {phaseLabel(session.phase)}
         </AppText>
         {isTimed ? (
           <View
@@ -155,7 +150,7 @@ export const ExaminerInterview: React.FC = () => {
         {action.bullets.length > 0 ? (
           <View style={styles.bullets}>
             <AppText variant="labelMd" color="textSecondary">
-              You should say:
+              {t('interview.youShouldSay')}
             </AppText>
             {action.bullets.map(bullet => (
               <AppText
@@ -185,7 +180,7 @@ export const ExaminerInterview: React.FC = () => {
       <View style={styles.controls}>
         {phase === 'part2_cue' ? (
           <Button
-            title="I'm ready"
+            title={t('interview.ready')}
             onPress={() => void exam.answer('', 'typed')}
             disabled={busy}
           />
@@ -199,10 +194,10 @@ export const ExaminerInterview: React.FC = () => {
               align="center"
               style={styles.hint}
             >
-              Make notes if you like. You can start early.
+              {t('interview.prepHint')}
             </AppText>
             <Button
-              title="Start speaking now"
+              title={t('interview.startEarly')}
               onPress={() => void exam.skipPreparation()}
               disabled={busy}
             />
@@ -220,7 +215,7 @@ export const ExaminerInterview: React.FC = () => {
               disabled={busy}
               accessibilityRole="button"
               accessibilityLabel={
-                mic.isRecording ? 'Stop and send answer' : 'Start recording'
+                mic.isRecording ? t('a11y.record.stop') : t('a11y.record.start')
               }
               style={[
                 styles.recordButton,
@@ -241,10 +236,10 @@ export const ExaminerInterview: React.FC = () => {
               style={styles.hint}
             >
               {busy
-                ? 'Sending your answer…'
+                ? t('interview.sending')
                 : mic.isRecording
-                ? 'Listening — tap when you have finished'
-                : 'Tap to answer'}
+                ? t('interview.listening')
+                : t('interview.tapToAnswer')}
             </AppText>
           </>
         ) : null}
