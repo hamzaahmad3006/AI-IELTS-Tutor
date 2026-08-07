@@ -2,12 +2,15 @@
 
 Everything **not yet completed** to finish the project, organized by area. Checked = done, unchecked = remaining. Use this as the living backlog.
 
+> **Out of scope: notifications and reminders.** Not wanted for this product, so
+> the items are removed rather than left permanently open.
+>
 > **Scope: Android only.** iOS is not a target for this project — no iOS hardware is
 > available, so iOS items are removed from the backlog rather than left open and
 > permanently unachievable. The Xcode project is still in the tree and still builds a
 > bundle in CI; it is simply not maintained or verified.
 >
-> **Status as of PR #84** — **160 of 205 checklist items done (~78%)**. Weighted by
+> **Status as of PR #85** — **163 of 202 checklist items done (~81%)**. Weighted by
 > effort it is further along than that, since the backend and data layer are largely
 > complete while most remaining items are large features (live voice, deployment) or
 > are blocked on native modules.
@@ -170,7 +173,6 @@ Everything **not yet completed** to finish the project, organized by area. Check
       rebuild that cannot be verified on iOS here
 - [x] Replan on exam-date change — rebuilds only if a plan already exists, so it
       never creates one for someone who never asked
-- [ ] Notification & reminder scheduling
 - [ ] Real time-on-task across all four modules — needs the client to submit
       elapsed time per attempt (schema + API change); only Speaking records it today
 - [x] Consent management — reachable any time from Profile, both consents
@@ -227,7 +229,6 @@ Everything **not yet completed** to finish the project, organized by area. Check
       Conflict policy is last-write-wins **per target**, collapsed at enqueue time:
       toggling a task on/off/on offline sends one final state, not three writes
       that race. An exhausted item stays queued rather than being deleted
-- [ ] Push notifications / reminders integration
 - [x] Error boundary + global error handling (`ErrorBoundary` at the root; requests
       that never reach the server raise a toast, HTTP errors stay with the screen)
 - [ ] Accessibility pass (labels, dynamic type, contrast) + localization (i18n) setup
@@ -287,7 +288,6 @@ Everything **not yet completed** to finish the project, organized by area. Check
 - [x] Analytics: progress + band prediction + **real dashboard overview** (greeting, streak, prediction, module levels, recommendations) — [ ] insights
 - [x] Vocabulary SRS endpoints (`/vocabulary/review`, `/grade`, `/stats`) with an SM-2 scheduler
 - [x] Grammar lesson endpoints (`/grammar/lessons`, `/grammar/lessons/{id}`) with weakness-based recommendation
-- [ ] Notifications / reminders
 
 ---
 
