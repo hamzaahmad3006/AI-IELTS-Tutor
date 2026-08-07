@@ -1,6 +1,7 @@
 /** Writing practice logic: pick a task, write against the clock, submit. */
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useTimeOnTask } from '../../../hooks/useTimeOnTask';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { writingApi } from '@api';
@@ -60,6 +61,7 @@ export const useWriting = (): UseWritingResult => {
   const [examType, setExamTypeState] = useState<ExamType>('academic');
   const [taskNumber, setTaskNumberState] = useState<number>(2);
   const [essayText, setEssayText] = useState<string>('');
+  const timeOnTask = useTimeOnTask();
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [result, setResult] = useState<WritingResult | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -110,19 +112,24 @@ export const useWriting = (): UseWritingResult => {
         essayText,
         taskType: prompt?.taskNumber ?? taskNumber,
         promptText: prompt?.prompt,
+        // Frozen here rather than read on the server: the screen stays mounted
+        // while the result renders, and a clock still running would count the
+        // time spent reading feedback as time spent writing.
+        durationSec: timeOnTask.finish(),
       })
       .then(res => setResult(res))
       .catch(() => setError('Scoring failed. Please try again.'))
       .finally(() => setIsSubmitting(false));
-  }, [essayText, wordCount, prompt, taskNumber, countdown]);
+  }, [essayText, wordCount, prompt, taskNumber, countdown, timeOnTask]);
 
   const tryAnother = useCallback((): void => {
     setResult(null);
     setEssayText('');
     setError(null);
     countdown.reset();
+    timeOnTask.reset();
     loadPrompt();
-  }, [loadPrompt, countdown]);
+  }, [loadPrompt, countdown, timeOnTask]);
 
   const onBack = useCallback((): void => {
     navigation.goBack();

@@ -25,6 +25,14 @@ export interface WritingSubmit {
   essayText: string;
   taskType: number; // 1 | 2
   promptText?: string;
+  /**
+   * Foreground seconds spent on this attempt.
+   *
+   * Optional so an older client still submits successfully — refusing a
+   * submission to collect a statistic would break the app to improve a chart.
+   * The server clamps whatever arrives.
+   */
+  durationSec?: number;
 }
 
 export interface WritingResult {

@@ -10,6 +10,7 @@ from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from core.consent import require_consent
+from core.time_on_task import clamp
 from ai.orchestrator import AIOrchestrator, ScoringError
 from models.attempt import WritingAttempt
 from models.user import User
@@ -31,6 +32,9 @@ class WritingSubmitRequest(CamelModel):
     essay_text: str = Field(min_length=1, max_length=8000)
     task_type: int = Field(default=2, ge=1, le=2)
     prompt_text: str | None = None
+    #: Seconds spent, measured by the client. Clamped server-side; see
+    #: core.time_on_task for why the client cannot simply be believed.
+    duration_sec: int = Field(default=0, ge=0)
 
 
 class WritingPromptResponse(CamelModel):
@@ -292,6 +296,7 @@ class WritingController:
 
         attempt = WritingAttempt(
             user_id=user.id,
+            duration_sec=clamp(payload.duration_sec, "writing"),
             task_type=payload.task_type,
             prompt_text=payload.prompt_text,
             essay_text=payload.essay_text,

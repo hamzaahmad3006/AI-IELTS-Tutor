@@ -37,3 +37,6 @@ class ListeningAttempt(Base, TimestampMixin):
     raw_score: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
     total_questions: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
     band: Mapped[float] = mapped_column(Float, default=0.0, nullable=False)
+    #: Seconds the learner spent on this attempt, as reported by the client
+    #: and clamped server-side. Zero means nobody measured it.
+    duration_sec: Mapped[int] = mapped_column(Integer, default=0, nullable=False)

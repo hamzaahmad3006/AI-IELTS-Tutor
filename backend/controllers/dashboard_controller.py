@@ -16,6 +16,7 @@ from models.listening import ListeningAttempt
 from models.profile import LearnerProfile
 from models.reading import ReadingAttempt
 from models.speaking import SpeakingAttempt
+from core.time_on_task import total_minutes
 from models.user import User
 
 from .analytics_controller import AnalyticsController
@@ -60,9 +61,26 @@ class ChecklistItem(CamelModel):
     priority: str | None
 
 
+class StudyTime(CamelModel):
+    """Minutes actually spent, not attempts counted.
+
+    Attempt counts flatter: five two-minute taps look like more work than one
+    forty-minute essay. Minutes are what a learner is actually budgeting.
+    """
+
+    today_minutes: int
+    week_minutes: int
+    total_minutes: int
+    #: Against the daily goal set at onboarding. Capped at 100 so a long day
+    #: reads as "done" rather than "247%", which sounds like a warning.
+    daily_goal_minutes: int
+    daily_goal_pct: int
+
+
 class DashboardData(CamelModel):
     greeting_name: str
     streak_days: int
+    study_time: StudyTime
     prediction: BandPrediction
     coach: DailyCoachMessage
     modules: list[ModuleProgress]
@@ -81,6 +99,54 @@ async def _activity_dates(session: AsyncSession, user_id: str) -> set[date]:
             ts = created_at if created_at.tzinfo else created_at.replace(tzinfo=timezone.utc)
             dates.add(ts.date())
     return dates
+
+
+async def _study_time(
+    session: AsyncSession, user_id: str, daily_goal: int
+) -> StudyTime:
+    """Sum recorded durations across every module.
+
+    Zero-duration rows are included in the sum and cost nothing: attempts made
+    before time was tracked genuinely have no measurement, and excluding them
+    would make no difference to a total they contribute nothing to.
+    """
+    now = datetime.now(tz=timezone.utc)
+    today = now.date()
+    week_start = today - timedelta(days=6)
+
+    total = 0
+    this_week = 0
+    todays = 0
+
+    for model in _ATTEMPT_MODELS:
+        rows = await session.execute(
+            select(model.created_at, model.duration_sec).where(
+                model.user_id == user_id
+            )
+        )
+        for created_at, seconds in rows.all():
+            seconds = int(seconds or 0)
+            total += seconds
+            ts = (
+                created_at
+                if created_at.tzinfo
+                else created_at.replace(tzinfo=timezone.utc)
+            )
+            if ts.date() >= week_start:
+                this_week += seconds
+            if ts.date() == today:
+                todays += seconds
+
+    today_minutes = total_minutes(todays)
+    goal = max(1, daily_goal)
+    return StudyTime(
+        today_minutes=today_minutes,
+        week_minutes=total_minutes(this_week),
+        total_minutes=total_minutes(total),
+        daily_goal_minutes=daily_goal,
+        # Capped: "247% of your goal" reads like a warning rather than praise.
+        daily_goal_pct=min(100, round(today_minutes / goal * 100)),
+    )
 
 
 def _streak(dates: set[date]) -> int:
@@ -224,6 +290,9 @@ class DashboardController:
         return DashboardData(
             greeting_name=first_name,
             streak_days=_streak(dates_by_module),
+            study_time=await _study_time(
+                session, user.id, profile.daily_minutes if profile else 30
+            ),
             prediction=band_prediction,
             coach=coach,
             modules=modules,
