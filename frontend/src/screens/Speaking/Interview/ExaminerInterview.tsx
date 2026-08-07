@@ -16,6 +16,7 @@ import {
   AppText,
   BandBadge,
   Button,
+  EstimateNote,
   Card,
   Icon,
   ProgressBar,
@@ -101,7 +102,8 @@ export const ExaminerInterview: React.FC = () => {
           <AppText variant="titleLg" color="primary">
             Speaking test complete
           </AppText>
-          <BandBadge band={result.overallBand ?? 0} />
+          <BandBadge band={result.overallBand ?? 0} display="value" />
+          <EstimateNote />
           <AppText
             variant="bodyMd"
             color="textSecondary"

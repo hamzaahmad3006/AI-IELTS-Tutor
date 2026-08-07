@@ -5,6 +5,7 @@ import { ActivityIndicator, Pressable, StyleSheet, View } from 'react-native';
 import {
   AppText,
   BandBadge,
+  EstimateNote,
   Button,
   Card,
   DifficultySelector,
@@ -77,6 +78,7 @@ export const Practice: React.FC = () => {
               </AppText>
             </View>
             <BandBadge band={result.band} />
+            <EstimateNote variant="short" />
           </View>
         </Card>
 

@@ -36,6 +36,20 @@ def run() -> None:
         ).json()
         headers = {"Authorization": f"Bearer {login['tokens']['accessToken']}"}
 
+        client.post(
+            "/v1/onboarding",
+            headers=headers,
+            json={
+                "examType": "academic",
+                "selfLevel": "intermediate",
+                "targetBand": 7.0,
+                "examDate": None,
+                "dailyMinutes": 30,
+                "consentVoice": True,
+                "consentAi": True,
+            },
+        )
+
         # Requires auth.
         assert client.get("/v1/grammar/lessons").status_code in (401, 403)
 

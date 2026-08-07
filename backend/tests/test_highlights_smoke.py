@@ -90,6 +90,20 @@ def run() -> None:
         ).json()
         h = {"Authorization": f"Bearer {login['tokens']['accessToken']}"}
 
+        client.post(
+            "/v1/onboarding",
+            headers=h,
+            json={
+                "examType": "academic",
+                "selfLevel": "intermediate",
+                "targetBand": 7.0,
+                "examDate": None,
+                "dailyMinutes": 30,
+                "consentVoice": True,
+                "consentAi": True,
+            },
+        )
+
         r = client.post(
             "/v1/speaking/attempts",
             headers=h,

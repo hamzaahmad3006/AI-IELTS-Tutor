@@ -25,6 +25,7 @@ from fastapi import UploadFile
 from ai.orchestrator import AIOrchestrator
 from ai.voice_providers import SpendLimitExceeded, build_stt, build_tts
 from core.config import get_settings
+from core.consent import require_consent
 from core.errors import AppError, NotFoundError, ValidationError
 from core.livekit import VideoGrant, mint_access_token, room_name_for
 from core.interview import (
@@ -375,6 +376,10 @@ class InterviewController:
         exam = _load(row)
         if exam.is_complete:
             raise ValidationError("This interview has already finished")
+
+        # Voice consent is separate from AI consent: someone can be happy to
+        # have an essay scored and unwilling to have their voice recorded.
+        await require_consent(session, user.id, "voice")
 
         audio = await upload.read()
         if not audio:

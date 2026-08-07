@@ -7,14 +7,14 @@ Everything **not yet completed** to finish the project, organized by area. Check
 > permanently unachievable. The Xcode project is still in the tree and still builds a
 > bundle in CI; it is simply not maintained or verified.
 >
-> **Status as of PR #83** — **158 of 205 checklist items done (~77%)**. Weighted by
+> **Status as of PR #84** — **160 of 205 checklist items done (~78%)**. Weighted by
 > effort it is further along than that, since the backend and data layer are largely
 > complete while most remaining items are large features (live voice, deployment) or
 > are blocked on native modules.
 > **Running on real infrastructure:** live Supabase PostgreSQL 17.6 and the real Groq
 > API, verified on a physical Android phone — register → onboarding → dashboard → all
 > four practice modules → progress → coach → profile → logout.
-> **Verified by:** 37 backend smoke suites, a 13-step E2E user-journey check, 170
+> **Verified by:** 38 backend smoke suites, a 13-step E2E user-journey check, 170
 > frontend tests, ESLint at zero warnings, Prettier, `tsc --noEmit`, and a Docker image
 > build — all gated in CI on every push.
 > **Biggest remaining:** the live voice (LiveKit) pipeline, native audio playback,
@@ -394,9 +394,9 @@ Everything **not yet completed** to finish the project, organized by area. Check
 
 ## 13. Compliance & Polish
 
-- [ ] Consent capture + enforcement (voice + AI)
+- [x] Consent capture + enforcement (voice + AI) — `core/consent.py`; AI scoring and audio upload both refuse without it, revocation applies on the next request
 - [ ] Data export + account deletion (GDPR-style)
-- [ ] "Scores are estimates" disclaimers in UI
+- [x] "Scores are estimates" disclaimers in UI — `EstimateNote` next to every reported band
 - [ ] Play Store assets (icons, splash, screenshots, privacy policy)
 - [ ] Performance tuning (cold start, list virtualization, memoization)
 - [ ] Dark-mode QA across all screens

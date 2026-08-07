@@ -83,6 +83,20 @@ def run() -> None:
             ).json()["tokens"]["accessToken"]
         }
 
+        client.post(
+            "/v1/onboarding",
+            headers=h,
+            json={
+                "examType": "academic",
+                "selfLevel": "intermediate",
+                "targetBand": 7.0,
+                "examDate": None,
+                "dailyMinutes": 30,
+                "consentVoice": True,
+                "consentAi": True,
+            },
+        )
+
         # No history -> every module resolves to medium
         r = client.get("/v1/me/adaptive-difficulty", headers=h)
         assert r.status_code == 200, r.text
