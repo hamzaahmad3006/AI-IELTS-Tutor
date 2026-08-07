@@ -20,6 +20,7 @@ from core.config import get_settings
 from core.logging import configure_logging
 from db.session import init_models, seed_admin
 from core.metrics import MetricsMiddleware
+from core.environment import enforce
 from middleware import CorrelationIdMiddleware, register_exception_handlers
 from routes import api_router
 from routes.health import router as health_router
@@ -42,17 +43,29 @@ async def lifespan(_: FastAPI) -> AsyncIterator[None]:
     yield
 
 
+_settings = get_settings()
+
+# Refuses to start rather than warning. A warning in a log nobody reads is
+# exactly how a service ends up serving production traffic on a signing key
+# that is published in its own repository.
+enforce(_settings)
+
 app = FastAPI(
     title="AI IELTS Tutor API",
     version="1.0.0",
     description="Backend for the AI-powered IELTS preparation platform.",
     lifespan=lifespan,
+    # Suppressed outside development: interactive docs hand an attacker an
+    # accurate map of every endpoint and payload shape.
+    docs_url="/docs" if _settings.docs_enabled else None,
+    redoc_url="/redoc" if _settings.docs_enabled else None,
+    openapi_url="/openapi.json" if _settings.docs_enabled else None,
 )
 
 # CORS (useful for local browser testing; RN native does not require it).
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=_settings.cors_origins_list,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

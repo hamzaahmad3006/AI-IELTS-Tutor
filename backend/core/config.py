@@ -6,6 +6,8 @@ from functools import lru_cache
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
+from core.environment import Environment
+
 
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(
@@ -16,6 +18,12 @@ class Settings(BaseSettings):
     app_env: str = "development"
     api_v1_prefix: str = "/v1"
     log_level: str = "INFO"
+
+    #: Comma-separated origins allowed to call this API. The wildcard is a
+    #: development convenience and is refused in staging and production, where
+    #: it is both a security hole and -- combined with credentials -- rejected
+    #: by browsers anyway.
+    cors_origins: str = "*"
 
     # Security
     jwt_secret: str = "change_me_in_production"
@@ -80,6 +88,24 @@ class Settings(BaseSettings):
     rate_limit_login_per_min: int = 10
     rate_limit_register_per_min: int = 5
     rate_limit_ai_per_min: int = 20
+
+    @property
+    def environment(self) -> Environment:
+        return Environment.parse(self.app_env)
+
+    @property
+    def cors_origins_list(self) -> list[str]:
+        return [o.strip() for o in self.cors_origins.split(",") if o.strip()]
+
+    @property
+    def docs_enabled(self) -> bool:
+        """Interactive docs are a development tool.
+
+        In production they hand an attacker a complete, accurate map of every
+        endpoint and payload shape. The OpenAPI schema is still generated; it
+        is simply not served.
+        """
+        return not self.environment.is_hardened
 
     @property
     def is_sqlite(self) -> bool:

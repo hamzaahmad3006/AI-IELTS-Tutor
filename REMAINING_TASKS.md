@@ -381,7 +381,7 @@ Everything **not yet completed** to finish the project, organized by area. Check
 ## 12. DevOps / Infra
 
 - [x] Dockerfile (api, multi-stage, non-root) + docker-compose (API + Postgres) + CI image build & health check — [ ] worker/voice images
-- [ ] Environment configs (dev/staging/prod)
+- [x] Environment configs (dev/staging/prod) — `core/environment.py`; staging and production refuse to boot on published defaults, wildcard CORS, SQLite or a disabled limiter, and docs are dev-only
 - [x] CI: backend compile + Alembic up/down + smoke suites on every push/PR (GitHub Actions) — [ ] frontend typecheck/build, lint, deploy stages
 - [x] Observability: Prometheus metrics at `/metrics` (request count/latency/in-flight + AI calls, tokens, estimated spend)
 - [ ] Observability: tracing (OpenTelemetry), dashboards + alerts
