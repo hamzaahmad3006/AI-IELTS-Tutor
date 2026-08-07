@@ -216,7 +216,7 @@ Everything **not yet completed** to finish the project, organized by area. Check
 
 ## 3. Frontend — State, API & Infra
 
-- [ ] Redux slices for: speaking, writing, reading, listening, planner, analytics, vocabulary, coach, offline
+- [x] Redux slices — `createAsyncSlice` factory plus progress, trend, insights, planner, vocabulary, weakness and coach; auth and offline stay hand-written because they own real behaviour
 - [x] Typed interview API client (`interviewApi`) driving the examiner state machine
 - [ ] RTK Query (or thunks) for all real endpoints
 - [x] **Full API layer live-verified** against the backend — auth, onboarding/profile, `/me`, dashboard, analytics, and all four modules
