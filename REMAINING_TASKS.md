@@ -369,7 +369,7 @@ Everything **not yet completed** to finish the project, organized by area. Check
 - [x] Frontend unit tests — Jest in CI (band-scale logic, auth slice, onboarding slice). `npm test` was broken (missing `@react-native/jest-preset`) and is now fixed — [ ] broaden to hooks/selectors/utils
 - [x] **Every screen has a render test** (React Native Testing Library): auth (3, incl. validation interactions), all 4 practice screens, all 5 dashboard tabs + History, plus the full app tree — 38 tests / 7 suites in CI
 - [ ] Frontend E2E — Detox
-- [ ] Backend unit tests (services, repos, validators) — pytest
+- [x] Backend unit tests (pytest) — `tests/unit`, 36 tests over rounding, error mapping and request validators; found that IELTS band rounding was half-to-even and under-scoring every `.25` average
 - [x] Backend integration smoke suites (TestClient + SQLite) for all verticals, run in isolated processes via `tests/run_smoke.py` — [ ] broaden to pytest unit tests + Postgres/testcontainers
 - [x] **E2E user-journey check** (`tests/journey/journey_check.js`) — 13 steps in the app's screen order, content-agnostic, run in CI
 - [x] Frontend typecheck gate (`tsc --noEmit`) in CI
