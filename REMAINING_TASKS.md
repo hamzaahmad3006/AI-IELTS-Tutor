@@ -10,14 +10,14 @@ Everything **not yet completed** to finish the project, organized by area. Check
 > permanently unachievable. The Xcode project is still in the tree and still builds a
 > bundle in CI; it is simply not maintained or verified.
 >
-> **Status as of PR #86** — **165 of 203 checklist items done (~81%)**. Weighted by
+> **Status as of PR #86** — **169 of 204 checklist items done (~83%)**. Weighted by
 > effort it is further along than that, since the backend and data layer are largely
 > complete while most remaining items are large features (live voice, deployment) or
 > are blocked on native modules.
 > **Running on real infrastructure:** live Supabase PostgreSQL 17.6 and the real Groq
 > API, verified on a physical Android phone — register → onboarding → dashboard → all
 > four practice modules → progress → coach → profile → logout.
-> **Verified by:** 40 backend smoke suites, a 13-step E2E user-journey check, 170
+> **Verified by:** 41 backend smoke suites, a 13-step E2E user-journey check, 170
 > frontend tests, ESLint at zero warnings, Prettier, `tsc --noEmit`, and a Docker image
 > build — all gated in CI on every push.
 > **Biggest remaining:** the live voice (LiveKit) pipeline, native audio playback,
@@ -356,7 +356,7 @@ Everything **not yet completed** to finish the project, organized by area. Check
 
 - [ ] Implement full PostgreSQL schema (SRS §15) via migrations
 - [ ] Object storage (S3-compatible) for recordings/audio + signed URLs
-- [ ] Seed content scripts (passages, audio, questions, vocab, grammar)
+- [x] Seed content script (`scripts/seed_content.py`) — seeds every bank explicitly, idempotent, non-zero exit when a bank is empty so it works as a deployment gate
 - [x] Indexes on the hot query shapes (attempts, ai_interactions, refresh_tokens, weaknesses) — migration 0018
 - [x] Retention sweeps (`core/retention.py`, `scripts/run_retention.py`) — dry run by default; usage rows are anonymised before deletion so cost history survives
 - [ ] Partitioning (attempts, ai_interactions) — deferred on purpose: these tables hold thousands of rows, and partitioning an existing table means rewriting it. Revisit at millions.
@@ -374,7 +374,7 @@ Everything **not yet completed** to finish the project, organized by area. Check
 - [x] **E2E user-journey check** (`tests/journey/journey_check.js`) — 13 steps in the app's screen order, content-agnostic, run in CI
 - [x] Frontend typecheck gate (`tsc --noEmit`) in CI
 - [x] AI evaluation suite (rubric MAE vs gold set) — the harness in `backend/evals/`
-- [ ] Voice pipeline tests (latency budget, FSM, barge-in)
+- [x] Voice pipeline tests — FSM and barge-in in `test_turn_taking_smoke`/`test_agent_smoke`; latency budget in `test_voice_latency_smoke` (our own code's share, not simulated network time)
 - [ ] Load tests (k6/Locust) against SLOs
 - [x] Security tests (authz, injection, rate limits)
 
