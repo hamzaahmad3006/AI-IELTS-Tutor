@@ -10,6 +10,7 @@ from pydantic import Field
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from core.consent import require_consent
 from ai.orchestrator import AIOrchestrator, ScoringError
 from models.cue_card import CueCard
 from core.highlights import resolve_highlights
@@ -189,6 +190,11 @@ class SpeakingController:
         orchestrator: AIOrchestrator,
         payload: SpeakingSubmitRequest,
     ) -> SpeakingResultResponse:
+        # Checked before the attempt row is created: recording that a
+        # learner submitted work we then refused to score would leave a
+        # permanently unscored attempt in their history.
+        await require_consent(session, user.id, "ai")
+
         attempt = SpeakingAttempt(
             user_id=user.id,
             part=payload.part,

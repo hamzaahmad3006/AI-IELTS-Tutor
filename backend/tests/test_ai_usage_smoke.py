@@ -36,6 +36,20 @@ def run() -> None:
         lh = {"Authorization": f"Bearer {learner['tokens']['accessToken']}"}
 
         client.post(
+            "/v1/onboarding",
+            headers=lh,
+            json={
+                "examType": "academic",
+                "selfLevel": "intermediate",
+                "targetBand": 7.0,
+                "examDate": None,
+                "dailyMinutes": 30,
+                "consentVoice": True,
+                "consentAi": True,
+            },
+        )
+
+        client.post(
             "/v1/writing/attempts",
             headers=lh,
             json={"essayText": "This is a reasonably detailed essay about technology and society. " * 6, "taskType": 2},

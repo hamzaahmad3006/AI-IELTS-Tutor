@@ -43,6 +43,20 @@ def run() -> None:
             json={"email": "weak@example.com", "password": "StrongPass123"},
         ).json()
         h = {"Authorization": f"Bearer {login['tokens']['accessToken']}"}
+
+        client.post(
+            "/v1/onboarding",
+            headers=h,
+            json={
+                "examType": "academic",
+                "selfLevel": "intermediate",
+                "targetBand": 7.0,
+                "examDate": None,
+                "dailyMinutes": 30,
+                "consentVoice": True,
+                "consentAi": True,
+            },
+        )
         user_id = login["user"]["id"]
 
         # No weaknesses yet

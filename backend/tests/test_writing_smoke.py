@@ -44,6 +44,24 @@ def run() -> None:
         ).json()
         headers = {"Authorization": f"Bearer {login['tokens']['accessToken']}"}
 
+        # Onboarding, because consent is now enforced: an account that never
+        # answered the consent question has not agreed to AI scoring, and
+        # treating "never asked" as "agreed" is what made the checkbox
+        # decorative in the first place.
+        client.post(
+            "/v1/onboarding",
+            headers=headers,
+            json={
+                "examType": "academic",
+                "selfLevel": "intermediate",
+                "targetBand": 7.0,
+                "examDate": None,
+                "dailyMinutes": 30,
+                "consentVoice": True,
+                "consentAi": True,
+            },
+        )
+
         # Submit essay for scoring
         r = client.post(
             "/v1/writing/attempts",

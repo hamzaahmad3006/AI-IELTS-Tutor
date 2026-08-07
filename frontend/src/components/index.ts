@@ -3,6 +3,11 @@ export { AppText } from './AppText/AppText';
 export { Button } from './Button/Button';
 export { Card } from './Card/Card';
 export { Input } from './Input/Input';
+export {
+  EstimateNote,
+  ESTIMATE_TEXT_FULL,
+  ESTIMATE_TEXT_SHORT,
+} from './EstimateNote/EstimateNote';
 export { BandBadge } from './BandBadge/BandBadge';
 export { ProgressBar } from './ProgressBar/ProgressBar';
 export { ScreenContainer } from './ScreenContainer/ScreenContainer';
