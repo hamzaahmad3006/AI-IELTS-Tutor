@@ -73,3 +73,7 @@ tmp/
 
 # Synthesised TTS audio: regenerable, binary, and potentially large.
 backend/media/tts-cache/
+
+# Synthesised TTS audio and stored recordings: regenerable or user data,
+# neither belongs in git.
+backend/media/recordings/
