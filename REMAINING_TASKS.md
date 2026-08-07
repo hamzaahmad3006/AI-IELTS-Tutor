@@ -36,7 +36,7 @@ Everything **not yet completed** to finish the project, organized by area. Check
       deliberate `void` on fire-and-forget promises) are disabled **with reasons**
       rather than worked around case by case
 - [ ] **Verify the app boots on an Android emulator** ← main outstanding validation
-- [ ] Add `react-native-config` (or equivalent) so `.env` is actually read by the app
+- [x] `.env` read by the app — `react-native-dotenv` (pure Babel, no native module); `API_HOST` overrides Metro detection, which is the case that breaks release builds on a real phone
 - [x] Path aliases in tsconfig + Babel + Jest — 86 files migrated, zero three-level
       climbs left. `src/types` is aliased as `@models`, not `@types`, because
       module-resolver matches by prefix and would capture `@types/react`
