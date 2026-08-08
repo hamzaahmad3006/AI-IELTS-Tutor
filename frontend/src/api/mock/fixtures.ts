@@ -49,6 +49,13 @@ export const MOCK_AUTH: AuthResponse = {
 };
 
 export const MOCK_DASHBOARD: DashboardData = {
+  studyTime: {
+    todayMinutes: 18,
+    weekMinutes: 96,
+    totalMinutes: 412,
+    dailyGoalMinutes: 30,
+    dailyGoalPct: 60,
+  },
   greetingName: 'Sarah',
   streakDays: 5,
   prediction: {

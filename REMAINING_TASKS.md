@@ -10,7 +10,7 @@ Everything **not yet completed** to finish the project, organized by area. Check
 > permanently unachievable. The Xcode project is still in the tree and still builds a
 > bundle in CI; it is simply not maintained or verified.
 >
-> **Status as of PR #87** — **171 of 205 checklist items done (~83%)**. Weighted by
+> **Status as of PR #87** — **172 of 205 checklist items done (~84%)**. Weighted by
 > effort it is further along than that, since the backend and data layer are largely
 > complete while most remaining items are large features (live voice, deployment) or
 > are blocked on native modules.
@@ -210,7 +210,7 @@ Everything **not yet completed** to finish the project, organized by area. Check
 - [x] Empty / error / offline state components (`EmptyState`, three variants — a new
       account must not be told "something went wrong")
 - [x] Skeleton loaders (`Skeleton` + `SkeletonCard`, shared pulse; adopted on Progress)
-- [ ] Streak flame (animated) + progress ring (SVG)
+- [x] Streak flame + progress ring (SVG) — geometry extracted as pure functions and unit-tested, since SVG attributes are not queryable in the RN test renderer; flame intensity is logarithmic so day 1 is already visible
 
 ---
 
