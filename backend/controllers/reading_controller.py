@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from typing import Any
 
+from pydantic import Field
 from fastapi import HTTPException, status
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -11,6 +12,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from core.band_mapping import reading_band
 from models.content import Passage, Question
 from models.reading import ReadingAttempt
+from core.time_on_task import clamp
 from models.user import User
 
 from db.repository import OwnedRepository
@@ -48,6 +50,9 @@ class PassageResponse(CamelModel):
 class ReadingSubmitRequest(CamelModel):
     passage_id: str
     answers: dict[str, Any]
+    #: Seconds spent, measured by the client. Clamped server-side; see
+    #: core.time_on_task for why the client cannot simply be believed.
+    duration_sec: int = Field(default=0, ge=0)
 
 
 class PerQuestionResult(CamelModel):
@@ -525,6 +530,7 @@ class ReadingController:
 
         attempt = ReadingAttempt(
             user_id=user.id,
+            duration_sec=clamp(payload.duration_sec, "reading"),
             passage_id=passage.id,
             answers=payload.answers,
             raw_score=raw,

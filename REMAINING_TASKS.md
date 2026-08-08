@@ -10,14 +10,14 @@ Everything **not yet completed** to finish the project, organized by area. Check
 > permanently unachievable. The Xcode project is still in the tree and still builds a
 > bundle in CI; it is simply not maintained or verified.
 >
-> **Status as of PR #86** — **170 of 205 checklist items done (~83%)**. Weighted by
+> **Status as of PR #87** — **172 of 205 checklist items done (~84%)**. Weighted by
 > effort it is further along than that, since the backend and data layer are largely
 > complete while most remaining items are large features (live voice, deployment) or
 > are blocked on native modules.
 > **Running on real infrastructure:** live Supabase PostgreSQL 17.6 and the real Groq
 > API, verified on a physical Android phone — register → onboarding → dashboard → all
 > four practice modules → progress → coach → profile → logout.
-> **Verified by:** 42 backend smoke suites, a 13-step E2E user-journey check, 170
+> **Verified by:** 43 backend smoke suites, a 13-step E2E user-journey check, 170
 > frontend tests, ESLint at zero warnings, Prettier, `tsc --noEmit`, and a Docker image
 > build — all gated in CI on every push.
 > **Biggest remaining:** the live voice (LiveKit) pipeline, native audio playback,
@@ -173,7 +173,7 @@ Everything **not yet completed** to finish the project, organized by area. Check
       rebuild that cannot be verified on iOS here
 - [x] Replan on exam-date change — rebuilds only if a plan already exists, so it
       never creates one for someone who never asked
-- [ ] Real time-on-task across all four modules — needs the client to submit
+- [x] Real time-on-task across all four modules — migration 0021, client measures foreground time only, server clamps per module; surfaced on the dashboard as today/week/total against the daily goal
       elapsed time per attempt (schema + API change); only Speaking records it today
 - [x] Consent management — reachable any time from Profile, both consents
       withdrawable, and withdrawing AI states what stops working
@@ -210,7 +210,7 @@ Everything **not yet completed** to finish the project, organized by area. Check
 - [x] Empty / error / offline state components (`EmptyState`, three variants — a new
       account must not be told "something went wrong")
 - [x] Skeleton loaders (`Skeleton` + `SkeletonCard`, shared pulse; adopted on Progress)
-- [ ] Streak flame (animated) + progress ring (SVG)
+- [x] Streak flame + progress ring (SVG) — geometry extracted as pure functions and unit-tested, since SVG attributes are not queryable in the RN test renderer; flame intensity is logarithmic so day 1 is already visible
 
 ---
 

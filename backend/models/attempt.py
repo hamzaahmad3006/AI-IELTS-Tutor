@@ -35,6 +35,10 @@ class WritingAttempt(Base, TimestampMixin):
     word_count: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
     status: Mapped[str] = mapped_column(String(20), default="scored", nullable=False)
 
+    #: Seconds the learner spent on this attempt, as reported by the client
+    #: and clamped server-side. Zero means nobody measured it.
+    duration_sec: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
+
     overall_band: Mapped[float | None] = mapped_column(Float, nullable=True)
     task_response: Mapped[float | None] = mapped_column(Float, nullable=True)
     coherence_cohesion: Mapped[float | None] = mapped_column(Float, nullable=True)

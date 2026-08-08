@@ -9,6 +9,7 @@ import {
   Card,
   Icon,
   ProgressBar,
+  ProgressRing,
   ScreenContainer,
   useTheme,
 } from '@components';
@@ -75,11 +76,19 @@ export const Home: React.FC = () => {
         Ready to push your band score higher today?
       </AppText>
 
-      {/* Streak */}
-      <View style={[styles.streak, { backgroundColor: theme.colors.card }]}>
-        <Icon name="flame" size={16} color="highlight" />
-        <AppText variant="labelMd" style={styles.streakText}>
-          {data.streakDays} days streak
+      {/* Today's study time against the goal, with the streak in the middle.
+          Minutes rather than attempt counts: five two-minute taps look like
+          more work than one forty-minute essay, and minutes are what a learner
+          is actually budgeting. */}
+      <View style={styles.ring}>
+        <ProgressRing
+          value={data.studyTime.todayMinutes}
+          goal={data.studyTime.dailyGoalMinutes}
+          streakDays={data.streakDays}
+        />
+        <AppText variant="labelMd" color="textSecondary">
+          {data.studyTime.todayMinutes} of {data.studyTime.dailyGoalMinutes} min
+          today
         </AppText>
       </View>
 
@@ -277,6 +286,7 @@ const styles = StyleSheet.create({
   },
   brand: { marginLeft: SPACING.xs },
   greetingSub: { marginTop: SPACING.xxs },
+  ring: { alignItems: 'center', gap: SPACING.xs, marginVertical: SPACING.md },
   streak: {
     flexDirection: 'row',
     alignItems: 'center',

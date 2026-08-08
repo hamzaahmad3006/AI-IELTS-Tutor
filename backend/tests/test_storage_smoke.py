@@ -114,8 +114,14 @@ def check_signatures() -> None:
     # Tampered expiry.
     assert not verify(key, future + 3600, signature, SECRET)
 
-    # Tampered signature.
-    assert not verify(key, future, signature[:-1] + "0", SECRET)
+    # Tampered signature. The replacement character has to differ from the one
+    # it replaces: appending a fixed "0" produces an identical signature
+    # whenever the last hex digit is already zero, which is a one-in-sixteen
+    # test that passes locally and fails in CI.
+    flipped = "1" if signature[-1] == "0" else "0"
+    tampered = signature[:-1] + flipped
+    assert tampered != signature
+    assert not verify(key, future, tampered, SECRET)
 
 
 def check_signed_url_shape(root: Path) -> None:
