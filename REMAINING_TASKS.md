@@ -196,7 +196,7 @@ Everything **not yet completed** to finish the project, organized by area. Check
 
 - [x] Line chart / trend chart component (`LineChart`, SVG, fixed 0-9 band axis)
 - [x] Radar chart component (`RadarChart`, SVG, n-axis)
-- [ ] Waveform visualiser (input level is already exposed; the drawing is not)
+- [x] Waveform visualiser — live mic level on the interview screen; dBFS normalised over the range that matters so ordinary speech is visibly active
 - [ ] Audio player with scrubber + speed control
 - [x] Question rendering (MCQ / True-False-Not-Given radio options + short-answer input) — [ ] Matching Headings drag-connect
 - [x] Cue-card rendering (topic, prompt, bullet points)

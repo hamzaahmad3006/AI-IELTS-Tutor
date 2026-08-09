@@ -21,6 +21,7 @@ import {
   Icon,
   ProgressBar,
   ScreenContainer,
+  Waveform,
   useTheme,
 } from '@components';
 import { RADIUS, SPACING } from '@constants';
@@ -206,6 +207,12 @@ export const ExaminerInterview: React.FC = () => {
 
         {phase !== 'part2_cue' && phase !== 'part2_prep' ? (
           <>
+            {/* Answers "can you hear me?". A candidate who has tapped answer
+                and sees nothing move cannot tell whether they are being
+                recorded or whether the app has hung — and on a timed exam that
+                ambiguity costs them the question. */}
+            <Waveform level={mic.level} active={mic.isRecording} />
+
             <Pressable
               onPress={() =>
                 mic.isRecording

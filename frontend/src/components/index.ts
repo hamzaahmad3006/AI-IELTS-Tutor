@@ -9,6 +9,7 @@ export {
   ESTIMATE_TEXT_SHORT,
 } from './EstimateNote/EstimateNote';
 export { BandBadge } from './BandBadge/BandBadge';
+export { Waveform } from './Waveform/Waveform';
 export { ProgressRing } from './ProgressRing/ProgressRing';
 export { ProgressBar } from './ProgressBar/ProgressBar';
 export { ScreenContainer } from './ScreenContainer/ScreenContainer';
