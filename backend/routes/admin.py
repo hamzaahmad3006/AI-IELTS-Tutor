@@ -21,6 +21,10 @@ from controllers.admin_overview_controller import (
 from controllers.ai_usage_controller import AIUsageController, AIUsageResponse
 from controllers.pagination import DEFAULT_LIMIT
 from db.session import get_db
+from controllers.admin_reports_controller import (
+    AdminReportsController,
+    PlatformReports,
+)
 from dependencies import require_roles
 from models.user import User
 
@@ -65,3 +69,17 @@ async def update_user(
     session: DbSession,
 ) -> AdminUserItem:
     return await AdminUsersController.update_user(session, admin, user_id, payload)
+
+
+@router.get("/reports", response_model=PlatformReports)
+async def reports(
+    current: AdminUser,
+    session: DbSession,
+    days: int = 30,
+) -> PlatformReports:
+    """Trends rather than totals: growth, band distribution and retention.
+
+    The overview answers "how many". This answers "is that going up", which is
+    the only version of the question anyone acts on.
+    """
+    return await AdminReportsController.reports(session, days=days)
