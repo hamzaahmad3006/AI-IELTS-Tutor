@@ -1,7 +1,14 @@
 /** Attempt history screen (UI only). Logic in useHistory. */
 
-import React from 'react';
-import { ActivityIndicator, Pressable, StyleSheet, View } from 'react-native';
+import React, { useCallback } from 'react';
+import {
+  ActivityIndicator,
+  FlatList,
+  type ListRenderItemInfo,
+  Pressable,
+  StyleSheet,
+  View,
+} from 'react-native';
 import {
   AppText,
   BandBadge,
@@ -49,8 +56,19 @@ export const History: React.FC = () => {
     onBack,
   } = useHistory();
 
-  return (
-    <ScreenContainer scroll>
+  const renderRow = useCallback(
+    ({ item }: ListRenderItemInfo<HistoryRow>) => <HistoryCard row={item} />,
+    [],
+  );
+
+  const keyExtractor = useCallback((item: HistoryRow) => item.attemptId, []);
+
+  // Everything above the rows, rendered once as the list header rather than
+  // per row. Passed as an element rather than a component so it does not
+  // remount -- FlatList treats a new component identity as a new header and
+  // tears down the chart on every render.
+  const header = (
+    <>
       <View style={styles.header}>
         <Pressable onPress={onBack} hitSlop={8}>
           <Icon name="back" size={24} color="primary" />
@@ -134,12 +152,23 @@ export const History: React.FC = () => {
             your band and score.
           </AppText>
         </Card>
-      ) : (
-        <>
-          {rows.map(row => (
-            <HistoryCard key={row.attemptId} row={row} />
-          ))}
-          {hasMore ? (
+      ) : null}
+    </>
+  );
+
+  return (
+    <ScreenContainer>
+      <FlatList
+        data={isLoading || error ? [] : rows}
+        renderItem={renderRow}
+        keyExtractor={keyExtractor}
+        ListHeaderComponent={header}
+        // Reached before the user hits the bottom, so the next page is
+        // arriving while they are still reading the current one.
+        onEndReached={hasMore && !isLoadingMore ? loadMore : undefined}
+        onEndReachedThreshold={0.5}
+        ListFooterComponent={
+          hasMore ? (
             <Button
               title={isLoadingMore ? 'Loading…' : 'Load more'}
               variant="secondary"
@@ -147,14 +176,25 @@ export const History: React.FC = () => {
               loading={isLoadingMore}
               style={styles.section}
             />
-          ) : null}
-        </>
-      )}
+          ) : null
+        }
+        // A screenful plus a little. History cards are a fixed shape, so
+        // rendering far ahead buys nothing and costs the first paint.
+        initialNumToRender={8}
+        windowSize={7}
+        removeClippedSubviews
+        contentContainerStyle={styles.listContent}
+        testID="history-list"
+      />
     </ScreenContainer>
   );
 };
 
-const HistoryCard: React.FC<{ row: HistoryRow }> = ({ row }) => {
+/**
+ * Memoised: a list of a hundred attempts re-rendered every card on every
+ * parent render, and the rows never change once loaded.
+ */
+const HistoryCard: React.FC<{ row: HistoryRow }> = React.memo(({ row }) => {
   const band = row.band;
   return (
     <Card style={styles.card}>
@@ -181,9 +221,12 @@ const HistoryCard: React.FC<{ row: HistoryRow }> = ({ row }) => {
       </View>
     </Card>
   );
-};
+});
+
+HistoryCard.displayName = 'HistoryCard';
 
 const styles = StyleSheet.create({
+  listContent: { paddingBottom: SPACING.xl },
   header: {
     flexDirection: 'row',
     alignItems: 'center',

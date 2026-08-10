@@ -10,7 +10,7 @@ Everything **not yet completed** to finish the project, organized by area. Check
 > permanently unachievable. The Xcode project is still in the tree and still builds a
 > bundle in CI; it is simply not maintained or verified.
 >
-> **Status as of PR #90** — **178 of 207 checklist items done (~86%)**. Weighted by
+> **Status as of PR #90** — **179 of 208 checklist items done (~86%)**. Weighted by
 > effort it is further along than that, since the backend and data layer are largely
 > complete while most remaining items are large features (live voice, deployment) or
 > are blocked on native modules.
@@ -403,7 +403,8 @@ Everything **not yet completed** to finish the project, organized by area. Check
 - [x] Data export + account deletion (GDPR-style) — now covers study plans, mock tests, interview transcripts and plan tasks; a metadata-reflecting test fails when a new `user_id` table is not covered
 - [x] "Scores are estimates" disclaimers in UI — `EstimateNote` next to every reported band
 - [ ] Play Store assets (icons, splash, screenshots, privacy policy)
-- [ ] Performance tuning (cold start, list virtualization, memoization)
+- [x] Performance tuning — History (the one unbounded list) virtualised with `FlatList` + memoised rows; password hashing moved off the event loop after the load run
+- [ ] Performance: cold-start profiling (needs a device)
 - [ ] Dark-mode QA across all screens
 - [ ] Final accessibility (WCAG 2.1 AA) audit
 
