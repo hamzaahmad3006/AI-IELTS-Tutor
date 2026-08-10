@@ -130,6 +130,9 @@ class AuthController:
         )
         session.add(user)
         await session.flush()
+        # Registration signs you in, so it counts as a login.
+        user.last_login_at = datetime.now(tz=timezone.utc)
+
         tokens = await cls._issue_tokens(session, user)
         return AuthResponse(user=cls._to_user_dto(user), tokens=tokens)
 
@@ -151,6 +154,11 @@ class AuthController:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN, detail="Account is disabled"
             )
+
+        # After the checks, not before: a failed attempt is not a login, and
+        # stamping one would make a brute-force run look like activity.
+        user.last_login_at = datetime.now(tz=timezone.utc)
+
         tokens = await cls._issue_tokens(session, user)
         return AuthResponse(user=cls._to_user_dto(user), tokens=tokens)
 

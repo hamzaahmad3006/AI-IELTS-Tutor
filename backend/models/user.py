@@ -30,6 +30,13 @@ class User(Base, TimestampMixin):
     is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
     email_verified: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
 
+    #: When this account last signed in. Null means never, which is
+    #: different from "signed in at registration time" -- the distinction
+    #: matters for spotting accounts that were created and abandoned.
+    last_login_at: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True), nullable=True
+    )
+
     refresh_tokens: Mapped[list["RefreshToken"]] = relationship(
         back_populates="user", cascade="all, delete-orphan"
     )

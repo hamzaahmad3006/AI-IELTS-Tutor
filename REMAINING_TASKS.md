@@ -10,14 +10,14 @@ Everything **not yet completed** to finish the project, organized by area. Check
 > permanently unachievable. The Xcode project is still in the tree and still builds a
 > bundle in CI; it is simply not maintained or verified.
 >
-> **Status as of PR #90** — **180 of 209 checklist items done (~86%)**. Weighted by
+> **Status as of PR #90** — **181 of 210 checklist items done (~86%)**. Weighted by
 > effort it is further along than that, since the backend and data layer are largely
 > complete while most remaining items are large features (live voice, deployment) or
 > are blocked on native modules.
 > **Running on real infrastructure:** live Supabase PostgreSQL 17.6 and the real Groq
 > API, verified on a physical Android phone — register → onboarding → dashboard → all
 > four practice modules → progress → coach → profile → logout.
-> **Verified by:** 47 backend smoke suites, a 13-step E2E user-journey check, 170
+> **Verified by:** 48 backend smoke suites, a 13-step E2E user-journey check, 170
 > frontend tests, ESLint at zero warnings, Prettier, `tsc --noEmit`, and a Docker image
 > build — all gated in CI on every push.
 > **Biggest remaining:** the live voice (LiveKit) pipeline, native audio playback,
@@ -356,7 +356,8 @@ Everything **not yet completed** to finish the project, organized by area. Check
 
 ## 10. Data & Storage
 
-- [ ] Implement full PostgreSQL schema (SRS §15) via migrations
+- [x] Schema reconciled against SRS §15 — added `users.last_login_at` (migration 0023) and a drift test that fails when models and migrations disagree. `deleted_at` deliberately not added: account deletion here is real deletion, and a soft-deleted row still holds the person's essays and transcripts.
+- [ ] Postgres-native types (UUID/CITEXT/enums) as the SRS illustrates — a large migration of a working schema for limited benefit; revisit if the string columns become a problem
 - [x] Object storage port + local backend with HMAC signed URLs (`core/storage.py`); recordings require a signature, public clips do not
 - [ ] S3-compatible adapter — needs a real bucket to verify against
 - [x] Seed content script (`scripts/seed_content.py`) — seeds every bank explicitly, idempotent, non-zero exit when a bank is empty so it works as a deployment gate
