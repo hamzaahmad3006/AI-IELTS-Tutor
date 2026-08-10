@@ -131,3 +131,39 @@ class AIOrchestrator:
         )
         _stamp(result, template)
         return score, result
+
+    async def generate_content(
+        self, *, kind: str, **kwargs: object
+    ) -> tuple[BaseModel, LLMResult]:
+        """Generate one practice item and validate it against its schema.
+
+        A malformed item is a ScoringError like any other parse failure. The
+        alternative -- storing whatever came back -- means a reviewer opens a
+        draft with a missing answer field and cannot tell whether the model
+        failed or the code did.
+        """
+        from ai.generation import PROMPT_IDS, SCHEMAS  # noqa: PLC0415
+
+        if kind not in SCHEMAS:
+            raise ScoringError(f"Unknown generation kind: {kind}")
+
+        messages, template = build_prompt(PROMPT_IDS[kind], **kwargs)
+        result = await self._provider.complete(
+            messages=messages,
+            json_object=True,
+            # Higher than scoring, deliberately. Scoring wants the same answer
+            # every time; content generation wants variety, and 0.2 produces
+            # ten passages about renewable energy.
+            temperature=0.8,
+            max_tokens=1600,
+        )
+        if result.data is None:
+            raise ScoringError("Provider did not return a JSON object")
+
+        try:
+            item = SCHEMAS[kind].model_validate(result.data)
+        except Exception as exc:  # noqa: BLE001 - normalise to domain error
+            raise ScoringError(f"Invalid generated {kind}: {exc}") from exc
+
+        _stamp(result, template)
+        return item, result

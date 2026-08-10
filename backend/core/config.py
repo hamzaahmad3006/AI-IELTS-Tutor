@@ -31,6 +31,12 @@ class Settings(BaseSettings):
     #: up to do nothing. Enable it on one instance, or on a dedicated worker.
     jobs_enabled: bool = False
 
+    #: OTLP endpoint for traces, e.g. http://localhost:4318/v1/traces.
+    #: Blank disables tracing entirely -- creating spans with nowhere to send
+    #: them costs work and buffers into a queue nobody drains.
+    otel_endpoint: str = ""
+    otel_service_name: str = "ai-ielts-tutor-api"
+
     # Security
     jwt_secret: str = "change_me_in_production"
     jwt_alg: str = "HS256"

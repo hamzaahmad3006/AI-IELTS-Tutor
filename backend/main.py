@@ -23,6 +23,7 @@ from core.logging import configure_logging
 from db.session import init_models, seed_admin
 from core.metrics import MetricsMiddleware
 from core.environment import enforce
+from core.tracing import configure_tracing
 from db.session import SessionLocal
 from jobs.definitions import JOBS
 from jobs.scheduler import scheduler_loop
@@ -100,6 +101,11 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+# Installed after the app exists and before it serves, so every route is
+# instrumented. Returns False and logs when no endpoint is configured, which is
+# the default -- telemetry is never worth failing a boot for.
+configure_tracing(app)
+
 app.add_middleware(CorrelationIdMiddleware)
 # Outermost of the two, so the duration it records includes the time spent
 # in every other middleware -- which is what a latency alert should fire on.

@@ -74,7 +74,38 @@ const persistConfig = {
   whitelist: ['theme', 'offline'],
 };
 
-const persistedReducer = persistReducer(persistConfig, rootReducer);
+type RootReducerState = ReturnType<typeof rootReducer>;
+
+/**
+ * Wraps the root reducer so logging out clears every cached read.
+ *
+ * Done here rather than by dispatching a reset per slice, because a
+ * hand-written list of slices to clear is one someone forgets to update — and
+ * the thing it forgets is one learner's progress still on screen for the next
+ * person to sign in on the same device. Discarding the whole state and letting
+ * every reducer rebuild its initial value cannot be forgotten.
+ *
+ * `theme` survives, deliberately. It is a device preference rather than
+ * anyone's data, and resetting it to light mode at 11pm because someone signed
+ * out is a small hostility.
+ */
+const clearOnLogout = (
+  state: RootReducerState | undefined,
+  action: { type: string },
+): RootReducerState => {
+  if (
+    action.type === 'auth/logout' ||
+    action.type === 'auth/logoutServer/fulfilled'
+  ) {
+    return rootReducer(
+      { theme: state?.theme } as Partial<RootReducerState> as RootReducerState,
+      action,
+    );
+  }
+  return rootReducer(state, action);
+};
+
+const persistedReducer = persistReducer(persistConfig, clearOnLogout);
 
 export const store = configureStore({
   reducer: persistedReducer,

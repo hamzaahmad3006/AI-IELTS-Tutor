@@ -10,14 +10,14 @@ Everything **not yet completed** to finish the project, organized by area. Check
 > permanently unachievable. The Xcode project is still in the tree and still builds a
 > bundle in CI; it is simply not maintained or verified.
 >
-> **Status as of PR #88** — **174 of 205 checklist items done (~85%)**. Weighted by
+> **Status as of PR #89** — **177 of 207 checklist items done (~86%)**. Weighted by
 > effort it is further along than that, since the backend and data layer are largely
 > complete while most remaining items are large features (live voice, deployment) or
 > are blocked on native modules.
 > **Running on real infrastructure:** live Supabase PostgreSQL 17.6 and the real Groq
 > API, verified on a physical Android phone — register → onboarding → dashboard → all
 > four practice modules → progress → coach → profile → logout.
-> **Verified by:** 44 backend smoke suites, a 13-step E2E user-journey check, 170
+> **Verified by:** 46 backend smoke suites, a 13-step E2E user-journey check, 170
 > frontend tests, ESLint at zero warnings, Prettier, `tsc --noEmit`, and a Docker image
 > build — all gated in CI on every push.
 > **Biggest remaining:** the live voice (LiveKit) pipeline, native audio playback,
@@ -218,7 +218,7 @@ Everything **not yet completed** to finish the project, organized by area. Check
 
 - [x] Redux slices — `createAsyncSlice` factory plus progress, trend, insights, planner, vocabulary, weakness and coach; auth and offline stay hand-written because they own real behaviour
 - [x] Typed interview API client (`interviewApi`) driving the examiner state machine
-- [ ] RTK Query (or thunks) for all real endpoints
+- [x] Thunks for the endpoints that benefit from caching (`createAsyncSlice` + `contentSlices`), and logout clears them. Practice screens keep local state deliberately: a half-written essay is not shared state and putting it in a global store would be architecture for its own sake.
 - [x] **Full API layer live-verified** against the backend — auth, onboarding/profile, `/me`, dashboard, analytics, and all four modules
 - [x] **Mock data can never reach a release build** (`useMock` is gated on `__DEV__`, guarded by a test). Dev still defaults to fixtures via `USE_MOCK_IN_DEV` — [ ] set it to false once a backend is routinely running
 - [x] Fixture data kept out of release bundles — production Babel alias swaps `@fixtures` for a stub (14.4 KB removed); a CI grep asserts it stays out
@@ -309,7 +309,8 @@ Everything **not yet completed** to finish the project, organized by area. Check
 - [x] AI weakness memory: record from scored attempts (rising severity + decay), `GET /me/weaknesses` by priority — [ ] semantic (pgvector) retriever
 - [x] Adaptive difficulty controller (EMA + severity decay)
 - [x] Band predictor (transparent heuristic: weekly velocity + projection + confidence)
-- [ ] Question/passage/audio generation
+- [x] Question/passage/writing-prompt generation (`ai/generation.py`, `POST /admin/generate`) — versioned prompts, batch-capped, admin-only, and drafts for review rather than served content
+- [ ] Audio generation for listening clips — needs a TTS budget decision; the ElevenLabs cache is sized for a fixed question bank
 - [x] AI usage logging: `ai_interactions` table (provider/model/tokens/latency/cost) written on every scoring call
 - [x] Offline eval harness (gold-set MAE gate)
 - [ ] Future adapters scaffolding (LangGraph / CrewAI / AutoGen / OpenAI / Gemini / Claude)
@@ -387,7 +388,8 @@ Everything **not yet completed** to finish the project, organized by area. Check
 - [x] Environment configs (dev/staging/prod) — `core/environment.py`; staging and production refuse to boot on published defaults, wildcard CORS, SQLite or a disabled limiter, and docs are dev-only
 - [x] CI: backend compile + Alembic up/down + smoke suites on every push/PR (GitHub Actions) — [ ] frontend typecheck/build, lint, deploy stages
 - [x] Observability: Prometheus metrics at `/metrics` (request count/latency/in-flight + AI calls, tokens, estimated spend)
-- [ ] Observability: tracing (OpenTelemetry), dashboards + alerts
+- [x] Observability: OpenTelemetry tracing (`core/tracing.py`) — off unless an OTLP endpoint is set, health/ready/metrics excluded, never fatal
+- [ ] Observability: dashboards + alerts (needs a running collector)
 - [x] Health/readiness probes wired to real dependencies — `/ready` returns 503 when Postgres is unreachable; `/health` stays liveness-only
 - [ ] Kubernetes manifests / Helm (future)
 - [ ] Secrets management integration
