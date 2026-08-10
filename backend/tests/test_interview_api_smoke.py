@@ -15,6 +15,7 @@ os.environ.setdefault("DATABASE_URL", "sqlite+aiosqlite:///./test_interview_api.
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 import tests._env  # noqa: E402,F401  (pins AI_PROVIDER=mock before settings load)
+from tests._plans import grant_plan  # noqa: E402
 
 from fastapi.testclient import TestClient  # noqa: E402
 
@@ -66,6 +67,9 @@ def _auth(client: TestClient, email: str) -> dict[str, str]:
             "consentAi": True,
         },
     )
+    # The spoken interview is a paid feature; a suite that exercises it gives
+    # its learner a plan that includes it, as a real candidate would have.
+    grant_plan(email)
     return h
 
 

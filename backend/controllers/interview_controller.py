@@ -26,6 +26,7 @@ from ai.orchestrator import AIOrchestrator
 from ai.voice_providers import SpendLimitExceeded, build_stt, build_tts
 from core.config import get_settings
 from core.consent import require_consent
+from core.plans import require_capacity
 from core.errors import AppError, NotFoundError, ValidationError
 from core.livekit import VideoGrant, mint_access_token, room_name_for
 from core.interview import (
@@ -265,6 +266,11 @@ class InterviewController:
     async def start(
         session: AsyncSession, user: User, difficulty: str | None = None
     ) -> InterviewSessionOut:
+        # Checked at the start rather than at scoring: letting someone talk for
+        # twelve minutes and then refusing to grade it wastes their time as
+        # well as the transcription budget.
+        await require_capacity(session, user.id, user.plan, feature="interview")
+
         script = await _build_script(session, difficulty)
         exam = Interview(script=script)
 

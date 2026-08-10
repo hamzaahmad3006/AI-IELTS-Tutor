@@ -23,6 +23,10 @@ class User(Base, TimestampMixin):
     password_hash: Mapped[str] = mapped_column(String(255), nullable=False)
     full_name: Mapped[str] = mapped_column(String(120), nullable=False)
     role: Mapped[str] = mapped_column(String(32), default="learner", nullable=False)
+
+    #: Entitlement tier. Defaults to free; see core/plans.py for what each
+    #: one allows. Separate from `role`, which is about administration.
+    plan: Mapped[str] = mapped_column(String(20), default="free", nullable=False)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
     email_verified: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
 
