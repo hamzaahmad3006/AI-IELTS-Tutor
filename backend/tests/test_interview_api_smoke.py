@@ -15,6 +15,7 @@ os.environ.setdefault("DATABASE_URL", "sqlite+aiosqlite:///./test_interview_api.
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 import tests._env  # noqa: E402,F401  (pins AI_PROVIDER=mock before settings load)
+from tests._plans import grant_plan  # noqa: E402
 
 from fastapi.testclient import TestClient  # noqa: E402
 
@@ -66,6 +67,9 @@ def _auth(client: TestClient, email: str) -> dict[str, str]:
             "consentAi": True,
         },
     )
+    # The spoken interview is a paid feature; a suite that exercises it gives
+    # its learner a plan that includes it, as a real candidate would have.
+    grant_plan(email)
     return h
 
 
@@ -127,6 +131,51 @@ def check_audio_endpoints(client: TestClient, h: dict) -> None:
             f"/v1/interview/sessions/{session_id}/answer-audio",
             headers=other,
             files={"audio": ("a.wav", b"RIFF123", "audio/wav")},
+        ).status_code
+        == 404
+    )
+
+
+def check_recording_alignment(client: TestClient, h: dict) -> None:
+    """Recordings line up with the turns they belong to.
+
+    A transcript is a lossy record: "I think, um, maybe" and a confident
+    sentence read identically once hesitation has been flattened into text --
+    and hesitation is a scored criterion. A learner arguing with their Fluency
+    band needs to hear themselves, against the right line.
+    """
+    started = client.post("/v1/interview/sessions", headers=h)
+    session_id = started.json()["id"]
+
+    for text in ("My name is Sara.", "I live in Lahore."):
+        client.post(
+            f"/v1/interview/sessions/{session_id}/answer",
+            headers=h,
+            json={"text": text, "source": "typed"},
+        )
+
+    r = client.get(f"/v1/interview/sessions/{session_id}/transcript", headers=h)
+    assert r.status_code == 200, r.text
+    body = r.json()
+
+    # Only the candidate's answers. The examiner's questions are not the
+    # learner's words and must not appear in something labelled their
+    # transcript.
+    texts = [line["text"] for line in body["lines"]]
+    assert "My name is Sara." in texts and "I live in Lahore." in texts
+    assert "Where do you live?" not in texts
+
+    for line in body["lines"]:
+        assert line["phase"]
+        # Null is a normal state: recordings are opt-in, so a client must
+        # render the transcript without a link rather than treat it as broken.
+        assert "audioUrl" in line
+
+    # Ownership follows the session.
+    other = _auth(client, "transcript-other@example.com")
+    assert (
+        client.get(
+            f"/v1/interview/sessions/{session_id}/transcript", headers=other
         ).status_code
         == 404
     )
@@ -274,6 +323,7 @@ def run() -> None:
         assert early.status_code in (400, 422), early.text
 
         check_audio_endpoints(client, h)
+        check_recording_alignment(client, h)
 
     print("INTERVIEW API SMOKE TEST PASSED")
 

@@ -10,14 +10,14 @@ Everything **not yet completed** to finish the project, organized by area. Check
 > permanently unachievable. The Xcode project is still in the tree and still builds a
 > bundle in CI; it is simply not maintained or verified.
 >
-> **Status as of PR #89** — **177 of 207 checklist items done (~86%)**. Weighted by
+> **Status as of PR #90** — **184 of 210 checklist items done (~88%)**. Weighted by
 > effort it is further along than that, since the backend and data layer are largely
 > complete while most remaining items are large features (live voice, deployment) or
 > are blocked on native modules.
 > **Running on real infrastructure:** live Supabase PostgreSQL 17.6 and the real Groq
 > API, verified on a physical Android phone — register → onboarding → dashboard → all
 > four practice modules → progress → coach → profile → logout.
-> **Verified by:** 46 backend smoke suites, a 13-step E2E user-journey check, 170
+> **Verified by:** 48 backend smoke suites, a 13-step E2E user-journey check, 170
 > frontend tests, ESLint at zero warnings, Prettier, `tsc --noEmit`, and a Docker image
 > build — all gated in CI on every push.
 > **Biggest remaining:** the live voice (LiveKit) pipeline, native audio playback,
@@ -84,7 +84,7 @@ Everything **not yet completed** to finish the project, organized by area. Check
 - [x] Highlighted transcript + jump-to-issue markers — the AI returns verbatim
       quotes, the API locates each in the transcript and **drops any it cannot
       find**, so a paraphrase never highlights the wrong words
-- [ ] Recording replay alongside the transcript — blocked on the voice pipeline
+- [ ] Recording replay in the app UI — backend and signed URLs are done; the player needs a device-verified audio library
 - [x] Speaking history (shown in the unified History screen)
 
 ### Writing (practice + feedback built)
@@ -93,7 +93,7 @@ Everything **not yet completed** to finish the project, organized by area. Check
 - [x] Submission → scoring pending/loading state
 - [x] Task selection UI — Academic/General x Task 1/Task 2, with the Task 1 label
       following the paper (Report vs Letter) and the word target switching with it
-- [ ] Task 1 chart/image assets — Task 1 prompts currently state their data as text
+- [x] Task 1 chart assets — `core/charts.py` renders SVG line and bar charts; four generated and wired to Academic Task 1 prompts, each with a screen-reader alternative generated from the same numbers
       (a table and a process list), so they are fully answerable; real chart images
       would be an upgrade rather than a fix
 - [x] Writing timer — real IELTS allowances (20 min Task 1, 40 min Task 2), amber
@@ -331,7 +331,7 @@ Everything **not yet completed** to finish the project, organized by area. Check
 - [x] Streaming TTS adapter — ElevenLabs WebSocket (`ai/voice_providers/elevenlabs_stream.py`), first-chunk playback, counted against the same spend ledger
 - [x] Barge-in / VAD handling — `core/turn_taking.py`, pure and unit-tested; IELTS-tuned silence thresholds and the Part 2 two-minute hard stop
 - [x] Part state machine (Greeting → Part1 → Part2 cue/prep/long-turn/follow-up → Part3 → Scoring) — `core/interview.py`, pure and unit-tested; enforces the 1-minute prep and 2-minute long turn
-- [ ] Recording storage (object store, signed URLs) + transcript alignment
+- [x] Recording storage + transcript alignment — interview audio stored under a session/turn key, replayed through short-lived signed URLs, `GET /interview/sessions/{id}/transcript`; opt-in via `KEEP_RECORDINGS`
 - [x] Interview session hook (`useExaminerSession`) — server-owned phases, server-supplied countdowns, in-flight guard, re-read on failure
 - [x] Spoken interview screen (`ExaminerInterview`) — per-phase controls, cue card, server-driven countdowns, wired into navigation
 - [x] React Native recorder + mic permissions (`src/audio/recorder.ts`, `useSpokenAnswer`) — records, uploads, releases the mic on unmount; builds and links on Android
@@ -349,13 +349,15 @@ Everything **not yet completed** to finish the project, organized by area. Check
 - [x] Content management: reading passages + questions CRUD (audit-logged, RBAC content_editor/admin) — [ ] audio, cue cards, writing prompts, vocabulary, grammar lessons; versioning
 - [x] Platform analytics & reports — `GET /admin/reports`: daily activity, band distribution and cohort-correct retention
 - [x] AI usage monitoring endpoint `GET /admin/ai-usage` (tokens, cost, latency, error rate, by-model) — [ ] budget alerts
-- [ ] Subscription/plan management (future, feature-flagged)
+- [x] Plan entitlements and monthly AI limits (`core/plans.py`, migration 0022, `GET /me/plan`) — the half of subscriptions that needs no payment provider and solves the cost problem
+- [ ] Payment provider integration (Stripe/Play Billing) — needs a merchant account
 
 ---
 
 ## 10. Data & Storage
 
-- [ ] Implement full PostgreSQL schema (SRS §15) via migrations
+- [x] Schema reconciled against SRS §15 — added `users.last_login_at` (migration 0023) and a drift test that fails when models and migrations disagree. `deleted_at` deliberately not added: account deletion here is real deletion, and a soft-deleted row still holds the person's essays and transcripts.
+- [ ] Postgres-native types (UUID/CITEXT/enums) as the SRS illustrates — a large migration of a working schema for limited benefit; revisit if the string columns become a problem
 - [x] Object storage port + local backend with HMAC signed URLs (`core/storage.py`); recordings require a signature, public clips do not
 - [ ] S3-compatible adapter — needs a real bucket to verify against
 - [x] Seed content script (`scripts/seed_content.py`) — seeds every bank explicitly, idempotent, non-zero exit when a bank is empty so it works as a deployment gate
@@ -370,14 +372,14 @@ Everything **not yet completed** to finish the project, organized by area. Check
 
 - [x] Frontend unit tests — Jest in CI (band-scale logic, auth slice, onboarding slice). `npm test` was broken (missing `@react-native/jest-preset`) and is now fixed — [ ] broaden to hooks/selectors/utils
 - [x] **Every screen has a render test** (React Native Testing Library): auth (3, incl. validation interactions), all 4 practice screens, all 5 dashboard tabs + History, plus the full app tree — 38 tests / 7 suites in CI
-- [ ] Frontend E2E — Detox
+- [x] Frontend E2E — Detox configured (`.detoxrc.js`, `e2e/`) with one critical-path spec. **Never executed**: the emulator here does not boot and no device is attached, so `testID` props and onboarding step order will need fixing on the first real run. Recorded in `e2e/README.md` rather than hidden.
 - [x] Backend unit tests (pytest) — `tests/unit`, 36 tests over rounding, error mapping and request validators; found that IELTS band rounding was half-to-even and under-scoring every `.25` average
 - [x] Backend integration smoke suites (TestClient + SQLite) for all verticals, run in isolated processes via `tests/run_smoke.py` — [ ] broaden to pytest unit tests + Postgres/testcontainers
 - [x] **E2E user-journey check** (`tests/journey/journey_check.js`) — 13 steps in the app's screen order, content-agnostic, run in CI
 - [x] Frontend typecheck gate (`tsc --noEmit`) in CI
 - [x] AI evaluation suite (rubric MAE vs gold set) — the harness in `backend/evals/`
 - [x] Voice pipeline tests — FSM and barge-in in `test_turn_taking_smoke`/`test_agent_smoke`; latency budget in `test_voice_latency_smoke` (our own code's share, not simulated network time)
-- [ ] Load tests (k6/Locust) against SLOs
+- [x] Load tests against stated SLOs (`tests/load/`) — Locust, exits non-zero on breach; the first run found password hashing blocking the event loop
 - [x] Security tests (authz, injection, rate limits)
 
 ---
@@ -403,7 +405,8 @@ Everything **not yet completed** to finish the project, organized by area. Check
 - [x] Data export + account deletion (GDPR-style) — now covers study plans, mock tests, interview transcripts and plan tasks; a metadata-reflecting test fails when a new `user_id` table is not covered
 - [x] "Scores are estimates" disclaimers in UI — `EstimateNote` next to every reported band
 - [ ] Play Store assets (icons, splash, screenshots, privacy policy)
-- [ ] Performance tuning (cold start, list virtualization, memoization)
+- [x] Performance tuning — History (the one unbounded list) virtualised with `FlatList` + memoised rows; password hashing moved off the event loop after the load run
+- [ ] Performance: cold-start profiling (needs a device)
 - [ ] Dark-mode QA across all screens
 - [ ] Final accessibility (WCAG 2.1 AA) audit
 

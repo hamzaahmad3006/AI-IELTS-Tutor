@@ -10,6 +10,7 @@ from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from core.consent import require_consent
+from core.plans import require_capacity
 from core.time_on_task import clamp
 from ai.orchestrator import AIOrchestrator, ScoringError
 from models.attempt import WritingAttempt
@@ -103,6 +104,65 @@ _SEED_PROMPTS: list[dict[str, object]] = [
         "topic": "chart",
         "difficulty": "medium",
         "min_words": 150,
+        # Backed by a real chart image. Reading figures off a graph and reading
+        # them out of a sentence are different skills, and only the first is
+        # what Task 1 examines.
+        "asset_ref": "charts/transport-modes.svg",
+        "prompt": (
+            "The line graph shows the transport used to commute in one city "
+            "between 2000 and 2020. "
+            "Summarise the information by selecting and reporting the main "
+            "features, and make comparisons where relevant."
+        ),
+    },
+    {
+        "exam_type": "academic",
+        "task_number": 1,
+        "topic": "chart",
+        "difficulty": "medium",
+        "min_words": 150,
+        "asset_ref": "charts/energy-sources.svg",
+        "prompt": (
+            "The bar chart compares how two countries generated electricity "
+            "in 2022. "
+            "Summarise the information by selecting and reporting the main "
+            "features, and make comparisons where relevant."
+        ),
+    },
+    {
+        "exam_type": "academic",
+        "task_number": 1,
+        "topic": "chart",
+        "difficulty": "hard",
+        "min_words": 150,
+        "asset_ref": "charts/university-enrolment.svg",
+        "prompt": (
+            "The line graph shows university enrolment by subject area "
+            "between 2015 and 2023. "
+            "Summarise the information by selecting and reporting the main "
+            "features, and make comparisons where relevant."
+        ),
+    },
+    {
+        "exam_type": "academic",
+        "task_number": 1,
+        "topic": "chart",
+        "difficulty": "easy",
+        "min_words": 150,
+        "asset_ref": "charts/household-spending.svg",
+        "prompt": (
+            "The bar chart shows average household spending by category in "
+            "2010 and 2020. "
+            "Summarise the information by selecting and reporting the main "
+            "features, and make comparisons where relevant."
+        ),
+    },
+    {
+        "exam_type": "academic",
+        "task_number": 1,
+        "topic": "chart",
+        "difficulty": "medium",
+        "min_words": 150,
         # The data is stated in the prompt rather than shown as a chart image,
         # so the task is fully answerable before Task 1 visual assets exist.
         "prompt": (
@@ -170,17 +230,18 @@ async def _ensure_prompts_seeded(session: AsyncSession) -> None:
     guard means a database seeded from an earlier, smaller bank never receives
     newly added task types, and the learner silently gets the wrong paper.
     """
-    existing = {
-        (exam_type, task_number)
-        for exam_type, task_number in (
-            await session.execute(
-                select(WritingPrompt.exam_type, WritingPrompt.task_number).distinct()
-            )
-        ).all()
-    }
+    # Keyed on the prompt text, not on (exam_type, task_number). The coarser
+    # guard skipped every prompt in a pairing that already had one, so adding
+    # a variant -- four chart-backed Task 1 prompts to an Academic Task 1 that
+    # already existed -- inserted nothing and reported success. That is the
+    # same starvation this function was already rewritten once to avoid; the
+    # pairing granularity simply moved the problem down a level.
+    existing = set(
+        (await session.scalars(select(WritingPrompt.prompt))).all()
+    )
     added = False
     for row in _SEED_PROMPTS:
-        if (row["exam_type"], row["task_number"]) in existing:
+        if row["prompt"] in existing:
             continue
         session.add(WritingPrompt(**row, source="seed"))
         added = True
@@ -293,6 +354,10 @@ class WritingController:
         # learner submitted work we then refused to score would leave a
         # permanently unscored attempt in their history.
         await require_consent(session, user.id, "ai")
+        # Checked before the work starts. Scoring an essay and then
+        # refusing to show the result spends the money and delivers
+        # nothing, which is the worst of both.
+        await require_capacity(session, user.id, user.plan, feature="writing")
 
         attempt = WritingAttempt(
             user_id=user.id,

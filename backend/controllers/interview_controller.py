@@ -12,7 +12,10 @@ today and a streaming provider can be added without this file changing.
 
 from __future__ import annotations
 
+import logging
+
 import random
+from pathlib import Path
 from datetime import datetime, timezone
 
 from sqlalchemy import select
@@ -26,6 +29,12 @@ from ai.orchestrator import AIOrchestrator
 from ai.voice_providers import SpendLimitExceeded, build_stt, build_tts
 from core.config import get_settings
 from core.consent import require_consent
+from core.plans import require_capacity
+from core.storage import (
+    LocalStorage,
+    extension_for,
+    recording_key,
+)
 from core.errors import AppError, NotFoundError, ValidationError
 from core.livekit import VideoGrant, mint_access_token, room_name_for
 from core.interview import (
@@ -49,6 +58,8 @@ from .speaking_controller import (
     _ensure_cue_cards_seeded,
 )
 from .speaking_questions import ensure_seeded
+
+logger = logging.getLogger("interview")
 
 _sessions = OwnedRepository(InterviewSession, label="Interview session")
 
@@ -121,6 +132,21 @@ class RealtimeToken(CamelModel):
     room: str
     identity: str
     expires_at: int
+
+
+class TranscriptLine(CamelModel):
+    phase: str
+    text: str
+    #: Signed replay link, or null when the recording was not kept. Null is a
+    #: normal state -- recordings are opt-in -- so the client must render the
+    #: transcript without one rather than treating it as an error.
+    audio_url: str | None = None
+
+
+class InterviewTranscript(CamelModel):
+    id: str
+    source: str
+    lines: list[TranscriptLine]
 
 
 class AnswerRequest(CamelModel):
@@ -222,6 +248,14 @@ def _script_from_json(raw: dict) -> InterviewScript:
     )
 
 
+def _recording_store() -> LocalStorage:
+    settings = get_settings()
+    return LocalStorage(
+        root=Path(__file__).resolve().parent.parent / "media",
+        secret=settings.jwt_secret,
+    )
+
+
 def _load(row: InterviewSession) -> Interview:
     """Rebuild the machine from a stored row.
 
@@ -265,6 +299,11 @@ class InterviewController:
     async def start(
         session: AsyncSession, user: User, difficulty: str | None = None
     ) -> InterviewSessionOut:
+        # Checked at the start rather than at scoring: letting someone talk for
+        # twelve minutes and then refusing to grade it wastes their time as
+        # well as the transcription budget.
+        await require_capacity(session, user.id, user.plan, feature="interview")
+
         script = await _build_script(session, difficulty)
         exam = Interview(script=script)
 
@@ -390,6 +429,29 @@ class InterviewController:
                 f"the limit is {MAX_AUDIO_BYTES // 1024} KB"
             )
 
+        # Stored before transcription, not after. If the provider is down the
+        # learner's answer still exists; transcribing first and storing second
+        # means an outage silently discards what they said.
+        stored_key: str | None = None
+        settings = get_settings()
+        if settings.keep_recordings:
+            mime = upload.content_type or "audio/wav"
+            # Indexed by the turn this will become, so the recording and the
+            # transcript line up without a separate mapping table.
+            stored_key = recording_key(
+                row.id, len(exam.turns), extension_for(mime)
+            )
+            try:
+                _recording_store().put(stored_key, audio, content_type=mime)
+            except Exception as exc:  # noqa: BLE001 - never lose the answer
+                # A storage failure must not cost the learner their turn. The
+                # transcript is what gets scored; the audio is a convenience.
+                logger.warning(
+                    "could not store recording",
+                    extra={"session": row.id, "error": str(exc)},
+                )
+                stored_key = None
+
         stt = build_stt()
         try:
             transcript = await stt.transcribe(
@@ -405,6 +467,15 @@ class InterviewController:
         # timed test is worse than a turn scored as silence.
         exam.answer(transcript.text)
         _save(row, exam)
+        if stored_key:
+            # Written onto the turn the answer just became, so the transcript
+            # and the audio stay aligned even if turns are added later.
+            turns = list(row.turns or [])
+            for turn in reversed(turns):
+                if turn.get("speaker") == "candidate":
+                    turn["recordingKey"] = stored_key
+                    break
+            row.turns = turns
         row.transcript_source = (
             "server-stt" if stt.name != "mock" else "unknown"
         )
@@ -485,4 +556,43 @@ class InterviewController:
             room=minted.room,
             identity=minted.identity,
             expires_at=minted.expires_at,
+        )
+
+    @staticmethod
+    async def transcript(
+        session: AsyncSession, user: User, session_id: str
+    ) -> "InterviewTranscript":
+        """The candidate's answers, each with a link to what they actually said.
+
+        Replay matters because a transcript is a lossy record: "I think, um,
+        maybe" and a confident sentence read identically once hesitation has
+        been flattened into text, and hesitation is a scored criterion. A
+        learner arguing with their Fluency band needs to hear themselves.
+        """
+        row = await _sessions.get_owned(session, session_id, user.id)
+        exam = _load(row)
+
+        store = _recording_store()
+        lines: list[TranscriptLine] = []
+        for stored, turn in zip(row.turns or [], exam.turns):
+            if turn.speaker is not Speaker.CANDIDATE:
+                continue
+            key = (stored or {}).get("recordingKey")
+            audio_url = None
+            if key and store.exists(key):
+                # Signed per request rather than stored: a URL that never
+                # expires is a permanent public link to someone's voice.
+                audio_url = store.signed_url(key).path
+            lines.append(
+                TranscriptLine(
+                    phase=turn.phase.value,
+                    text=turn.text,
+                    audio_url=audio_url,
+                )
+            )
+
+        return InterviewTranscript(
+            id=row.id,
+            source=row.transcript_source,
+            lines=lines,
         )

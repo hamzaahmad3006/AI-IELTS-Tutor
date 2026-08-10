@@ -11,6 +11,7 @@ from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from core.consent import require_consent
+from core.plans import require_capacity
 from ai.orchestrator import AIOrchestrator, ScoringError
 from models.cue_card import CueCard
 from core.highlights import resolve_highlights
@@ -194,6 +195,10 @@ class SpeakingController:
         # learner submitted work we then refused to score would leave a
         # permanently unscored attempt in their history.
         await require_consent(session, user.id, "ai")
+        # Checked before the work starts. Scoring an essay and then
+        # refusing to show the result spends the money and delivers
+        # nothing, which is the worst of both.
+        await require_capacity(session, user.id, user.plan, feature="speaking")
 
         attempt = SpeakingAttempt(
             user_id=user.id,

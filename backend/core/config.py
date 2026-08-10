@@ -37,6 +37,12 @@ class Settings(BaseSettings):
     otel_endpoint: str = ""
     otel_service_name: str = "ai-ielts-tutor-api"
 
+    #: Keep interview recordings after transcribing them, so a learner can
+    #: replay what they actually said next to the transcript. Off by default:
+    #: storing someone's voice is a decision, not a side effect, and the
+    #: retention sweep does not yet cover audio.
+    keep_recordings: bool = False
+
     # Security
     jwt_secret: str = "change_me_in_production"
     jwt_alg: str = "HS256"
@@ -52,6 +58,17 @@ class Settings(BaseSettings):
     # AI (provider-agnostic)
     ai_provider: str = "groq"
     groq_api_key: str = ""
+
+    #: Any OpenAI-compatible endpoint: openai, together, openrouter, fireworks,
+    #: or a self-hosted gateway. Set AI_PROVIDER to one of those names, or to
+    #: "openai-compatible" with LLM_BASE_URL for anything else.
+    #:
+    #: This exists because a provider you cannot switch away from in an
+    #: afternoon is a single point of failure, and this project has run out of
+    #: Groq quota twice.
+    llm_api_key: str = ""
+    llm_base_url: str = ""
+    llm_model: str = ""
 
     # Voice: speech-to-text. Defaults to the mock so nothing bills by accident;
     # set STT_PROVIDER=deepgram and DEEPGRAM_API_KEY in .env to enable.

@@ -189,6 +189,31 @@ def check_media_route_enforces_signatures() -> None:
         store.delete(key)
 
 
+def check_recording_keys() -> None:
+    """Keys line a recording up with the turn it belongs to."""
+    from core.storage import extension_for, recording_key
+
+    key = recording_key("sess-1", 0, "m4a")
+    assert key.startswith(f"{RECORDINGS_PREFIX}/sess-1/")
+    # Zero-padded, so turn 2 and turn 10 sort in the order they were spoken
+    # rather than lexicographically.
+    assert "turn-000" in key
+    assert recording_key("sess-1", 10) > recording_key("sess-1", 2)
+
+    # Re-uploading the same turn overwrites rather than accumulating orphans.
+    assert recording_key("sess-1", 3) == recording_key("sess-1", 3)
+
+    # No learner id in the path: session ids are already unguessable, and a
+    # user id in a key appears in every log line that mentions the object.
+    assert "user" not in key
+
+    assert extension_for("audio/mp4") == "m4a"
+    assert extension_for("audio/wav; codecs=1") == "wav"
+    # An unknown type still produces a usable key rather than an exception.
+    assert extension_for("application/octet-stream") == "m4a"
+    assert extension_for("") == "m4a"
+
+
 def run() -> None:
     with tempfile.TemporaryDirectory() as tmp:
         check_round_trip(Path(tmp))
@@ -197,6 +222,7 @@ def run() -> None:
     with tempfile.TemporaryDirectory() as tmp:
         check_traversal_is_refused(Path(tmp))
     check_signatures()
+    check_recording_keys()
     with tempfile.TemporaryDirectory() as tmp:
         check_signed_url_shape(Path(tmp))
     check_media_route_enforces_signatures()

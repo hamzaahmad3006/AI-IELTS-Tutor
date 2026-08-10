@@ -32,6 +32,11 @@ _CONTENT_TYPES = {
     ".m4a": "audio/mp4",
     ".wav": "audio/wav",
     ".ogg": "audio/ogg",
+    # Task 1 charts. Served as image/svg+xml rather than the octet-stream
+    # fallback, which a client downloads instead of rendering.
+    ".svg": "image/svg+xml",
+    # The screen-reader alternative that ships beside each chart.
+    ".txt": "text/plain; charset=utf-8",
 }
 
 

@@ -12,11 +12,13 @@ from controllers.adaptive_controller import (
     DifficultyResponse,
     RecommendationsResponse,
 )
+from controllers.plan_controller import PlanUsageOut
 from controllers.privacy_controller import (
     DeleteAccountResponse,
     PrivacyController,
 )
 from controllers.weakness_controller import WeaknessListResponse, WeaknessService
+from core.plans import usage_for
 from db.session import get_db
 from dependencies import get_current_user
 from models.user import User
@@ -64,3 +66,22 @@ async def delete_account(
 ) -> DeleteAccountResponse:
     """Irreversibly erase the signed-in learner and all their data."""
     return await PrivacyController.delete_account(session, current)
+
+
+@router.get("/plan", response_model=PlanUsageOut)
+async def plan_usage(session: DbSession, user: CurrentUser) -> PlanUsageOut:
+    """What the learner's plan allows, and how much of it is left.
+
+    Exposed so someone can see the wall before they hit it. A limit that only
+    announces itself at the moment of refusal feels arbitrary, however
+    reasonable the number is.
+    """
+    summary = await usage_for(session, user.id, user.plan)
+    return PlanUsageOut(
+        plan=summary.plan,
+        label=summary.label,
+        used=summary.used,
+        limit=summary.limit,
+        remaining=summary.remaining,
+        spoken_interview=summary.spoken_interview,
+    )

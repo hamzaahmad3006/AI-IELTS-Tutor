@@ -18,6 +18,7 @@ os.environ.setdefault("DATABASE_URL", "sqlite+aiosqlite:///./test_consent.db")
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 import tests._env  # noqa: E402,F401  (pins AI_PROVIDER=mock before settings load)
+from tests._plans import grant_plan  # noqa: E402
 
 from fastapi.testclient import TestClient  # noqa: E402
 
@@ -109,6 +110,7 @@ def check_voice_consent_is_separate() -> None:
     with TestClient(app) as client:
         h = _register(client, "no-voice@example.com")
         _onboard(client, h, ai=True, voice=False)
+        grant_plan("no-voice@example.com")
 
         # AI scoring works: they agreed to that.
         r = client.post(
@@ -140,6 +142,7 @@ def check_consent_granted_allows_everything() -> None:
     with TestClient(app) as client:
         h = _register(client, "full-consent@example.com")
         _onboard(client, h, ai=True, voice=True)
+        grant_plan("full-consent@example.com")
 
         assert (
             client.post(

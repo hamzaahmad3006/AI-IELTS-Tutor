@@ -19,7 +19,11 @@ from controllers.interview_controller import (
     InterviewSessionOut,
 )
 from controllers.speaking_controller import SpeakingResultResponse
-from controllers.interview_controller import QuestionAudio, RealtimeToken
+from controllers.interview_controller import (
+    InterviewTranscript,
+    QuestionAudio,
+    RealtimeToken,
+)
 from db.session import get_db
 from dependencies import get_current_user, get_orchestrator
 from models.user import User
@@ -134,3 +138,11 @@ async def realtime_token(
     browser history, proxy logs and referrer headers.
     """
     return await InterviewController.realtime_token(session, user, session_id)
+
+
+@router.get("/sessions/{session_id}/transcript", response_model=InterviewTranscript)
+async def transcript(
+    session_id: str, session: DbSession, user: CurrentUser
+) -> InterviewTranscript:
+    """The candidate's answers, aligned with replay links where kept."""
+    return await InterviewController.transcript(session, user, session_id)
