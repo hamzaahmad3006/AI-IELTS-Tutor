@@ -161,3 +161,29 @@ class LocalStorage:
         return SignedUrl(
             path=f"{self.base_path}/{quote(safe)}?{query}", expires_at=expires_at
         )
+
+
+def recording_key(session_id: str, turn_index: int, extension: str = "m4a") -> str:
+    """Where one answer's audio lives.
+
+    Keyed by session and turn rather than by a random id, so a recording can be
+    found from the transcript it belongs to without a lookup table -- and so
+    re-uploading the same turn overwrites rather than accumulating orphans.
+
+    The learner id is deliberately absent: session ids are already unguessable,
+    and putting a user id in a path means it appears in every log line that
+    mentions the object.
+    """
+    return f"{RECORDINGS_PREFIX}/{session_id}/turn-{turn_index:03d}.{extension}"
+
+
+def extension_for(mime_type: str) -> str:
+    """File extension for a recording, for the media route's content type."""
+    return {
+        "audio/mp4": "m4a",
+        "audio/m4a": "m4a",
+        "audio/mpeg": "mp3",
+        "audio/wav": "wav",
+        "audio/x-wav": "wav",
+        "audio/ogg": "ogg",
+    }.get((mime_type or "").split(";")[0].strip().lower(), "m4a")

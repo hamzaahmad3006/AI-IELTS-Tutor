@@ -37,6 +37,12 @@ class Settings(BaseSettings):
     otel_endpoint: str = ""
     otel_service_name: str = "ai-ielts-tutor-api"
 
+    #: Keep interview recordings after transcribing them, so a learner can
+    #: replay what they actually said next to the transcript. Off by default:
+    #: storing someone's voice is a decision, not a side effect, and the
+    #: retention sweep does not yet cover audio.
+    keep_recordings: bool = False
+
     # Security
     jwt_secret: str = "change_me_in_production"
     jwt_alg: str = "HS256"

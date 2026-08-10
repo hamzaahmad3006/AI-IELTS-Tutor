@@ -10,7 +10,7 @@ Everything **not yet completed** to finish the project, organized by area. Check
 > permanently unachievable. The Xcode project is still in the tree and still builds a
 > bundle in CI; it is simply not maintained or verified.
 >
-> **Status as of PR #90** — **182 of 210 checklist items done (~87%)**. Weighted by
+> **Status as of PR #90** — **183 of 210 checklist items done (~87%)**. Weighted by
 > effort it is further along than that, since the backend and data layer are largely
 > complete while most remaining items are large features (live voice, deployment) or
 > are blocked on native modules.
@@ -84,7 +84,7 @@ Everything **not yet completed** to finish the project, organized by area. Check
 - [x] Highlighted transcript + jump-to-issue markers — the AI returns verbatim
       quotes, the API locates each in the transcript and **drops any it cannot
       find**, so a paraphrase never highlights the wrong words
-- [ ] Recording replay alongside the transcript — blocked on the voice pipeline
+- [ ] Recording replay in the app UI — backend and signed URLs are done; the player needs a device-verified audio library
 - [x] Speaking history (shown in the unified History screen)
 
 ### Writing (practice + feedback built)
@@ -331,7 +331,7 @@ Everything **not yet completed** to finish the project, organized by area. Check
 - [x] Streaming TTS adapter — ElevenLabs WebSocket (`ai/voice_providers/elevenlabs_stream.py`), first-chunk playback, counted against the same spend ledger
 - [x] Barge-in / VAD handling — `core/turn_taking.py`, pure and unit-tested; IELTS-tuned silence thresholds and the Part 2 two-minute hard stop
 - [x] Part state machine (Greeting → Part1 → Part2 cue/prep/long-turn/follow-up → Part3 → Scoring) — `core/interview.py`, pure and unit-tested; enforces the 1-minute prep and 2-minute long turn
-- [ ] Recording storage (object store, signed URLs) + transcript alignment
+- [x] Recording storage + transcript alignment — interview audio stored under a session/turn key, replayed through short-lived signed URLs, `GET /interview/sessions/{id}/transcript`; opt-in via `KEEP_RECORDINGS`
 - [x] Interview session hook (`useExaminerSession`) — server-owned phases, server-supplied countdowns, in-flight guard, re-read on failure
 - [x] Spoken interview screen (`ExaminerInterview`) — per-phase controls, cue card, server-driven countdowns, wired into navigation
 - [x] React Native recorder + mic permissions (`src/audio/recorder.ts`, `useSpokenAnswer`) — records, uploads, releases the mic on unmount; builds and links on Android
