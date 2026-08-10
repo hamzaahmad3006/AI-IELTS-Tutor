@@ -10,7 +10,7 @@ Everything **not yet completed** to finish the project, organized by area. Check
 > permanently unachievable. The Xcode project is still in the tree and still builds a
 > bundle in CI; it is simply not maintained or verified.
 >
-> **Status as of PR #90** — **181 of 210 checklist items done (~86%)**. Weighted by
+> **Status as of PR #90** — **182 of 210 checklist items done (~87%)**. Weighted by
 > effort it is further along than that, since the backend and data layer are largely
 > complete while most remaining items are large features (live voice, deployment) or
 > are blocked on native modules.
@@ -372,7 +372,7 @@ Everything **not yet completed** to finish the project, organized by area. Check
 
 - [x] Frontend unit tests — Jest in CI (band-scale logic, auth slice, onboarding slice). `npm test` was broken (missing `@react-native/jest-preset`) and is now fixed — [ ] broaden to hooks/selectors/utils
 - [x] **Every screen has a render test** (React Native Testing Library): auth (3, incl. validation interactions), all 4 practice screens, all 5 dashboard tabs + History, plus the full app tree — 38 tests / 7 suites in CI
-- [ ] Frontend E2E — Detox
+- [x] Frontend E2E — Detox configured (`.detoxrc.js`, `e2e/`) with one critical-path spec. **Never executed**: the emulator here does not boot and no device is attached, so `testID` props and onboarding step order will need fixing on the first real run. Recorded in `e2e/README.md` rather than hidden.
 - [x] Backend unit tests (pytest) — `tests/unit`, 36 tests over rounding, error mapping and request validators; found that IELTS band rounding was half-to-even and under-scoring every `.25` average
 - [x] Backend integration smoke suites (TestClient + SQLite) for all verticals, run in isolated processes via `tests/run_smoke.py` — [ ] broaden to pytest unit tests + Postgres/testcontainers
 - [x] **E2E user-journey check** (`tests/journey/journey_check.js`) — 13 steps in the app's screen order, content-agnostic, run in CI

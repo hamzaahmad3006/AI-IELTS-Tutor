@@ -20,6 +20,19 @@ module.exports = {
   },
   overrides: [
     {
+      // Detox specs run in their own environment: `device`, `element`, `by`
+      // and `waitFor` are injected globals. Scoped here rather than declared
+      // project-wide, so a stray `device` in app code is still an error.
+      files: ['e2e/**/*.e2e.js'],
+      env: { jest: true, node: true },
+      globals: {
+        device: 'readonly',
+        element: 'readonly',
+        by: 'readonly',
+        waitFor: 'readonly',
+      },
+    },
+    {
       files: ['**/__tests__/**/*.{ts,tsx}'],
       rules: {
         // Test harnesses legitimately define a component inline to drive a
