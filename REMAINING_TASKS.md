@@ -10,7 +10,7 @@ Everything **not yet completed** to finish the project, organized by area. Check
 > permanently unachievable. The Xcode project is still in the tree and still builds a
 > bundle in CI; it is simply not maintained or verified.
 >
-> **Status as of PR #92** — **187 of 213 checklist items done (~88%)**. Weighted by
+> **Status as of PR #92** — **188 of 215 checklist items done (~87%)**. Weighted by
 > effort it is further along than that, since the backend and data layer are largely
 > complete while most remaining items are large features (live voice, deployment) or
 > are blocked on native modules.
@@ -318,7 +318,20 @@ Everything **not yet completed** to finish the project, organized by area. Check
 - [ ] Audio generation for listening clips — needs a TTS budget decision; the ElevenLabs cache is sized for a fixed question bank
 - [x] AI usage logging: `ai_interactions` table (provider/model/tokens/latency/cost) written on every scoring call
 - [x] Offline eval harness (gold-set MAE gate)
-- [ ] Future adapters scaffolding (LangGraph / CrewAI / AutoGen / OpenAI / Gemini / Claude)
+- [x] **Provider fallback: OpenAI-compatible adapter** — one adapter covers OpenAI,
+      Together, OpenRouter, Fireworks and any self-hosted gateway, since they share
+      a wire format, so switching is a line of config rather than a new file.
+      Written because running out of Groq quota took the whole scoring path down
+      twice. Response parsing is tested against a stubbed transport for the things
+      compatible endpoints actually omit (`usage`, empty `choices`), which also
+      means the suite spends no quota
+- [ ] Anthropic / Gemini adapters — deliberately not folded into the
+      OpenAI-compatible one: system prompts, content and usage shapes all differ
+      enough that the wrapper would be worse than two honest adapters. Worth
+      writing against real keys, when someone needs them
+- [ ] Agent-framework scaffolding (LangGraph / CrewAI / AutoGen) — the examiner
+      state machine is already a pure function with a transport port, so this is a
+      swap rather than a rewrite; no current need drives it
 
 ---
 
