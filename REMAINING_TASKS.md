@@ -10,7 +10,7 @@ Everything **not yet completed** to finish the project, organized by area. Check
 > permanently unachievable. The Xcode project is still in the tree and still builds a
 > bundle in CI; it is simply not maintained or verified.
 >
-> **Status as of PR #89** — **175 of 206 checklist items done (~85%)**. Weighted by
+> **Status as of PR #89** — **176 of 206 checklist items done (~85%)**. Weighted by
 > effort it is further along than that, since the backend and data layer are largely
 > complete while most remaining items are large features (live voice, deployment) or
 > are blocked on native modules.
@@ -218,7 +218,7 @@ Everything **not yet completed** to finish the project, organized by area. Check
 
 - [x] Redux slices — `createAsyncSlice` factory plus progress, trend, insights, planner, vocabulary, weakness and coach; auth and offline stay hand-written because they own real behaviour
 - [x] Typed interview API client (`interviewApi`) driving the examiner state machine
-- [ ] RTK Query (or thunks) for all real endpoints
+- [x] Thunks for the endpoints that benefit from caching (`createAsyncSlice` + `contentSlices`), and logout clears them. Practice screens keep local state deliberately: a half-written essay is not shared state and putting it in a global store would be architecture for its own sake.
 - [x] **Full API layer live-verified** against the backend — auth, onboarding/profile, `/me`, dashboard, analytics, and all four modules
 - [x] **Mock data can never reach a release build** (`useMock` is gated on `__DEV__`, guarded by a test). Dev still defaults to fixtures via `USE_MOCK_IN_DEV` — [ ] set it to false once a backend is routinely running
 - [x] Fixture data kept out of release bundles — production Babel alias swaps `@fixtures` for a stub (14.4 KB removed); a CI grep asserts it stays out
