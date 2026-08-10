@@ -10,14 +10,14 @@ Everything **not yet completed** to finish the project, organized by area. Check
 > permanently unachievable. The Xcode project is still in the tree and still builds a
 > bundle in CI; it is simply not maintained or verified.
 >
-> **Status as of PR #89** — **176 of 206 checklist items done (~85%)**. Weighted by
+> **Status as of PR #89** — **177 of 207 checklist items done (~86%)**. Weighted by
 > effort it is further along than that, since the backend and data layer are largely
 > complete while most remaining items are large features (live voice, deployment) or
 > are blocked on native modules.
 > **Running on real infrastructure:** live Supabase PostgreSQL 17.6 and the real Groq
 > API, verified on a physical Android phone — register → onboarding → dashboard → all
 > four practice modules → progress → coach → profile → logout.
-> **Verified by:** 45 backend smoke suites, a 13-step E2E user-journey check, 170
+> **Verified by:** 46 backend smoke suites, a 13-step E2E user-journey check, 170
 > frontend tests, ESLint at zero warnings, Prettier, `tsc --noEmit`, and a Docker image
 > build — all gated in CI on every push.
 > **Biggest remaining:** the live voice (LiveKit) pipeline, native audio playback,
@@ -309,7 +309,8 @@ Everything **not yet completed** to finish the project, organized by area. Check
 - [x] AI weakness memory: record from scored attempts (rising severity + decay), `GET /me/weaknesses` by priority — [ ] semantic (pgvector) retriever
 - [x] Adaptive difficulty controller (EMA + severity decay)
 - [x] Band predictor (transparent heuristic: weekly velocity + projection + confidence)
-- [ ] Question/passage/audio generation
+- [x] Question/passage/writing-prompt generation (`ai/generation.py`, `POST /admin/generate`) — versioned prompts, batch-capped, admin-only, and drafts for review rather than served content
+- [ ] Audio generation for listening clips — needs a TTS budget decision; the ElevenLabs cache is sized for a fixed question bank
 - [x] AI usage logging: `ai_interactions` table (provider/model/tokens/latency/cost) written on every scoring call
 - [x] Offline eval harness (gold-set MAE gate)
 - [ ] Future adapters scaffolding (LangGraph / CrewAI / AutoGen / OpenAI / Gemini / Claude)

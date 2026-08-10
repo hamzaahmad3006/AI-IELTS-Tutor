@@ -19,7 +19,13 @@ from controllers.admin_content_controller import (
 )
 from controllers.pagination import DEFAULT_LIMIT
 from db.session import get_db
-from dependencies import require_roles
+from ai.orchestrator import AIOrchestrator
+from controllers.content_generation_controller import (
+    ContentGenerationController,
+    GenerateRequest,
+    GenerateResponse,
+)
+from dependencies import get_orchestrator, require_roles
 from models.user import User
 
 router = APIRouter(prefix="/admin", tags=["admin-content"])
@@ -91,3 +97,21 @@ async def delete_question(
     question_id: str, admin: ContentAdmin, session: DbSession
 ) -> None:
     await AdminContentController.delete_question(session, admin, question_id)
+
+
+@router.post("/generate", response_model=GenerateResponse)
+async def generate_content(
+    payload: GenerateRequest,
+    current: ContentAdmin,
+    session: DbSession,
+    orchestrator: Annotated[AIOrchestrator, Depends(get_orchestrator)],
+) -> GenerateResponse:
+    """Generate practice content as drafts for review.
+
+    Nothing generated here is served to a learner. A model asked for an IELTS
+    question will occasionally write one with two defensible answers, and a
+    learner marked wrong by a broken question learns the wrong lesson.
+    """
+    return await ContentGenerationController.generate(
+        session, current, orchestrator, payload
+    )
