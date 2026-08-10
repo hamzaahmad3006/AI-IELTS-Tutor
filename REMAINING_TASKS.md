@@ -10,7 +10,7 @@ Everything **not yet completed** to finish the project, organized by area. Check
 > permanently unachievable. The Xcode project is still in the tree and still builds a
 > bundle in CI; it is simply not maintained or verified.
 >
-> **Status as of PR #90** — **183 of 210 checklist items done (~87%)**. Weighted by
+> **Status as of PR #90** — **184 of 210 checklist items done (~88%)**. Weighted by
 > effort it is further along than that, since the backend and data layer are largely
 > complete while most remaining items are large features (live voice, deployment) or
 > are blocked on native modules.
@@ -93,7 +93,7 @@ Everything **not yet completed** to finish the project, organized by area. Check
 - [x] Submission → scoring pending/loading state
 - [x] Task selection UI — Academic/General x Task 1/Task 2, with the Task 1 label
       following the paper (Report vs Letter) and the word target switching with it
-- [ ] Task 1 chart/image assets — Task 1 prompts currently state their data as text
+- [x] Task 1 chart assets — `core/charts.py` renders SVG line and bar charts; four generated and wired to Academic Task 1 prompts, each with a screen-reader alternative generated from the same numbers
       (a table and a process list), so they are fully answerable; real chart images
       would be an upgrade rather than a fix
 - [x] Writing timer — real IELTS allowances (20 min Task 1, 40 min Task 2), amber

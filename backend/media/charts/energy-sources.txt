@@ -1,0 +1,1 @@
+Electricity generation by source in two countries, 2022. Vertical axis: Share of generation. Country A: Coal 40%, Gas 25%, Nuclear 15%, Hydro 10%, Wind and solar 10%. Country B: Coal 10%, Gas 20%, Nuclear 5%, Hydro 25%, Wind and solar 40%.
