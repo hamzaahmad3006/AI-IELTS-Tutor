@@ -10,7 +10,13 @@ import {
   ScreenContainer,
   useTheme,
 } from '@components';
-import { PALETTE, RADIUS, SPACING, type IconName } from '@constants';
+import {
+  PALETTE,
+  RADIUS,
+  readableOn,
+  SPACING,
+  type IconName,
+} from '@constants';
 import type { AdaptiveDifficultyItem, IeltsModule } from '@models';
 import { usePractice } from './usePractice';
 
@@ -110,7 +116,10 @@ const ModuleCard: React.FC<{
               <AppText variant="titleLg">{meta.label}</AppText>
               {level && color ? (
                 <View style={[styles.pill, { backgroundColor: color }]}>
-                  <AppText variant="labelSm" color="textInverse">
+                  <AppText
+                    variant="labelSm"
+                    style={{ color: readableOn(color) }}
+                  >
                     {level.difficulty.toUpperCase()}
                   </AppText>
                 </View>

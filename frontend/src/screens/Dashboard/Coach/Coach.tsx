@@ -11,7 +11,13 @@ import {
   ScreenContainer,
   useTheme,
 } from '@components';
-import { PALETTE, RADIUS, SPACING, type IconName } from '@constants';
+import {
+  readableOn,
+  PALETTE,
+  RADIUS,
+  SPACING,
+  type IconName,
+} from '@constants';
 import type {
   AdaptiveDifficultyItem,
   IeltsModule,
@@ -90,12 +96,22 @@ export const Coach: React.FC = () => {
 
       {/* Coach message */}
       <View
-        style={[styles.coachBanner, { backgroundColor: PALETTE.tealContainer }]}
+        style={[
+          styles.coachBanner,
+          { backgroundColor: theme.colors.accentContainer },
+        ]}
       >
         <View style={[styles.coachIcon, { backgroundColor: PALETTE.teal }]}>
-          <Icon name="coach" size={22} color="textInverse" />
+          {/* onAccent, not textInverse: the teal disc is a fixed colour, so a
+              foreground that flips with the theme put a white icon on teal
+              (2.49:1) in light mode. */}
+          <Icon name="coach" size={22} color="onAccent" />
         </View>
-        <AppText variant="bodyMd" style={styles.coachMessage}>
+        <AppText
+          variant="bodyMd"
+          color="onAccentContainer"
+          style={styles.coachMessage}
+        >
           {message}
         </AppText>
       </View>
@@ -207,7 +223,7 @@ const DifficultyRow: React.FC<{ item: AdaptiveDifficultyItem }> = ({
       <View style={styles.diffHead}>
         <AppText variant="bodyMd">{MODULE_LABELS[item.module]}</AppText>
         <View style={[styles.diffPill, { backgroundColor: color }]}>
-          <AppText variant="labelSm" color="textInverse">
+          <AppText variant="labelSm" style={{ color: readableOn(color) }}>
             {item.difficulty.toUpperCase()}
           </AppText>
         </View>

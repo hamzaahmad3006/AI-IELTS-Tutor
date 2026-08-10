@@ -3,7 +3,13 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import { AppText } from '../AppText/AppText';
-import { getBandColor, getBandScaleLabel, RADIUS, SPACING } from '@constants';
+import {
+  getBandColor,
+  getBandScaleLabel,
+  ON_BRIGHT_FILL,
+  RADIUS,
+  SPACING,
+} from '@constants';
 
 interface BandBadgeProps {
   band: number;
@@ -20,7 +26,9 @@ export const BandBadge: React.FC<BandBadgeProps> = ({
     display === 'scale' ? getBandScaleLabel(band) : `Band ${band.toFixed(1)}`;
   return (
     <View style={[styles.badge, { backgroundColor: color }]}>
-      <AppText variant="labelMd" color="textInverse">
+      {/* Fixed ink, not `textInverse`: the pill colour does not follow the
+          theme, so its label must not either. */}
+      <AppText variant="labelMd" style={styles.label}>
         {label}
       </AppText>
     </View>
@@ -34,4 +42,5 @@ const styles = StyleSheet.create({
     paddingVertical: SPACING.xxs,
     alignSelf: 'flex-start',
   },
+  label: { color: ON_BRIGHT_FILL },
 });

@@ -10,14 +10,14 @@ Everything **not yet completed** to finish the project, organized by area. Check
 > permanently unachievable. The Xcode project is still in the tree and still builds a
 > bundle in CI; it is simply not maintained or verified.
 >
-> **Status as of PR #90** — **184 of 210 checklist items done (~88%)**. Weighted by
+> **Status as of PR #92** — **187 of 213 checklist items done (~88%)**. Weighted by
 > effort it is further along than that, since the backend and data layer are largely
 > complete while most remaining items are large features (live voice, deployment) or
 > are blocked on native modules.
 > **Running on real infrastructure:** live Supabase PostgreSQL 17.6 and the real Groq
 > API, verified on a physical Android phone — register → onboarding → dashboard → all
 > four practice modules → progress → coach → profile → logout.
-> **Verified by:** 48 backend smoke suites, a 13-step E2E user-journey check, 170
+> **Verified by:** 50 backend smoke suites, a 13-step E2E user-journey check, 347
 > frontend tests, ESLint at zero warnings, Prettier, `tsc --noEmit`, and a Docker image
 > build — all gated in CI on every push.
 > **Biggest remaining:** the live voice (LiveKit) pipeline, native audio playback,
@@ -232,7 +232,12 @@ Everything **not yet completed** to finish the project, organized by area. Check
 - [x] Error boundary + global error handling (`ErrorBoundary` at the root; requests
       that never reach the server raise a toast, HTTP errors stay with the screen)
 - [x] Localisation setup (`src/i18n`) + spoken accessibility labels — interview screen, recorder errors and the estimate disclaimer all read from the dictionary
-- [ ] Accessibility: dynamic type + contrast audit (needs a device)
+- [x] Accessibility: **contrast audit** — every text/surface pair in both themes
+      measured against WCAG AA and enforced in CI (`constants/__tests__/contrast.test.ts`,
+      55 assertions). Found and fixed 11 real failures; listed under "Final
+      accessibility" below
+- [ ] Accessibility: dynamic type (font scaling) — needs a device, to check the
+      layouts survive the larger system font sizes
 
 ---
 
@@ -407,8 +412,25 @@ Everything **not yet completed** to finish the project, organized by area. Check
 - [ ] Play Store assets (icons, splash, screenshots, privacy policy)
 - [x] Performance tuning — History (the one unbounded list) virtualised with `FlatList` + memoised rows; password hashing moved off the event loop after the load run
 - [ ] Performance: cold-start profiling (needs a device)
-- [ ] Dark-mode QA across all screens
-- [ ] Final accessibility (WCAG 2.1 AA) audit
+- [x] **Dark-mode QA — the static half.** Zero hardcoded hex outside `constants/`,
+      and the two `rgba()` washes that assumed a white card are gone. The real
+      defect was structural: fills that do not follow the theme (band pills,
+      difficulty chips, the teal discs, the indigo CTA, the splash) took their
+      foreground from `textInverse`, which does flip — so exactly one theme was
+      wrong every time. `readableOn(fill)` now picks the foreground by
+      measurement, and the coach/tip panels became real `accentContainer` /
+      `onAccentContainer` roles instead of a fixed mint
+- [ ] Dark-mode QA: the visual pass on a device (spacing, elevation, gradients —
+      the things a ratio cannot judge)
+- [x] **Accessibility (WCAG 2.1 AA) — colour contrast.** 11 real failures found
+      and fixed, worst first: coach banner text 1.17:1 (invisible in dark mode),
+      primary CTA label on the accent gradient 1.86:1, tip link 1.87:1, LIME band
+      badge 1.98:1, AMBER badge and "Hard" grade button 2.15:1, consent warning
+      2.15:1, teal checkboxes/discs 2.49:1, success text 2.54:1, indigo CTA in
+      dark mode 2.70:1, dark-theme `textMuted` 3.63:1 and `info` 3.11:1. All are
+      now enforced by the CI suite rather than re-eyeballed
+- [ ] Accessibility: the rest of AA — touch-target sizes, focus order, screen
+      reader traversal. Needs a device and TalkBack
 
 ---
 

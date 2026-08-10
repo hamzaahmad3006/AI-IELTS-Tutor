@@ -4,7 +4,14 @@ import React from 'react';
 import { StatusBar, StyleSheet, View } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import { AppText, Icon, Logo } from '@components';
-import { PALETTE, RADIUS, SPACING, LAYOUT } from '@constants';
+import {
+  ON_BRIGHT_FILL,
+  ON_DARK_FILL,
+  PALETTE,
+  RADIUS,
+  SPACING,
+  LAYOUT,
+} from '@constants';
 import { useSplash } from './useSplash';
 
 export const Splash: React.FC = () => {
@@ -21,26 +28,30 @@ export const Splash: React.FC = () => {
       <View style={styles.center}>
         <View style={styles.logoTile}>
           <Logo size={LAYOUT.logoSizeSplash * 0.62} />
-          <AppText variant="labelMd" color="textPrimary" style={styles.mark}>
+          {/* The tile is always white, so its text is always dark ink --
+              `textPrimary` is near-white in dark mode and vanished on it. */}
+          <AppText variant="labelMd" style={styles.mark}>
             {brandMark}
           </AppText>
         </View>
 
-        <AppText variant="headlineLg" color="textInverse" style={styles.title}>
+        {/* Fixed white throughout: the splash gradient is the brand indigo
+            in both themes, and does not follow the theme the way
+            `textInverse` does. */}
+        <AppText variant="headlineLg" style={[styles.onBrand, styles.title]}>
           {displayName}
         </AppText>
         <AppText
           variant="bodyLg"
-          color="textInverse"
           align="center"
-          style={styles.tagline}
+          style={[styles.onBrand, styles.tagline]}
         >
           {tagline}
         </AppText>
 
         <View style={styles.poweredRow}>
           <Icon name="sparkle" size={16} color="accent" />
-          <AppText variant="labelSm" color="textInverse" style={styles.powered}>
+          <AppText variant="labelSm" style={[styles.onBrand, styles.powered]}>
             {poweredBy}
           </AppText>
         </View>
@@ -70,7 +81,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginBottom: SPACING.xxl,
   },
-  mark: { marginTop: SPACING.xxs, letterSpacing: 1 },
+  mark: { marginTop: SPACING.xxs, letterSpacing: 1, color: ON_BRIGHT_FILL },
+  onBrand: { color: ON_DARK_FILL },
   title: { marginBottom: SPACING.sm },
   tagline: { opacity: 0.85 },
   poweredRow: {

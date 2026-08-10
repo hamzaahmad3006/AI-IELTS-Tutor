@@ -11,7 +11,7 @@ import {
   ScreenContainer,
   useTheme,
 } from '@components';
-import { getBandColor, RADIUS, SPACING } from '@constants';
+import { getBandColor, readableOn, RADIUS, SPACING } from '@constants';
 import { APP_CONFIG } from '@constants';
 import { useTargetBand } from './useTargetBand';
 
@@ -80,13 +80,19 @@ export const TargetBand: React.FC = () => {
         {/* Target circle */}
         <View style={styles.circleWrap}>
           <View style={[styles.circle, { backgroundColor: bandColor }]}>
-            <AppText variant="labelMd" color="textInverse">
+            {/* Measured against the band fill rather than taken from the
+                theme: the circle is a band colour in both themes, so a
+                foreground that flips left white on amber at 2.15:1. */}
+            <AppText variant="labelMd" style={{ color: readableOn(bandColor) }}>
               TARGET
             </AppText>
-            <AppText variant="displayLg" color="textInverse">
+            <AppText
+              variant="displayLg"
+              style={{ color: readableOn(bandColor) }}
+            >
               {targetBand.toFixed(1)}
             </AppText>
-            <AppText variant="titleLg" color="textInverse">
+            <AppText variant="titleLg" style={{ color: readableOn(bandColor) }}>
               {bandUserLabel}
             </AppText>
           </View>

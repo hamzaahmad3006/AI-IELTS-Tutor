@@ -193,7 +193,7 @@ const TaskRow: React.FC<{ task: PlanTask; onToggle: () => void }> = ({
             ]}
           >
             {task.isDone ? (
-              <Icon name="check" size={14} color="textInverse" />
+              <Icon name="check" size={14} color="onAccent" />
             ) : null}
           </View>
           <View style={styles.grow}>

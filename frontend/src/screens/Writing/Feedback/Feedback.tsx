@@ -14,13 +14,7 @@ import {
   ScreenContainer,
   useTheme,
 } from '@components';
-import {
-  getBandColor,
-  PALETTE,
-  RADIUS,
-  SPACING,
-  type IconName,
-} from '@constants';
+import { getBandColor, RADIUS, SPACING, type IconName } from '@constants';
 import type {
   EssaySegment,
   FeedbackTab,
@@ -122,24 +116,42 @@ export const Feedback: React.FC = () => {
       </Card>
 
       {/* Master tip */}
-      <View style={[styles.tip, { backgroundColor: PALETTE.tealContainer }]}>
-        <AppText variant="labelMd" style={styles.tipTitle}>
+      <View
+        style={[styles.tip, { backgroundColor: theme.colors.accentContainer }]}
+      >
+        <AppText variant="labelMd" color="onAccentContainer">
           Master Tip
         </AppText>
-        <AppText variant="bodyMd" style={styles.tipBody}>
+        <AppText
+          variant="bodyMd"
+          color="onAccentContainer"
+          style={styles.tipBody}
+        >
           {feedback.masterTip}
         </AppText>
         <View style={styles.tipLink}>
-          <AppText variant="labelMd" style={styles.tipLinkText}>
+          {/* Label and chevron both on the container's foreground. Mid-teal
+              was 1.87:1 on the light mint, and a fixed deep teal would be just
+              as unreadable once the panel itself goes dark. */}
+          <AppText
+            variant="labelMd"
+            color="onAccentContainer"
+            style={styles.tipLinkText}
+          >
             Learn more
           </AppText>
-          <Icon name="arrow-right" size={16} color="accent" />
+          <Icon name="arrow-right" size={16} color="onAccentContainer" />
         </View>
       </View>
 
       {/* Draft / Model tabs */}
       <Card style={styles.section}>
-        <View style={styles.tabs}>
+        {/* Themed rather than a black wash: the old rgba(0,0,0,0.04) was tuned
+            for a white card and, on a dark card, darkened an already dark
+            surface until the strip disappeared. */}
+        <View
+          style={[styles.tabs, { backgroundColor: theme.colors.containerHigh }]}
+        >
           <TabButton
             label="Your Draft"
             tab="draft"
@@ -284,7 +296,8 @@ const Segment: React.FC<{ segment: EssaySegment }> = ({ segment }) => {
     return (
       <AppText
         variant="bodyLg"
-        style={{ backgroundColor: PALETTE.tealContainer }}
+        color="onAccentContainer"
+        style={{ backgroundColor: theme.colors.accentContainer }}
       >
         {segment.text}
       </AppText>
@@ -365,17 +378,17 @@ const styles = StyleSheet.create({
     padding: SPACING.md,
     marginTop: SPACING.lg,
   },
-  tipTitle: { color: PALETTE.tealDeep },
-  tipBody: { marginTop: SPACING.xxs, color: PALETTE.ink2 },
+  // Colour comes from the onAccentContainer prop; a colour here would win
+  // over it, since style is flattened last.
+  tipBody: { marginTop: SPACING.xxs },
   tipLink: {
     flexDirection: 'row',
     alignItems: 'center',
     marginTop: SPACING.sm,
   },
-  tipLinkText: { color: PALETTE.teal, marginRight: SPACING.xxs },
+  tipLinkText: { marginRight: SPACING.xxs },
   tabs: {
     flexDirection: 'row',
-    backgroundColor: 'rgba(0,0,0,0.04)',
     borderRadius: RADIUS.pill,
     padding: SPACING.xxs,
     marginBottom: SPACING.md,

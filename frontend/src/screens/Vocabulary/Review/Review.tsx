@@ -11,7 +11,7 @@ import {
   ScreenContainer,
   useTheme,
 } from '@components';
-import { PALETTE, RADIUS, SPACING } from '@constants';
+import { ON_BRIGHT_FILL, PALETTE, RADIUS, SPACING } from '@constants';
 import type { VocabGrade } from '@models';
 import { useVocabularyReview } from './useVocabularyReview';
 
@@ -175,7 +175,10 @@ export const Review: React.FC = () => {
                       { backgroundColor: option.color },
                     ]}
                   >
-                    <AppText variant="labelMd" color="textInverse">
+                    {/* Fixed ink: the grade fills are PALETTE constants that
+                        do not follow the theme, so a label that does lands as
+                        white on amber in light mode. */}
+                    <AppText variant="labelMd" style={styles.gradeButtonLabel}>
                       {option.label}
                     </AppText>
                   </Pressable>
@@ -247,6 +250,7 @@ const styles = StyleSheet.create({
   example: { marginTop: SPACING.sm, fontStyle: 'italic' },
   gradeLabel: { marginTop: SPACING.lg, marginBottom: SPACING.xs },
   gradeRow: { flexDirection: 'row', flexWrap: 'wrap' },
+  gradeButtonLabel: { color: ON_BRIGHT_FILL },
   gradeButton: {
     flexGrow: 1,
     alignItems: 'center',

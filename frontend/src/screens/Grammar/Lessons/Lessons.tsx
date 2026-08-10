@@ -10,7 +10,7 @@ import {
   ScreenContainer,
   useTheme,
 } from '@components';
-import { PALETTE, RADIUS, SPACING } from '@constants';
+import { RADIUS, SPACING } from '@constants';
 import type { GrammarExample, GrammarLessonSummary } from '@models';
 import { useGrammarLessons } from './useGrammarLessons';
 
@@ -103,10 +103,17 @@ export const Lessons: React.FC = () => {
 
       {recommendedCount > 0 ? (
         <View
-          style={[styles.banner, { backgroundColor: PALETTE.tealContainer }]}
+          style={[
+            styles.banner,
+            { backgroundColor: theme.colors.accentContainer },
+          ]}
         >
-          <Icon name="sparkle" size={18} color="accent" />
-          <AppText variant="bodyMd" style={styles.bannerText}>
+          <Icon name="sparkle" size={18} color="onAccentContainer" />
+          <AppText
+            variant="bodyMd"
+            color="onAccentContainer"
+            style={styles.bannerText}
+          >
             {recommendedCount} lesson{recommendedCount === 1 ? '' : 's'} target
             mistakes the AI examiner found in your work.
           </AppText>
@@ -157,7 +164,7 @@ const LessonCard: React.FC<{
             <View
               style={[styles.pill, { backgroundColor: theme.colors.accent }]}
             >
-              <AppText variant="labelSm" color="textInverse">
+              <AppText variant="labelSm" color="onAccent">
                 FOR YOU
               </AppText>
             </View>

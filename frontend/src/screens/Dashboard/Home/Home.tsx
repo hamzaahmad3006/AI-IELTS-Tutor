@@ -15,6 +15,7 @@ import {
 } from '@components';
 import {
   APP_CONFIG,
+  ON_DARK_FILL,
   PALETTE,
   RADIUS,
   SPACING,
@@ -119,13 +120,27 @@ export const Home: React.FC = () => {
       </Card>
 
       {/* Daily coach */}
-      <View style={[styles.coach, { backgroundColor: PALETTE.tealContainer }]}>
+      <View
+        style={[
+          styles.coach,
+          { backgroundColor: theme.colors.accentContainer },
+        ]}
+      >
         <View style={styles.coachIcon}>
           <Icon name="coach" size={22} color="onAccent" />
         </View>
         <View style={styles.coachText}>
-          <AppText variant="labelMd">{data.coach.title}</AppText>
-          <AppText variant="bodyMd" style={styles.coachMsg}>
+          {/* Both on the container's own foreground. The default `textPrimary`
+              is near-white in dark mode and was landing on the mint panel at
+              1.17:1. */}
+          <AppText variant="labelMd" color="onAccentContainer">
+            {data.coach.title}
+          </AppText>
+          <AppText
+            variant="bodyMd"
+            color="onAccentContainer"
+            style={styles.coachMsg}
+          >
             "{data.coach.message}"
           </AppText>
         </View>
@@ -162,10 +177,12 @@ export const Home: React.FC = () => {
         end={{ x: 1, y: 1 }}
         style={styles.mock}
       >
-        <AppText variant="headlineMd" color="textInverse">
+        {/* Fixed white: the card is an indigo gradient in both themes, so
+            `textInverse` turned near-black on indigo (2.70:1) in dark mode. */}
+        <AppText variant="headlineMd" style={styles.onIndigo}>
           Ready for a Full Simulation?
         </AppText>
-        <AppText variant="bodyMd" color="textInverse" style={styles.mockBody}>
+        <AppText variant="bodyMd" style={[styles.onIndigo, styles.mockBody]}>
           Take a timed mock test and get instant AI-powered feedback across all
           four sections.
         </AppText>
@@ -174,11 +191,12 @@ export const Home: React.FC = () => {
             colors={[PALETTE.teal400, PALETTE.teal600]}
             style={styles.mockBtnInner}
           >
-            <AppText variant="button" color="textInverse">
+            {/* onAccent for the teal button: white on teal400 is 1.86:1. */}
+            <AppText variant="button" color="onAccent">
               Start Mock Test
             </AppText>
             <View style={styles.mockBtnIcon}>
-              <Icon name="rocket" size={20} color="textInverse" />
+              <Icon name="rocket" size={20} color="onAccent" />
             </View>
           </LinearGradient>
         </Pressable>
@@ -385,6 +403,7 @@ const styles = StyleSheet.create({
     padding: SPACING.lg,
     marginTop: SPACING.lg,
   },
+  onIndigo: { color: ON_DARK_FILL },
   mockBody: { marginTop: SPACING.xs, opacity: 0.9 },
   mockBtn: { marginTop: SPACING.lg, alignSelf: 'flex-start' },
   mockBtnInner: {
