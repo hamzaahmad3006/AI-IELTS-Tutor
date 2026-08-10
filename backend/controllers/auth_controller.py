@@ -16,9 +16,9 @@ from core.config import get_settings
 from core.security import (
     create_access_token,
     generate_refresh_token,
-    hash_password,
+    hash_password_async,
     hash_refresh_token,
-    verify_password,
+    verify_password_async,
 )
 from core.validation import validate_email, validate_password
 from core.errors import AlreadyExistsError
@@ -124,7 +124,7 @@ class AuthController:
             raise AlreadyExistsError("An account with this email already exists")
         user = User(
             email=payload.email.lower(),
-            password_hash=hash_password(payload.password),
+            password_hash=await hash_password_async(payload.password),
             full_name=payload.full_name,
             role="learner",
         )
@@ -140,7 +140,9 @@ class AuthController:
         user = await session.scalar(
             select(User).where(User.email == payload.email.lower())
         )
-        if user is None or not verify_password(payload.password, user.password_hash):
+        if user is None or not await verify_password_async(
+            payload.password, user.password_hash
+        ):
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Invalid email or password",

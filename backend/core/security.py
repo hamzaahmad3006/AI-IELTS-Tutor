@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import asyncio
+
 import hashlib
 import secrets
 from datetime import datetime, timedelta, timezone
@@ -15,11 +17,33 @@ _pwd_context = CryptContext(schemes=["argon2"], deprecated="auto")
 
 
 def hash_password(plain: str) -> str:
+    """Hash a password. Blocking: prefer `hash_password_async` in a handler."""
     return _pwd_context.hash(plain)
 
 
 def verify_password(plain: str, hashed: str) -> bool:
+    """Verify a password. Blocking: prefer `verify_password_async`."""
     return _pwd_context.verify(plain, hashed)
+
+
+async def hash_password_async(plain: str) -> str:
+    """Hash off the event loop.
+
+    Argon2 with these parameters is ~140ms of solid CPU. Called directly from
+    an async handler it blocks the *entire* process for that long -- not just
+    the one request -- so twenty people signing in at once queue behind each
+    other and p95 goes to seconds. A load test measured exactly that: 7.5s at
+    twenty users, against 140ms for a single hash.
+
+    A thread genuinely helps here because Argon2 is C code that releases the
+    GIL while it works, so the event loop keeps serving other requests.
+    """
+    return await asyncio.to_thread(_pwd_context.hash, plain)
+
+
+async def verify_password_async(plain: str, hashed: str) -> bool:
+    """Verify off the event loop, for the same reason."""
+    return await asyncio.to_thread(_pwd_context.verify, plain, hashed)
 
 
 def create_access_token(subject: str, role: str) -> str:

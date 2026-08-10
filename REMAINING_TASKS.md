@@ -10,7 +10,7 @@ Everything **not yet completed** to finish the project, organized by area. Check
 > permanently unachievable. The Xcode project is still in the tree and still builds a
 > bundle in CI; it is simply not maintained or verified.
 >
-> **Status as of PR #89** — **177 of 207 checklist items done (~86%)**. Weighted by
+> **Status as of PR #90** — **178 of 207 checklist items done (~86%)**. Weighted by
 > effort it is further along than that, since the backend and data layer are largely
 > complete while most remaining items are large features (live voice, deployment) or
 > are blocked on native modules.
@@ -377,7 +377,7 @@ Everything **not yet completed** to finish the project, organized by area. Check
 - [x] Frontend typecheck gate (`tsc --noEmit`) in CI
 - [x] AI evaluation suite (rubric MAE vs gold set) — the harness in `backend/evals/`
 - [x] Voice pipeline tests — FSM and barge-in in `test_turn_taking_smoke`/`test_agent_smoke`; latency budget in `test_voice_latency_smoke` (our own code's share, not simulated network time)
-- [ ] Load tests (k6/Locust) against SLOs
+- [x] Load tests against stated SLOs (`tests/load/`) — Locust, exits non-zero on breach; the first run found password hashing blocking the event loop
 - [x] Security tests (authz, injection, rate limits)
 
 ---
