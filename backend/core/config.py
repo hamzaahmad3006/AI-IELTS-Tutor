@@ -59,6 +59,17 @@ class Settings(BaseSettings):
     ai_provider: str = "groq"
     groq_api_key: str = ""
 
+    #: Any OpenAI-compatible endpoint: openai, together, openrouter, fireworks,
+    #: or a self-hosted gateway. Set AI_PROVIDER to one of those names, or to
+    #: "openai-compatible" with LLM_BASE_URL for anything else.
+    #:
+    #: This exists because a provider you cannot switch away from in an
+    #: afternoon is a single point of failure, and this project has run out of
+    #: Groq quota twice.
+    llm_api_key: str = ""
+    llm_base_url: str = ""
+    llm_model: str = ""
+
     # Voice: speech-to-text. Defaults to the mock so nothing bills by accident;
     # set STT_PROVIDER=deepgram and DEEPGRAM_API_KEY in .env to enable.
     stt_provider: str = "mock"
