@@ -95,10 +95,10 @@ export const Interview: React.FC = () => {
           <View
             style={[
               styles.confidence,
-              { backgroundColor: PALETTE.tealContainer },
+              { backgroundColor: theme.colors.accentContainer },
             ]}
           >
-            <AppText variant="labelSm" style={styles.confidenceText}>
+            <AppText variant="labelSm" color="onAccentContainer">
               Confidence Boost: {session.confidenceBoost}%
             </AppText>
           </View>
@@ -136,10 +136,12 @@ export const Interview: React.FC = () => {
             colors={[PALETTE.teal400, PALETTE.teal600]}
             style={styles.mainControl}
           >
+            {/* onAccent, not textInverse: the gradient is fixed, so a
+                theme-flipping icon was white on teal in light mode. */}
             <Icon
               name={isPaused ? 'play' : 'pause'}
               size={30}
-              color="textInverse"
+              color="onAccent"
             />
           </LinearGradient>
         </Pressable>
@@ -197,7 +199,8 @@ const TokenSpan: React.FC<{ token: TranscriptToken }> = ({ token }) => {
     return (
       <AppText
         variant="bodyLg"
-        style={{ backgroundColor: PALETTE.tealContainer }}
+        color="onAccentContainer"
+        style={{ backgroundColor: theme.colors.accentContainer }}
       >
         {token.text}
       </AppText>
@@ -250,7 +253,6 @@ const styles = StyleSheet.create({
     paddingVertical: SPACING.xxs,
     borderRadius: RADIUS.pill,
   },
-  confidenceText: { color: PALETTE.tealDeep },
   transcriptBody: { flex: 1 },
   examinerLine: { fontStyle: 'italic', marginBottom: SPACING.md },
   learnerLine: { marginBottom: SPACING.md },

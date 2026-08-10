@@ -69,7 +69,7 @@ const ConsentRow: React.FC<RowProps> = ({
           },
         ]}
       >
-        {checked ? <Icon name="check" size={14} color="textInverse" /> : null}
+        {checked ? <Icon name="check" size={14} color="onAccent" /> : null}
       </View>
     </Pressable>
   );
