@@ -10,14 +10,14 @@ Everything **not yet completed** to finish the project, organized by area. Check
 > permanently unachievable. The Xcode project is still in the tree and still builds a
 > bundle in CI; it is simply not maintained or verified.
 >
-> **Status as of PR #88** — **174 of 205 checklist items done (~85%)**. Weighted by
+> **Status as of PR #89** — **175 of 206 checklist items done (~85%)**. Weighted by
 > effort it is further along than that, since the backend and data layer are largely
 > complete while most remaining items are large features (live voice, deployment) or
 > are blocked on native modules.
 > **Running on real infrastructure:** live Supabase PostgreSQL 17.6 and the real Groq
 > API, verified on a physical Android phone — register → onboarding → dashboard → all
 > four practice modules → progress → coach → profile → logout.
-> **Verified by:** 44 backend smoke suites, a 13-step E2E user-journey check, 170
+> **Verified by:** 45 backend smoke suites, a 13-step E2E user-journey check, 170
 > frontend tests, ESLint at zero warnings, Prettier, `tsc --noEmit`, and a Docker image
 > build — all gated in CI on every push.
 > **Biggest remaining:** the live voice (LiveKit) pipeline, native audio playback,
@@ -387,7 +387,8 @@ Everything **not yet completed** to finish the project, organized by area. Check
 - [x] Environment configs (dev/staging/prod) — `core/environment.py`; staging and production refuse to boot on published defaults, wildcard CORS, SQLite or a disabled limiter, and docs are dev-only
 - [x] CI: backend compile + Alembic up/down + smoke suites on every push/PR (GitHub Actions) — [ ] frontend typecheck/build, lint, deploy stages
 - [x] Observability: Prometheus metrics at `/metrics` (request count/latency/in-flight + AI calls, tokens, estimated spend)
-- [ ] Observability: tracing (OpenTelemetry), dashboards + alerts
+- [x] Observability: OpenTelemetry tracing (`core/tracing.py`) — off unless an OTLP endpoint is set, health/ready/metrics excluded, never fatal
+- [ ] Observability: dashboards + alerts (needs a running collector)
 - [x] Health/readiness probes wired to real dependencies — `/ready` returns 503 when Postgres is unreachable; `/health` stays liveness-only
 - [ ] Kubernetes manifests / Helm (future)
 - [ ] Secrets management integration
