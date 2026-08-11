@@ -109,3 +109,17 @@ export interface SpeakingQuestionSet {
   /** How this part should be answered — Part 1 and Part 3 differ. */
   guidance: string;
 }
+
+/** What a recorded answer turned into. */
+export interface Transcription {
+  text: string;
+  durationMs: number;
+  /** Which recogniser produced it, so a bad transcript can be traced. */
+  provider: string;
+  /**
+   * False when the recogniser returned nothing usable — a quiet room, a muted
+   * mic. A normal outcome rather than an error, and the useful response is to
+   * let the candidate type or re-record instead of losing what they did.
+   */
+  isUsable: boolean;
+}

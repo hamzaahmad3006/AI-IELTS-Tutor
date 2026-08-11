@@ -1,10 +1,33 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.INTERNET" />
     <!-- The speaking test records the candidate's answers. Requested at first
          use rather than on launch: a microphone prompt before the learner has
          done anything reads as an app that wants to listen to them. -->
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
+
+    <!-- Live voice (LiveKit/WebRTC). MODIFY_AUDIO_SETTINGS is what lets the
+         audio session switch into communication mode, which is what enables
+         hardware echo cancellation — without it the examiner's own voice is
+         picked back up by the microphone and transcribed as the candidate's
+         answer. ACCESS_NETWORK_STATE is how WebRTC notices the network
+         changed and re-negotiates instead of going quietly silent. -->
+    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <!-- Bluetooth headsets, which is how a good share of people will sit a
+         spoken test. Runtime-requested on API 31+, and its absence degrades to
+         the speaker rather than failing. -->
+    <uses-permission
+        android:name="android.permission.BLUETOOTH_CONNECT"
+        android:usesPermissionFlags="neverForLocation"
+        tools:targetApi="31" />
+
+    <!-- Deliberately NOT requested: CAMERA. @livekit/react-native-webrtc
+         supports video and its sample apps ask for it, but this is an
+         audio-only speaking test. An IELTS app asking to see you is a reason
+         to uninstall it, and a permission with no feature behind it is a
+         question at Play Store review. -->
 
     <application
       android:name=".MainApplication"

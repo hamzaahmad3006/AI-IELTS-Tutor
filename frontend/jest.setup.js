@@ -71,3 +71,72 @@ jest.mock('react-native-audio-recorder-player', () => {
     },
   };
 });
+
+// LiveKit is WebRTC underneath: native code with no JS fallback, and its
+// globals are installed by registerGlobals() at app entry, which never runs in
+// Jest. Mocked as a small event-emitting fake rather than bare jest.fn()s, so
+// the wrapper's real behaviour -- refusing a second connect, releasing the
+// audio session on the failure path -- is what gets exercised.
+jest.mock('@livekit/react-native', () => ({
+  registerGlobals: jest.fn(),
+  AudioSession: {
+    startAudioSession: jest.fn(() => Promise.resolve()),
+    stopAudioSession: jest.fn(() => Promise.resolve()),
+  },
+}));
+
+jest.mock('livekit-client', () => {
+  const ConnectionState = {
+    Disconnected: 'disconnected',
+    Connecting: 'connecting',
+    Connected: 'connected',
+    Reconnecting: 'reconnecting',
+  };
+  const RoomEvent = {
+    ConnectionStateChanged: 'connectionStateChanged',
+    DataReceived: 'dataReceived',
+    TrackSubscribed: 'trackSubscribed',
+    Disconnected: 'disconnected',
+  };
+  const Track = { Kind: { Audio: 'audio', Video: 'video' } };
+
+  class FakeRoom {
+    constructor() {
+      this.state = ConnectionState.Disconnected;
+      this.handlers = {};
+      this.localParticipant = {
+        micEnabled: false,
+        setMicrophoneEnabled: jest.fn(enabled => {
+          this.localParticipant.micEnabled = enabled;
+          return Promise.resolve();
+        }),
+      };
+      this.connect = jest.fn(() => {
+        if (FakeRoom.failNextConnect) {
+          FakeRoom.failNextConnect = false;
+          return Promise.reject(new Error(FakeRoom.failureMessage));
+        }
+        this.state = ConnectionState.Connected;
+        this.emit(RoomEvent.ConnectionStateChanged, ConnectionState.Connected);
+        return Promise.resolve();
+      });
+      this.disconnect = jest.fn(() => {
+        this.state = ConnectionState.Disconnected;
+        return Promise.resolve();
+      });
+      FakeRoom.last = this;
+    }
+    on(event, handler) {
+      (this.handlers[event] ||= []).push(handler);
+      return this;
+    }
+    emit(event, ...args) {
+      (this.handlers[event] || []).forEach(handler => handler(...args));
+    }
+  }
+  FakeRoom.failNextConnect = false;
+  FakeRoom.failureMessage = 'network unreachable';
+  FakeRoom.last = null;
+
+  return { Room: FakeRoom, ConnectionState, RoomEvent, Track };
+});
