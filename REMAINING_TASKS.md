@@ -10,14 +10,14 @@ Everything **not yet completed** to finish the project, organized by area. Check
 > permanently unachievable. The Xcode project is still in the tree and still builds a
 > bundle in CI; it is simply not maintained or verified.
 >
-> **Status as of PR #93** — **191 of 217 checklist items done (~88%)**. Weighted by
+> **Status as of PR #95** — **192 of 219 checklist items done (~88%)**. Weighted by
 > effort it is further along than that, since the backend and data layer are largely
 > complete while most remaining items are large features (live voice, deployment) or
 > are blocked on native modules.
 > **Running on real infrastructure:** live Supabase PostgreSQL 17.6 and the real Groq
 > API, verified on a physical Android phone — register → onboarding → dashboard → all
 > four practice modules → progress → coach → profile → logout.
-> **Verified by:** 53 backend smoke suites, a 13-step E2E user-journey check, 347
+> **Verified by:** 54 backend smoke suites, a 13-step E2E user-journey check, 347
 > frontend tests, ESLint at zero warnings, Prettier, `tsc --noEmit`, and a Docker image
 > build — all gated in CI on every push.
 > **Biggest remaining:** the live voice (LiveKit) pipeline, native audio playback,
@@ -451,7 +451,24 @@ Everything **not yet completed** to finish the project, organized by area. Check
 - [x] Health/readiness probes wired to real dependencies — `/ready` returns 503 when Postgres is unreachable; `/health` stays liveness-only
 - [ ] Kubernetes manifests / Helm (future)
 - [ ] Secrets management integration
-- [ ] Crash reporting (Sentry) + analytics events
+- [x] **Crash reporting** (`core/crash_reporting.py`) — Sentry's envelope endpoint
+      over httpx, wired into the unhandled-exception handler. Off without a DSN.
+      Written by hand rather than with `sentry-sdk` for a specific reason: the
+      SDK's value is what it collects automatically — frame locals, request
+      bodies, headers, environment — and in this app those are the learner's
+      essay, the essay again, the bearer token and the Groq key. So the payload
+      is built by **allowlist**: exception type, a scrubbed message, frames
+      reduced to file/function/line, route template, correlation id. There is no
+      code that attaches anything else. A denylist has to be right every time; an
+      allowlist has to be right once.
+      The test stages a crash with secrets in the frame locals, the message and
+      the path, then searches the serialised envelope for each one. Also covered:
+      rate limiting (a crash loop must not exhaust the quota), absolute paths
+      reduced so a frame does not describe the host, and a reporting outage being
+      swallowed so it cannot turn a handled 500 into a dropped connection
+- [ ] Analytics events — a separate concern from crash reporting and not started.
+      Worth deciding what may be collected before what to collect it with, given
+      the consent model already in place
 
 ---
 

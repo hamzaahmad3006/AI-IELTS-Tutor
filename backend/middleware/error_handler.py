@@ -9,6 +9,7 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
+from core.crash_reporting import build_reporter
 from core.errors import AppError, code_for_status, type_for_code
 from core.rate_limit import RateLimitExceeded
 
@@ -19,7 +20,21 @@ def _correlation_id(request: Request) -> str:
     return getattr(request.state, "correlation_id", "")
 
 
+def _route_template(request: Request) -> str:
+    """The route pattern, never the request path.
+
+    A path carries ids, and an id is how a crash report gets tied back to a
+    person. The template groups the same bug across every learner who hit it,
+    which is also what makes the report useful.
+    """
+    route = request.scope.get("route")
+    return getattr(route, "path", "") or ""
+
+
 def register_exception_handlers(app: FastAPI) -> None:
+    # Built once at registration. A NullReporter when no DSN is configured,
+    # so the handler below never has to know whether reporting is on.
+    reporter = build_reporter()
     @app.exception_handler(AppError)
     async def app_error_handler(request: Request, exc: AppError) -> JSONResponse:
         # 5xx means the failure is ours; log it with enough context to trace,
@@ -105,6 +120,17 @@ def register_exception_handlers(app: FastAPI) -> None:
         # strings, SQL fragments or user data. The correlation id is how a
         # report is tied back to the logged traceback.
         logger.exception("unhandled exception", extra={"path": request.url.path})
+        # Reported after logging, never instead of it: the log holds the full
+        # traceback and the detail, Sentry gets the allowlisted summary and
+        # the correlation id that joins the two. `report` swallows its own
+        # failures, so a reporting outage cannot turn a handled 500 into a
+        # dropped connection.
+        reporter.report(
+            exc,
+            correlation_id=_correlation_id(request),
+            route=_route_template(request),
+            method=request.method,
+        )
         return JSONResponse(
             status_code=500,
             content={
