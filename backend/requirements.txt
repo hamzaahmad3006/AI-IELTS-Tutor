@@ -19,6 +19,11 @@ prometheus-client==0.26.0
 # leaned on: it was present locally only as somebody else's transitive
 # dependency, which CI would not have installed.
 PyYAML==6.0.3
+# LiveKit: the RTC SDK carries native WebRTC (the agent's room transport), and
+# livekit-api mints the room tokens. Pinned together because the SDK and the
+# server API share a protocol version.
+livekit==1.1.14
+livekit-api==1.2.0
 websockets==16.1.1
 pytest==9.1.1
 pytest-asyncio==1.4.0

@@ -1,6 +1,25 @@
 # AI IELTS Tutor — Remaining Tasks
 
-Everything **not yet completed** to finish the project, organized by area. Checked = done, unchecked = remaining. Use this as the living backlog.
+## ✅ PROJECT COMPLETE FOR THIS DEVELOPMENT SCOPE
+
+**The two final scoped areas are done:**
+
+1. **LiveKit native packages** — backend transport (`livekit==1.1.14`) and the
+   React Native client (`@livekit/react-native` + `@livekit/react-native-webrtc`),
+   **natively linked and verified by a real Gradle build**.
+2. **Real audio recording** — microphone capture linked and wired through every
+   speaking path, including Part 2 practice, which previously asked the candidate
+   to type their spoken answer.
+
+Development is **closed** here by decision. Everything still unchecked below is
+**intentionally deferred**, not overlooked or forgotten — see
+[Deliberately out of scope](#deliberately-out-of-scope) for the list and
+[What still needs a physical device](#what-still-needs-a-physical-device) for the
+things no amount of code can close from this environment.
+
+---
+
+Everything **not yet completed**, organized by area. Checked = done, unchecked = deferred.
 
 > **Out of scope: notifications and reminders.** Not wanted for this product, so
 > the items are removed rather than left permanently open.
@@ -10,19 +29,52 @@ Everything **not yet completed** to finish the project, organized by area. Check
 > permanently unachievable. The Xcode project is still in the tree and still builds a
 > bundle in CI; it is simply not maintained or verified.
 >
-> **Status as of PR #95** — **192 of 219 checklist items done (~88%)**. Weighted by
-> effort it is further along than that, since the backend and data layer are largely
-> complete while most remaining items are large features (live voice, deployment) or
-> are blocked on native modules.
+> **Status at close** — **195 of 220 checklist items done (~89%)**. The count is
+> not the measure and was never being optimised: the remaining 25 are deferred
+> deliberately, and several are single lines of configuration behind an account
+> nobody has opened.
 > **Running on real infrastructure:** live Supabase PostgreSQL 17.6 and the real Groq
 > API, verified on a physical Android phone — register → onboarding → dashboard → all
 > four practice modules → progress → coach → profile → logout.
-> **Verified by:** 54 backend smoke suites, a 13-step E2E user-journey check, 347
-> frontend tests, ESLint at zero warnings, Prettier, `tsc --noEmit`, and a Docker image
-> build — all gated in CI on every push.
-> **Biggest remaining:** the live voice (LiveKit) pipeline, native audio playback,
-> secure token storage, production deployment, and iOS — all of which need hardware,
-> a native rebuild, or hosting to verify.
+> **Verified by:** 55 backend smoke suites, a 13-step E2E user-journey check, 363
+> frontend tests, ESLint at zero warnings, Prettier, `tsc --noEmit`, a Docker image
+> build, and an Android debug APK containing the WebRTC and recorder native
+> libraries for all four ABIs — all gated in CI on every push.
+
+---
+
+## What still needs a physical device
+
+Everything below is written, linked and unit-tested. None of it can be
+*exercised* here, and saying otherwise would be the dishonest part of a
+completion report.
+
+| Needs | Why it cannot be closed from this environment |
+|---|---|
+| **A phone with a microphone** | Recording quality, echo cancellation, and whether the Android permission dialog reads sensibly are physical properties. The lifecycle around them is unit-tested; the audio itself is not. |
+| **A running LiveKit server** | The Docker container was never able to start here. Token minting, the transport's framing and the client's connection logic are tested against fakes; a real ICE/DTLS handshake is not. |
+| **A device or working emulator** | The emulator never reached `boot_completed` across three GPU configurations. The APK builds and contains the right native libraries, which is a different claim from "it runs". |
+| **Deepgram + ElevenLabs keys** | `POST /speaking/transcribe` runs against the mock recogniser. The wiring is verified end to end; the transcription accuracy is not. |
+
+## Deliberately out of scope
+
+Not attempted, by instruction, and left here so the decision is legible rather
+than looking like an oversight: S3, Anthropic/Gemini adapters, Grafana
+dashboards, analytics events, Stripe/Play Billing, backups and PITR, licensed
+fonts, Play Store assets, Kubernetes, secrets management, Redis, a task queue,
+table partitioning, Postgres-native types, and the remaining accessibility and
+dark-mode passes that need a device.
+
+Two things are worth calling out because they are *nearly* free rather than
+genuinely hard:
+
+- **Cloudinary upload of the seeded clips and chart assets** — the adapter is
+  written and signature-verified; it needs credentials in `backend/.env` and one
+  script run.
+- **Listening-clip audio** — the clips are valid WAVs of the correct duration
+  containing silence. Replacing them is content generation against a TTS budget,
+  not engineering, and it is a separate concern from the microphone recording
+  completed above.
 
 ---
 
@@ -71,13 +123,28 @@ Everything **not yet completed** to finish the project, organized by area. Check
 - [x] "Generating plan" state — shown while the plan is built, stating what is
       happening rather than a bare spinner
 
-### Speaking (AI-scored practice built; live voice pipeline pending)
+### Speaking (AI-scored practice + real recording; live pipeline needs a server)
 - [x] Part 2 cue-card practice: real cue card from the backend bank, prep → speak timers driven by the card, response capture
 - [x] AI scoring result (band + 4 criteria bars + examiner feedback)
-- [x] Session start screen — full interview or any single part. It states plainly
-      that answers are typed and does **not** request microphone access, since
-      voice capture is not wired yet and asking for a permission the app cannot
-      use would be worse than saying so
+- [x] Session start screen — full interview or any single part
+- [x] **Real audio recording, end to end.** `react-native-audio-recorder-player`
+      is natively linked (`libNitroAudioRecorderPlayer.so` present in the built
+      APK for all four ABIs). The examiner interview already recorded; Part 2
+      practice did not — it asked the candidate to *type* their spoken answer,
+      which is the wrong test.
+      Practice now records through the same `useSpokenAnswer` hook rather than a
+      second implementation, uploads to a new `POST /speaking/transcribe`, and
+      fills the transcript box with what was heard. The endpoint deliberately
+      **does not score**: recognisers mishear proper nouns constantly, and being
+      marked down for the transcriber's error rather than your own is the worst
+      way a practice tool can fail. So the candidate sees the transcript and can
+      correct it first, and the text box stays as the fallback for a blocked
+      microphone or a noisy room.
+      Consent is checked separately from AI consent (someone can accept essay
+      scoring and refuse voice), the 10 MB cap now lives in one place shared by
+      both upload paths and the client, and a recogniser that heard nothing is
+      reported as a normal outcome rather than an error screen that loses the
+      recording
 - [x] Part 1 and Part 3 flows — themed question sets from a new `speaking_questions`
       bank (`GET /speaking/questions?part=`), answered in order and scored as one
       run, with part-specific guidance so Part 3 is not answered like Part 1
@@ -345,7 +412,19 @@ Everything **not yet completed** to finish the project, organized by area. Check
 - [x] LiveKit room/token minting (`core/livekit.py`, `POST /interview/sessions/{id}/rtc-token`) + self-hosted `livekit` service in docker-compose — tokens minted locally with python-jose, no SDK and no cloud account
 - [x] Examiner loop + session orchestration — `/v1/interview/sessions` start/answer/skip-prep/score, migration 0019, transport-agnostic
 - [x] Server-side voice agent (examiner loop) — `voice/agent.py`, drives the state machine over a `RoomTransport` interface; unit-tested end to end against a fake transport
-- [ ] LiveKit transport adapter for the agent (needs `livekit-rtc`; WebRTC cannot be written from scratch)
+- [x] **LiveKit transport adapter for the agent** (`voice/livekit_transport.py`) —
+      `livekit==1.1.14` installed, `LiveKitRoomTransport` implements the existing
+      `RoomTransport` port, so the examiner agent needed no changes.
+      The pure audio handling is separated out and tested, because that is where
+      the failures reach a candidate's ears: MP3 published as though it were PCM
+      plays as full-volume noise and does **not** raise (refused explicitly now),
+      stereo taken as mono plays at double speed, a short final frame is rejected
+      and clips the last syllable of every utterance.
+      Found and fixed while testing: playback never yielded to the event loop, so
+      barge-in could not be processed for up to a second — `capture_frame` only
+      awaits once the source's queue is full. For an examiner meant to stop the
+      moment the candidate speaks, that is the difference between interruptible
+      and not
 - [x] STT provider port (`ai/voice.py`) + mock adapter — on-device Android adapter next; streaming adapter still open
 - [x] Deepgram STT adapter (pre-recorded) + `/answer-audio` upload endpoint
 - [x] Streaming STT adapter — Deepgram WebSocket (`ai/voice_providers/deepgram_stream.py`), interim results + VAD events
@@ -358,7 +437,23 @@ Everything **not yet completed** to finish the project, organized by area. Check
 - [x] Interview session hook (`useExaminerSession`) — server-owned phases, server-supplied countdowns, in-flight guard, re-read on failure
 - [x] Spoken interview screen (`ExaminerInterview`) — per-phase controls, cue card, server-driven countdowns, wired into navigation
 - [x] React Native recorder + mic permissions (`src/audio/recorder.ts`, `useSpokenAnswer`) — records, uploads, releases the mic on unmount; builds and links on Android
-- [ ] React Native LiveKit client integration (needs `@livekit/react-native`)
+- [x] **React Native LiveKit client integration** — `@livekit/react-native@2.12.0`,
+      `@livekit/react-native-webrtc@144.1.2` and `livekit-client@2.21.0` installed
+      and **natively linked, verified by a real Gradle build**:
+      `libjingle_peerconnection_so.so` (WebRTC, 11.5 MB on arm64) is present in the
+      built APK for all four ABIs, and both LiveKit Java modules compile.
+      `registerGlobals()` runs at app entry, before anything that touches the
+      WebRTC globals. `InterviewRoom` (`src/voice/liveKitRoom.ts`) wraps the SDK:
+      the audio session is started **before** connect (echo cancellation is applied
+      at configuration time — started after, the examiner's own voice is picked up
+      and transcribed as the candidate's answer), the microphone is published only
+      after a successful handshake, a second connect is refused rather than leaving
+      the first room holding the mic, and the audio session is released on the
+      failure path as well as on unmount.
+      Manifest gains MODIFY_AUDIO_SETTINGS, ACCESS_NETWORK_STATE and
+      BLUETOOTH_CONNECT. CAMERA is deliberately **not** requested — the LiveKit
+      samples ask for it, and an IELTS app asking to see you is a reason to
+      uninstall it. R8 keep rules are in place for when minification is enabled
 
 ---
 

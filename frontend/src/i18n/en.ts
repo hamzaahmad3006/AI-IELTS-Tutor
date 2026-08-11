@@ -25,6 +25,15 @@ export const en = {
   'a11y.playAudio': 'Play the audio clip',
   'a11y.pauseAudio': 'Pause the audio clip',
 
+  // Recording a practice answer.
+  'speaking.nothingHeard':
+    'We could not hear anything in that recording. Try again, or type your answer below.',
+  'speaking.transcribeFailed':
+    'That recording could not be transcribed. You can try again or type your answer.',
+  'speaking.recording': 'Recording — tap when you have finished',
+  'speaking.tapToRecord': 'Record your answer',
+  'speaking.transcribing': 'Writing down what you said…',
+
   // The spoken interview.
   'interview.preparing': 'Preparing your speaking test…',
   'interview.ready': "I'm ready",

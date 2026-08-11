@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, Query, status
+from fastapi import APIRouter, Depends, File, Query, UploadFile, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from ai.orchestrator import AIOrchestrator
@@ -15,6 +15,7 @@ from controllers.speaking_controller import (
     SpeakingController,
     SpeakingResultResponse,
     SpeakingSubmitRequest,
+    TranscriptionResponse,
 )
 from core.config import get_settings
 from core.rate_limit import limit_by_user
@@ -47,6 +48,28 @@ async def submit_attempt(
     orchestrator: Orchestrator,
 ) -> SpeakingResultResponse:
     return await SpeakingController.submit(session, current, orchestrator, payload)
+
+
+@router.post(
+    "/transcribe",
+    response_model=TranscriptionResponse,
+    dependencies=[Depends(limit_by_user("speaking_transcribe", _ai_limit))],
+)
+async def transcribe_answer(
+    current: CurrentUser,
+    session: DbSession,
+    audio: UploadFile = File(...),
+) -> TranscriptionResponse:
+    """Transcribe a recorded practice answer.
+
+    Deliberately does not score. The candidate sees the transcript first and
+    can correct it before submitting -- speech recognition mishears names
+    constantly, and being marked down for the transcriber's error rather than
+    your own is the worst way a practice tool can fail.
+
+    Rate-limited with the AI budget because it costs a provider call.
+    """
+    return await SpeakingController.transcribe(session, current, audio)
 
 
 @router.get("/cue-cards", response_model=CueCardResponse)

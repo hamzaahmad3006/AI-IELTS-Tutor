@@ -17,6 +17,8 @@
     "e2e": "detox test --configuration android.attached.debug"
   },
   "dependencies": {
+    "@livekit/react-native": "^2.12.0",
+    "@livekit/react-native-webrtc": "^144.1.2",
     "@react-native-async-storage/async-storage": "^2.1.1",
     "@react-native/new-app-screen": "0.86.0",
     "@react-navigation/bottom-tabs": "^7.2.0",
@@ -24,6 +26,7 @@
     "@react-navigation/native-stack": "^7.2.0",
     "@reduxjs/toolkit": "^2.5.1",
     "axios": "^1.7.9",
+    "livekit-client": "^2.21.0",
     "react": "19.2.3",
     "react-native": "0.86.0",
     "react-native-audio-recorder-player": "^4.5.0",

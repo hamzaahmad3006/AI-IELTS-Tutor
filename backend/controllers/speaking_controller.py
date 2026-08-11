@@ -5,12 +5,16 @@ transcript produced at the end of a session."""
 
 from __future__ import annotations
 
-from fastapi import HTTPException, status
+from fastapi import HTTPException, UploadFile, status
 from pydantic import Field
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from ai.voice_providers import build_stt
 from core.consent import require_consent
+from core.errors import ValidationError
+# Shared with the interview upload path; see the note beside it.
+from core.storage import MAX_AUDIO_BYTES
 from core.plans import require_capacity
 from ai.orchestrator import AIOrchestrator, ScoringError
 from models.cue_card import CueCard
@@ -44,6 +48,25 @@ class CueCardResponse(CamelModel):
     difficulty: str
     prep_seconds: int
     speak_seconds: int
+
+
+class TranscriptionResponse(CamelModel):
+    """What a recorded answer turned into.
+
+    The transcript is returned to the client rather than scored here on
+    purpose. A speaking answer is transcribed once and may be edited before
+    submission -- speech recognition mishears proper nouns constantly, and a
+    candidate being marked down for the transcriber's error rather than their
+    own is the worst possible failure of a practice tool.
+    """
+
+    text: str
+    duration_ms: int
+    provider: str
+    #: False when the provider returned nothing usable. The client shows the
+    #: text box rather than an error, because a silent failure here looks like
+    #: the app ignoring the recording.
+    is_usable: bool
 
 
 # ---------- Cue card bank seeding (dev/demo content) ----------
@@ -182,6 +205,55 @@ class SpeakingController:
             difficulty=card.difficulty,
             prep_seconds=card.prep_seconds,
             speak_seconds=card.speak_seconds,
+        )
+
+    @staticmethod
+    async def transcribe(
+        session: AsyncSession, user: User, upload: UploadFile
+    ) -> TranscriptionResponse:
+        """Turn a recorded practice answer into text.
+
+        Separate from `submit` rather than folded into it, so the candidate
+        sees the transcript before it is scored. Speech recognition mishears
+        proper nouns constantly, and being marked down for the transcriber's
+        mistake instead of your own is the worst thing a practice tool can do.
+
+        Mirrors the interview path's guarantees: voice consent is checked
+        separately from AI consent, and the recording is size-capped here so
+        the answer is refused with a message about the recording rather than
+        by a rejected request after the upload.
+        """
+        # Someone can be happy to have an essay scored and unwilling to have
+        # their voice recorded. The two consents are not the same.
+        await require_consent(session, user.id, "voice")
+
+        audio = await upload.read()
+        if not audio:
+            raise ValidationError("The recording was empty")
+        if len(audio) > MAX_AUDIO_BYTES:
+            raise ValidationError(
+                f"Recording is too large ({len(audio) // 1024} KB); "
+                f"the limit is {MAX_AUDIO_BYTES // 1024} KB"
+            )
+
+        stt = build_stt()
+        transcript = await stt.transcribe(
+            audio, mime_type=upload.content_type or "audio/mp4"
+        )
+        text = (transcript.text or "").strip()
+
+        return TranscriptionResponse(
+            text=text,
+            # None means the provider did not report one, which is different
+            # from zero but not worth distinguishing to a client that only
+            # displays it.
+            duration_ms=transcript.duration_ms or 0,
+            provider=transcript.provider,
+            # Reported rather than raised. A provider that heard nothing is a
+            # normal outcome -- a quiet room, a muted mic -- and the useful
+            # response is to let the candidate type or re-record, not an error
+            # screen that loses what they did.
+            is_usable=bool(text),
         )
 
     @staticmethod

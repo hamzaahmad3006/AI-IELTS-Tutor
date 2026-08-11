@@ -17,6 +17,7 @@ import {
 import { getBandColor, RADIUS, SPACING } from '@constants';
 import type { TextIssue } from '@components';
 import type { SpeakingCriteriaScore, SpeakingResult } from '@models';
+import { t } from '../../../i18n';
 import { useSpeakingPractice } from './useSpeakingPractice';
 
 const CRITERIA: Array<{ key: keyof SpeakingCriteriaScore; label: string }> = [
@@ -39,6 +40,12 @@ export const Practice: React.FC = () => {
     result,
     error,
     setTranscript,
+    isRecording,
+    isTranscribing,
+    level,
+    recordingError,
+    startRecording,
+    stopRecording,
     startSpeaking,
     submit,
     tryAnother,
@@ -115,9 +122,54 @@ export const Practice: React.FC = () => {
             color="textMuted"
             style={styles.dictationHint}
           >
-            Speak your answer aloud and type (or dictate) it here — the AI
-            examiner scores the transcript.
+            Record your answer — we write down what you said, and you can
+            correct it before it is scored. Typing works too.
           </AppText>
+
+          {/* Recording is the primary control; the text box below stays as the
+              fallback for a blocked microphone, a noisy room, or a transcript
+              that came back wrong. */}
+          <Button
+            title={
+              isRecording
+                ? t('speaking.recording')
+                : isTranscribing
+                ? t('speaking.transcribing')
+                : t('speaking.tapToRecord')
+            }
+            icon="mic"
+            variant={isRecording ? 'secondary' : 'primary'}
+            onPress={() => {
+              void (isRecording ? stopRecording() : startRecording());
+            }}
+            disabled={isTranscribing}
+            style={styles.recordButton}
+          />
+          {isRecording ? (
+            <View
+              accessible
+              accessibilityLabel={t('speaking.recording')}
+              style={styles.levelRow}
+            >
+              {/* A visible level, because without one a candidate cannot tell
+                  whether the microphone is actually hearing them. */}
+              <View
+                style={[
+                  styles.levelFill,
+                  {
+                    backgroundColor: theme.colors.accent,
+                    width: `${Math.min(100, Math.max(4, level))}%`,
+                  },
+                ]}
+              />
+            </View>
+          ) : null}
+          {recordingError ? (
+            <AppText variant="labelMd" color="error" style={styles.error}>
+              {recordingError}
+            </AppText>
+          ) : null}
+
           <Input
             label=""
             value={transcript}
@@ -324,6 +376,14 @@ const styles = StyleSheet.create({
     marginTop: SPACING.lg,
     marginBottom: SPACING.xxs,
   },
+  recordButton: { marginBottom: SPACING.sm },
+  levelRow: {
+    height: 6,
+    borderRadius: RADIUS.pill,
+    overflow: 'hidden',
+    marginBottom: SPACING.sm,
+  },
+  levelFill: { height: '100%', borderRadius: RADIUS.pill },
   dictationHint: { marginBottom: SPACING.xs },
   error: { marginBottom: SPACING.sm },
   resultRow: {

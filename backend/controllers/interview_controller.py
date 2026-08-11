@@ -31,6 +31,7 @@ from core.config import get_settings
 from core.consent import require_consent
 from core.plans import require_capacity
 from core.storage import (
+    MAX_AUDIO_BYTES,
     build_storage,
     ObjectStorage,
     extension_for,
@@ -76,7 +77,6 @@ TRANSCRIPT_SOURCES = ("android-device", "server-stt", "typed", "unknown")
 #: Refused above this. A 12-minute exam answer is well under a megabyte at any
 #: sane bitrate, so anything larger is a misconfigured recorder -- and an
 #: unbounded upload is both a transcription bill and a denial-of-service.
-MAX_AUDIO_BYTES = 10 * 1024 * 1024
 
 
 # ---------- Schemas ----------

@@ -53,6 +53,7 @@ export const ENDPOINTS = {
     cueCards: '/speaking/cue-cards',
     questions: '/speaking/questions',
     attempts: '/speaking/attempts',
+    transcribe: '/speaking/transcribe',
     attempt: (id: string): string => `/speaking/attempts/${id}`,
     history: '/speaking/history',
   },

@@ -44,6 +44,16 @@ DEFAULT_TTL_SECONDS = 15 * 60
 #: because minting a URL per clip per learner for shared content buys nothing.
 RECORDINGS_PREFIX = "recordings"
 
+#: Largest recording accepted from a client. Roughly forty minutes of the AAC
+#: the phone records at, so it bounds abuse without ever refusing a real answer.
+#:
+#: Lives here rather than in a controller because two upload paths enforce it
+#: -- the interview turn and the practice answer -- and the frontend refuses
+#: above the same number before spending a phone's data on the attempt. Three
+#: copies that can drift apart means a recording the app accepts and the API
+#: rejects, after the upload.
+MAX_AUDIO_BYTES = 10 * 1024 * 1024
+
 
 class StorageError(RuntimeError):
     pass

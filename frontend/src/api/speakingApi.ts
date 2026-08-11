@@ -16,6 +16,7 @@ import type {
   SpeakingResult,
   SpeakingSession,
   SpeakingSubmit,
+  Transcription,
 } from '../types';
 
 const delay = (ms: number): Promise<void> =>
@@ -69,6 +70,50 @@ export const speakingApi = {
       const { data } = await apiClient.get<SpeakingQuestionSet>(
         ENDPOINTS.speaking.questions,
         { params: difficulty ? { part, difficulty } : { part } },
+      );
+      return data;
+    } catch (error) {
+      throw toApiProblem(error);
+    }
+  },
+
+  /**
+   * Turn a recorded answer into text.
+   *
+   * Returns the transcript rather than a score, so the candidate can correct
+   * it before submitting. Recognisers mishear proper nouns constantly, and
+   * being marked down for the transcriber's error instead of your own is the
+   * worst way a practice tool can fail.
+   */
+  async transcribe(file: {
+    uri: string;
+    name: string;
+    type: string;
+  }): Promise<Transcription> {
+    if (API_CONFIG.useMock) {
+      await delay(600);
+      return {
+        text: MOCK_SPEAKING_RESULT.transcript,
+        durationMs: 42_000,
+        provider: 'mock',
+        isUsable: true,
+      };
+    }
+    const form = new FormData();
+    // React Native's FormData takes this shape for files; it is not a Blob and
+    // TypeScript's DOM lib does not describe it, hence the cast.
+    form.append('audio', file as unknown as Blob);
+
+    try {
+      const { data } = await apiClient.post<Transcription>(
+        ENDPOINTS.speaking.transcribe,
+        form,
+        {
+          // Left to the runtime deliberately: axios must set the multipart
+          // boundary itself, and hardcoding the header omits it, which makes
+          // the server reject an otherwise valid upload.
+          headers: { 'Content-Type': 'multipart/form-data' },
+        },
       );
       return data;
     } catch (error) {

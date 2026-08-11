@@ -9,6 +9,8 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { speakingApi } from '@api';
+import { t } from '../../../i18n';
+import { useSpokenAnswer } from '../Interview/useSpokenAnswer';
 import type {
   CueCard,
   RootStackParamList,
@@ -40,6 +42,14 @@ const FALLBACK_CUE_CARD: CueCard = {
 
 interface UseSpeakingPracticeResult {
   cueCard: CueCard;
+  /** Live microphone capture for the answer. */
+  isRecording: boolean;
+  isTranscribing: boolean;
+  /** Input level, for a "we can hear you" cue. */
+  level: number;
+  recordingError: string | null;
+  startRecording: () => Promise<void>;
+  stopRecording: () => Promise<void>;
   part: SpeakingPart;
   phase: SpeakingPhase;
   secondsLeft: number;
@@ -56,6 +66,12 @@ interface UseSpeakingPracticeResult {
   tryAnother: () => void;
   onBack: () => void;
 }
+
+/** Whatever the API surfaced, or a sentence the learner can act on. */
+const toMessage = (error: unknown): string => {
+  const detail = error instanceof Error ? error.message : '';
+  return detail || t('speaking.transcribeFailed');
+};
 
 const countWords = (text: string): number => {
   const trimmed = text.trim();
@@ -81,7 +97,48 @@ export const useSpeakingPractice = (): UseSpeakingPracticeResult => {
   const [error, setError] = useState<string | null>(null);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
+  const [isTranscribing, setIsTranscribing] = useState<boolean>(false);
+  const [recordingError, setRecordingError] = useState<string | null>(null);
+
   const wordCount = useMemo(() => countWords(transcript), [transcript]);
+
+  /**
+   * Recording reuses the interview's hook rather than a second implementation.
+   * The lifecycle problems are identical, and two recorders would be two
+   * places to get "stopped when never started" wrong.
+   *
+   * The transcript is appended rather than replaced, so a candidate can record
+   * in several passes -- which is what people actually do when they lose their
+   * thread mid-answer.
+   */
+  const {
+    isRecording,
+    level,
+    error: spokenError,
+    startRecording,
+    stopAndSend,
+  } = useSpokenAnswer({
+    onAnswer: async file => {
+      setIsTranscribing(true);
+      setRecordingError(null);
+      try {
+        const heard = await speakingApi.transcribe(file);
+        if (!heard.isUsable) {
+          // Not an error screen: a recogniser that heard nothing is a quiet
+          // room or a muted mic, and the answer is still typable.
+          setRecordingError(t('speaking.nothingHeard'));
+          return;
+        }
+        setTranscript(previous =>
+          previous.trim() ? `${previous.trim()} ${heard.text}` : heard.text,
+        );
+      } catch (err) {
+        setRecordingError(toMessage(err));
+      } finally {
+        setIsTranscribing(false);
+      }
+    },
+  });
 
   const loadCueCard = useCallback((): void => {
     speakingApi
@@ -166,6 +223,12 @@ export const useSpeakingPractice = (): UseSpeakingPracticeResult => {
     result,
     error,
     setTranscript,
+    isRecording,
+    isTranscribing,
+    level,
+    recordingError: recordingError ?? spokenError,
+    startRecording,
+    stopRecording: stopAndSend,
     startSpeaking,
     submit,
     tryAnother,
