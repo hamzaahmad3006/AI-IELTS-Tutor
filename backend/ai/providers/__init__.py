@@ -1,13 +1,17 @@
 """Provider factory: selects the LLM provider from configuration.
 
-Adding OpenAI / Gemini / Claude later is a new adapter + a branch here — no
-change to the orchestrator or any domain code."""
+Every adapter is reachable by name from a single config value, so switching
+away from a provider that is down, rate-limited or too expensive is one line in
+`.env` rather than a code change. That is the whole point: this project has run
+out of Groq quota twice, and each time the scoring path went with it."""
 
 from __future__ import annotations
 
 from ai.provider import LLMProvider
 from core.config import get_settings
 
+from .anthropic_provider import AnthropicProvider
+from .gemini_provider import GeminiProvider
 from .groq_provider import GroqProvider
 from .mock_provider import MockProvider
 from .openai_compatible import PRESETS, OpenAICompatibleProvider
@@ -19,6 +23,24 @@ def build_provider() -> LLMProvider:
 
     if choice == "groq" and settings.groq_api_key:
         return GroqProvider(api_key=settings.groq_api_key)
+
+    # Checked before the preset table: these two do not speak the OpenAI wire
+    # format and have their own adapters.
+    if choice == "anthropic" and settings.llm_api_key:
+        kwargs = {"api_key": settings.llm_api_key}
+        if settings.llm_model:
+            kwargs["model"] = settings.llm_model
+        if settings.llm_base_url:
+            kwargs["base_url"] = settings.llm_base_url
+        return AnthropicProvider(**kwargs)
+
+    if choice == "gemini" and settings.llm_api_key:
+        kwargs = {"api_key": settings.llm_api_key}
+        if settings.llm_model:
+            kwargs["model"] = settings.llm_model
+        if settings.llm_base_url:
+            kwargs["base_url"] = settings.llm_base_url
+        return GeminiProvider(**kwargs)
 
     if choice in PRESETS and settings.llm_api_key:
         base_url, default_model = PRESETS[choice]
@@ -49,7 +71,9 @@ def build_provider() -> LLMProvider:
 
 
 __all__ = [
+    "AnthropicProvider",
     "build_provider",
+    "GeminiProvider",
     "GroqProvider",
     "MockProvider",
     "OpenAICompatibleProvider",

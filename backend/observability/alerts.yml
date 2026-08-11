@@ -1,0 +1,176 @@
+# Prometheus alerting and recording rules.
+#
+# Scraped from the app's /metrics endpoint. Every metric referenced here is
+# defined in backend/core/metrics.py, and tests/test_alerts_smoke.py asserts
+# that -- an alert on a metric that does not exist is worse than no alert,
+# because it looks like coverage and can never fire.
+#
+# Written for symptoms rather than causes. A page that says "the API is
+# returning 5xx" tells an operator something; one that says "CPU is at 80%"
+# makes them go and find out whether anyone is actually affected.
+#
+# Two severities:
+#   critical  users are affected right now -- wake someone
+#   warning   heading somewhere bad, or costing money -- look at it in hours
+#
+# `for:` is set on every rule on purpose. Without it a single slow scrape or
+# one unlucky request pages someone at 3am, and alerts that cry wolf get muted,
+# which is worse than not having them.
+
+groups:
+  # ---------------------------------------------------------------------
+  - name: recording
+    # Precomputed because the alert expressions below share them, and because
+    # a dashboard querying a 5-minute rate over a fortnight is slow enough to
+    # time out. Recorded once per interval, read many times.
+    interval: 30s
+    rules:
+      - record: job:http_requests:rate5m
+        expr: sum(rate(http_requests_total[5m]))
+
+      - record: job:http_errors:rate5m
+        expr: sum(rate(http_requests_total{status=~"5.."}[5m]))
+
+      - record: job:http_error_ratio:rate5m
+        # Guarded against 0/0: with no traffic the numerator and denominator
+        # are both zero, and an unguarded ratio yields NaN, which compares
+        # false against every threshold and silently disables the alert.
+        expr: |
+          job:http_errors:rate5m
+            / clamp_min(job:http_requests:rate5m, 0.001)
+
+      - record: job:http_latency_p95:5m
+        expr: |
+          histogram_quantile(
+            0.95,
+            sum by (le) (rate(http_request_duration_seconds_bucket[5m]))
+          )
+
+      - record: job:ai_error_ratio:rate15m
+        expr: |
+          sum(rate(ai_calls_total{status!="ok"}[15m]))
+            / clamp_min(sum(rate(ai_calls_total[15m])), 0.001)
+
+  # ---------------------------------------------------------------------
+  - name: availability
+    rules:
+      - alert: ApiDown
+        # `up` comes from Prometheus itself, not the app -- which is the point:
+        # a metric the app exports cannot tell you the app stopped exporting.
+        expr: up{job="ielts-api"} == 0
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "API has not been scrapeable for 2 minutes"
+          description: >-
+            {{ $labels.instance }} is not responding to scrapes. If this is a
+            deploy it should clear on its own; if it does not, the process is
+            down or the port is unreachable.
+
+      - alert: HighErrorRate
+        expr: job:http_error_ratio:rate5m > 0.05
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Over 5% of requests are failing"
+          description: >-
+            {{ $value | humanizePercentage }} of requests returned 5xx over the
+            last 5 minutes. Check the AI provider first: scoring is the one
+            dependency that fails independently of us, and it has run out of
+            quota twice.
+
+      - alert: ElevatedErrorRate
+        expr: job:http_error_ratio:rate5m > 0.01
+        # Longer window than the critical rule: a low error rate needs to
+        # persist before it means anything, or every deploy pages someone.
+        for: 15m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Error rate above 1% for 15 minutes"
+
+  # ---------------------------------------------------------------------
+  - name: latency
+    rules:
+      - alert: SlowRequests
+        expr: job:http_latency_p95:5m > 2.5
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "p95 request latency above 2.5s"
+          description: >-
+            p95 is {{ $value | humanizeDuration }}. Scoring calls are seconds
+            long by nature, so check whether this is confined to the scoring
+            routes before treating it as a general slowdown.
+
+      - alert: RequestsPilingUp
+        expr: http_requests_in_progress > 50
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Requests are accumulating faster than they complete"
+          description: >-
+            {{ $value }} requests in flight. Argon2 hashing blocked the event
+            loop this way once already; anything synchronous in an async
+            handler produces exactly this shape.
+
+  # ---------------------------------------------------------------------
+  - name: ai
+    rules:
+      - alert: AiCallsFailing
+        expr: job:ai_error_ratio:rate15m > 0.25
+        for: 10m
+        labels:
+          severity: critical
+        annotations:
+          summary: "A quarter of scoring calls are failing"
+          description: >-
+            Usually quota or an expired key. AI_PROVIDER can be switched to
+            another configured provider without a deploy -- see
+            backend/.env.example.
+
+      - alert: AiProviderIsMock
+        # The mock is what the factory falls back to when no key is
+        # configured. In production that means every learner is receiving
+        # invented scores, which is worse than an outage and looks like
+        # success from every other angle.
+        expr: sum(rate(ai_calls_total{provider="mock"}[15m])) > 0
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Scores are being served by the offline mock"
+          description: >-
+            Learners are getting fabricated bands. Almost always a missing or
+            rejected API key.
+
+      - alert: AiSpendAccelerating
+        # Extrapolated from the last hour rather than a monthly total, so it
+        # fires while there is still something to do about it.
+        expr: sum(rate(ai_cost_usd_total[1h])) * 86400 > 25
+        for: 30m
+        labels:
+          severity: warning
+        annotations:
+          summary: "AI spend is on track for more than $25/day"
+          description: >-
+            Estimated from the local price table, not from an invoice, so
+            treat the trend as the signal and reconcile the number against the
+            real bill.
+
+      - alert: TokenUsageSpike
+        expr: |
+          sum(rate(ai_tokens_total[30m]))
+            > 3 * sum(rate(ai_tokens_total[6h] offset 30m))
+        for: 15m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Token consumption is triple its recent baseline"
+          description: >-
+            Either genuine growth or a retry loop. Check ai_calls_total by
+            status before assuming the good one.

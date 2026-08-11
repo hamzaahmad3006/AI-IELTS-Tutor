@@ -10,14 +10,14 @@ Everything **not yet completed** to finish the project, organized by area. Check
 > permanently unachievable. The Xcode project is still in the tree and still builds a
 > bundle in CI; it is simply not maintained or verified.
 >
-> **Status as of PR #92** — **188 of 215 checklist items done (~87%)**. Weighted by
+> **Status as of PR #93** — **191 of 217 checklist items done (~88%)**. Weighted by
 > effort it is further along than that, since the backend and data layer are largely
 > complete while most remaining items are large features (live voice, deployment) or
 > are blocked on native modules.
 > **Running on real infrastructure:** live Supabase PostgreSQL 17.6 and the real Groq
 > API, verified on a physical Android phone — register → onboarding → dashboard → all
 > four practice modules → progress → coach → profile → logout.
-> **Verified by:** 50 backend smoke suites, a 13-step E2E user-journey check, 347
+> **Verified by:** 53 backend smoke suites, a 13-step E2E user-journey check, 347
 > frontend tests, ESLint at zero warnings, Prettier, `tsc --noEmit`, and a Docker image
 > build — all gated in CI on every push.
 > **Biggest remaining:** the live voice (LiveKit) pipeline, native audio playback,
@@ -325,10 +325,15 @@ Everything **not yet completed** to finish the project, organized by area. Check
       twice. Response parsing is tested against a stubbed transport for the things
       compatible endpoints actually omit (`usage`, empty `choices`), which also
       means the suite spends no quota
-- [ ] Anthropic / Gemini adapters — deliberately not folded into the
-      OpenAI-compatible one: system prompts, content and usage shapes all differ
-      enough that the wrapper would be worse than two honest adapters. Worth
-      writing against real keys, when someone needs them
+- [x] **Anthropic / Gemini adapters** — separate files rather than branches inside
+      the OpenAI-compatible one, because the differences are structural: the system
+      prompt is a top-level parameter (Anthropic) or `systemInstruction` (Gemini),
+      `assistant` is spelled `model`, usage fields are renamed and Anthropic reports
+      no total, and JSON is requested by assistant-prefill or a response mime type
+      rather than `response_format`. Tested against a stubbed transport, including
+      the cases a live call will not reliably produce — a Gemini safety block, an
+      Anthropic thinking block before the answer, a response with no usage — so the
+      suite spends no quota. `AI_PROVIDER=anthropic|gemini` with `LLM_API_KEY`
 - [ ] Agent-framework scaffolding (LangGraph / CrewAI / AutoGen) — the examiner
       state machine is already a pure function with a transport port, so this is a
       swap rather than a rewrite; no current need drives it
@@ -377,7 +382,20 @@ Everything **not yet completed** to finish the project, organized by area. Check
 - [x] Schema reconciled against SRS §15 — added `users.last_login_at` (migration 0023) and a drift test that fails when models and migrations disagree. `deleted_at` deliberately not added: account deletion here is real deletion, and a soft-deleted row still holds the person's essays and transcripts.
 - [ ] Postgres-native types (UUID/CITEXT/enums) as the SRS illustrates — a large migration of a working schema for limited benefit; revisit if the string columns become a problem
 - [x] Object storage port + local backend with HMAC signed URLs (`core/storage.py`); recordings require a signature, public clips do not
-- [ ] S3-compatible adapter — needs a real bucket to verify against
+- [x] **S3-compatible adapter** (`core/s3_storage.py`) — implements the existing
+      `ObjectStorage` port over the S3 REST API with httpx, no boto3. Presigned
+      GETs mean audio is served straight from the bucket instead of streaming
+      through an API worker. Works against AWS, MinIO, R2, B2 and Spaces
+      (`STORAGE_BACKEND=s3`); a half-filled config falls back to local rather than
+      failing to start.
+      The earlier note said an adapter that cannot be run against a real bucket is
+      a guess. That was right about the risk and wrong about where it sits: the
+      part that fails silently is the SigV4 signature, and signatures *can* be
+      checked without a bucket. All 12 vectors (both addressing styles × keys with
+      `$`, spaces and `~`) were cross-checked against botocore's independent
+      implementation and pinned, so CI needs no AWS dependency
+- [ ] S3: the network round trip — real credentials, bucket policy, CORS, clock
+      skew. Needs an actual bucket; no local test can stand in for it
 - [x] Seed content script (`scripts/seed_content.py`) — seeds every bank explicitly, idempotent, non-zero exit when a bank is empty so it works as a deployment gate
 - [x] Indexes on the hot query shapes (attempts, ai_interactions, refresh_tokens, weaknesses) — migration 0018
 - [x] Retention sweeps (`core/retention.py`, `scripts/run_retention.py`) — dry run by default; usage rows are anonymised before deletion so cost history survives
@@ -409,7 +427,21 @@ Everything **not yet completed** to finish the project, organized by area. Check
 - [x] CI: backend compile + Alembic up/down + smoke suites on every push/PR (GitHub Actions) — [ ] frontend typecheck/build, lint, deploy stages
 - [x] Observability: Prometheus metrics at `/metrics` (request count/latency/in-flight + AI calls, tokens, estimated spend)
 - [x] Observability: OpenTelemetry tracing (`core/tracing.py`) — off unless an OTLP endpoint is set, health/ready/metrics excluded, never fatal
-- [ ] Observability: dashboards + alerts (needs a running collector)
+- [x] **Alerting rules** (`backend/observability/alerts.yml`) — 9 alerts and 5
+      recording rules over the metrics the app actually exports, written on
+      symptoms rather than causes, every one with a `for:` clause so a single slow
+      scrape cannot page anyone.
+      The test asserts the thing `promtool check rules` cannot: that every metric
+      named in a rule is registered in `core/metrics.py`. An alert on a metric that
+      does not exist parses, loads, reads as coverage and can never fire. It also
+      pins its own extractor in both directions, since a regex that matches nothing
+      would report no problems and pass.
+      Includes an alert for the failure that looks like success from every other
+      angle — the provider factory falling back to the offline mock in production,
+      where latency is fine, the error rate is zero, and every learner is receiving
+      an invented band score
+- [ ] Observability: Grafana dashboards — needs a running collector to build
+      against, and the recording rules above are the queries they would use
 - [x] Health/readiness probes wired to real dependencies — `/ready` returns 503 when Postgres is unreachable; `/health` stays liveness-only
 - [ ] Kubernetes manifests / Helm (future)
 - [ ] Secrets management integration

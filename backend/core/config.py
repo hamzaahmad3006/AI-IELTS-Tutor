@@ -87,6 +87,24 @@ class Settings(BaseSettings):
     #: problem rather than sitting exactly on the cliff edge.
     elevenlabs_monthly_char_limit: int = 9000
 
+    # Object storage. Local disk by default because it needs nothing; set
+    # STORAGE_BACKEND=s3 to serve recordings straight from a bucket, which
+    # keeps audio playback off the API workers.
+    #
+    # Works against AWS, MinIO, R2, B2 and Spaces -- they differ only in
+    # endpoint and whether the bucket sits in the host or the path.
+    storage_backend: str = "local"
+    s3_bucket: str = ""
+    s3_region: str = "us-east-1"
+    s3_access_key: str = ""
+    s3_secret_key: str = ""
+    s3_endpoint: str = "s3.amazonaws.com"
+    #: MinIO and most self-hosted gateways need the bucket in the path.
+    s3_path_style: bool = False
+    #: A CDN in front of the bucket. The signature is still computed against
+    #: the real host.
+    s3_public_host: str = ""
+
     # LiveKit (self-hosted). The dev-mode container publishes devkey/secret,
     # which are in LiveKit's own documentation -- fine on a laptop, and an open
     # server anywhere reachable. Generate real values before deploying.

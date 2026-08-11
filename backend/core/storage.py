@@ -163,6 +163,36 @@ class LocalStorage:
         )
 
 
+def build_storage(*, root: Path, secret: str) -> ObjectStorage:
+    """Pick the storage backend from configuration.
+
+    Local unless S3 is both selected and fully configured. Falling back rather
+    than raising on a half-filled config is deliberate: a missing bucket name
+    should not take down an app that works perfectly well off local disk, and
+    the backend in use is visible as `.name` wherever it matters.
+    """
+    # Imported here rather than at module scope: s3_storage imports from this
+    # module, and at module scope that is a cycle.
+    from core.config import get_settings
+
+    settings = get_settings()
+    if (settings.storage_backend or "").strip().lower() == "s3":
+        if settings.s3_bucket and settings.s3_access_key and settings.s3_secret_key:
+            from core.s3_storage import S3Storage
+
+            return S3Storage(
+                bucket=settings.s3_bucket,
+                region=settings.s3_region,
+                access_key=settings.s3_access_key,
+                secret_key=settings.s3_secret_key,
+                endpoint=settings.s3_endpoint,
+                path_style=settings.s3_path_style,
+                public_host=settings.s3_public_host,
+            )
+
+    return LocalStorage(root=root, secret=secret)
+
+
 def recording_key(session_id: str, turn_index: int, extension: str = "m4a") -> str:
     """Where one answer's audio lives.
 

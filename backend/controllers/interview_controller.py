@@ -31,7 +31,8 @@ from core.config import get_settings
 from core.consent import require_consent
 from core.plans import require_capacity
 from core.storage import (
-    LocalStorage,
+    build_storage,
+    ObjectStorage,
     extension_for,
     recording_key,
 )
@@ -248,9 +249,9 @@ def _script_from_json(raw: dict) -> InterviewScript:
     )
 
 
-def _recording_store() -> LocalStorage:
+def _recording_store() -> ObjectStorage:
     settings = get_settings()
-    return LocalStorage(
+    return build_storage(
         root=Path(__file__).resolve().parent.parent / "media",
         secret=settings.jwt_secret,
     )
