@@ -87,6 +87,14 @@ class Settings(BaseSettings):
     #: problem rather than sitting exactly on the cliff edge.
     elevenlabs_monthly_char_limit: int = 9000
 
+    # Crash reporting. Off without a DSN, which is the default. The payload is
+    # built by allowlist in core/crash_reporting.py -- no request bodies, no
+    # headers, no frame locals -- because in this app those are the learner's
+    # essay, the bearer token and the provider keys.
+    sentry_dsn: str = ""
+    #: Groups events by deploy. A commit sha is the usual value.
+    sentry_release: str = ""
+
     # Object storage. Local disk by default because it needs nothing; set
     # STORAGE_BACKEND=cloudinary to serve media from Cloudinary, which keeps
     # audio playback off the API workers.
