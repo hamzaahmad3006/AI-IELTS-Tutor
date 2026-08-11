@@ -73,17 +73,17 @@ export const SpeakingSession: React.FC = () => {
         <AppText variant="labelMd" color="textSecondary">
           HOW YOU ANSWER
         </AppText>
-        {/* Stated up front rather than discovered on the next screen. Asking
-            for microphone access we cannot yet use would be worse than saying
-            plainly that answers are typed for now. */}
+        {/* Stated up front rather than discovered on the next screen: the
+            microphone prompt appears when you tap record, not at launch, and
+            a learner should know that is coming before they start. */}
         <AppText
           variant="bodySm"
           color="textSecondary"
           style={styles.noticeBody}
         >
-          Answers are typed for now, and scored on what you say rather than how
-          you sound. Live voice recording is not enabled yet, so the app does
-          not ask for microphone access.
+          Record your answers and we write down what you said — you can correct
+          the transcript before it is scored. The microphone is only requested
+          when you tap record, and typing works if you would rather not speak.
         </AppText>
       </Card>
 

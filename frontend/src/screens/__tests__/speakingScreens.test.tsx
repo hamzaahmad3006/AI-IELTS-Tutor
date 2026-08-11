@@ -35,8 +35,10 @@ describe('Speaking session start', () => {
     // Asking for microphone access the app cannot yet use would be worse than
     // stating the limitation up front.
     renderWithProviders(<SpeakingSession />);
-    expect(screen.getByText(/Answers are typed for now/)).toBeTruthy();
-    expect(screen.getByText(/does not ask for microphone access/)).toBeTruthy();
+    // The session screen must set the expectation before the learner starts:
+    // answers are spoken, and the microphone prompt comes at the moment of use.
+    expect(screen.getByText(/Record your answers/)).toBeTruthy();
+    expect(screen.getByText(/only requested when you tap record/)).toBeTruthy();
   });
 });
 
