@@ -382,20 +382,26 @@ Everything **not yet completed** to finish the project, organized by area. Check
 - [x] Schema reconciled against SRS §15 — added `users.last_login_at` (migration 0023) and a drift test that fails when models and migrations disagree. `deleted_at` deliberately not added: account deletion here is real deletion, and a soft-deleted row still holds the person's essays and transcripts.
 - [ ] Postgres-native types (UUID/CITEXT/enums) as the SRS illustrates — a large migration of a working schema for limited benefit; revisit if the string columns become a problem
 - [x] Object storage port + local backend with HMAC signed URLs (`core/storage.py`); recordings require a signature, public clips do not
-- [x] **S3-compatible adapter** (`core/s3_storage.py`) — implements the existing
-      `ObjectStorage` port over the S3 REST API with httpx, no boto3. Presigned
-      GETs mean audio is served straight from the bucket instead of streaming
-      through an API worker. Works against AWS, MinIO, R2, B2 and Spaces
-      (`STORAGE_BACKEND=s3`); a half-filled config falls back to local rather than
-      failing to start.
-      The earlier note said an adapter that cannot be run against a real bucket is
-      a guess. That was right about the risk and wrong about where it sits: the
-      part that fails silently is the SigV4 signature, and signatures *can* be
-      checked without a bucket. All 12 vectors (both addressing styles × keys with
-      `$`, spaces and `~`) were cross-checked against botocore's independent
-      implementation and pinned, so CI needs no AWS dependency
-- [ ] S3: the network round trip — real credentials, bucket policy, CORS, clock
-      skew. Needs an actual bucket; no local test can stand in for it
+- [x] **Cloudinary adapter** (`core/cloudinary_storage.py`) — implements the
+      existing `ObjectStorage` port over Cloudinary's REST API with httpx, no SDK
+      dependency. `STORAGE_BACKEND=cloudinary`; a half-filled config falls back to
+      local rather than failing to start.
+      Two Cloudinary specifics drive the design. Audio has no resource type of its
+      own and must be uploaded as `video`. And delivery is public by default, so
+      the public/private split the port already draws maps onto `upload` vs
+      `authenticated`: seeded clips and chart assets come from the CDN, recordings
+      are uploaded as authenticated and served through expiring download URLs.
+      That last part matters — Cloudinary's signed *delivery* URLs stop tampering
+      but never expire, so a leaked one works forever; the private download
+      endpoint signs an `expires_at`, which is what the port's contract needs.
+      Signing was cross-checked against the official `cloudinary` SDK and the
+      vectors pinned, so CI needs no SDK
+- [ ] Cloudinary: the network round trip — real credentials, account limits,
+      whether the plan permits the resource type. Needs an actual account; no local
+      test can stand in for it
+- [ ] Move the seeded listening clips and chart assets into Cloudinary — they are
+      still served from local disk by the media route; only the code path exists so
+      far, nothing has been uploaded
 - [x] Seed content script (`scripts/seed_content.py`) — seeds every bank explicitly, idempotent, non-zero exit when a bank is empty so it works as a deployment gate
 - [x] Indexes on the hot query shapes (attempts, ai_interactions, refresh_tokens, weaknesses) — migration 0018
 - [x] Retention sweeps (`core/retention.py`, `scripts/run_retention.py`) — dry run by default; usage rows are anonymised before deletion so cost history survives
