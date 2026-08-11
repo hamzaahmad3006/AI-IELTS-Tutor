@@ -1,7 +1,10 @@
 """Media routes: serve stored audio.
 
-Audio lives on disk under `backend/media/`, keyed rather than pathed, so an
-S3-compatible backend is an adapter change rather than a rewrite.
+Audio lives on disk under `backend/media/`, keyed rather than pathed, so a
+hosted backend is an adapter change rather than a rewrite. These routes serve
+the local backend; with STORAGE_BACKEND=cloudinary the same public/private
+split is enforced by Cloudinary's own delivery types and this route is bypassed
+for media that has been uploaded there.
 
 Two classes of object are served here and they need different rules. Seeded
 listening clips are identical for every learner and public by nature. A

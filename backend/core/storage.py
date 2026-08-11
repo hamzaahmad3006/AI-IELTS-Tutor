@@ -2,8 +2,8 @@
 
 `AudioClip.object_key` has always been a storage key rather than a path, and the
 media route has always resolved it against a directory. This makes that
-resolution a port, so an S3-compatible backend is an adapter rather than a
-rewrite, and adds the piece that was missing either way: signatures.
+resolution a port, so a hosted backend is an adapter rather than a rewrite, and
+adds the piece that was missing either way: signatures.
 
 Without a signature, `/media/<key>` is world-readable to anyone who can guess a
 key. That is tolerable for seeded listening clips, which are the same for
@@ -14,10 +14,15 @@ object for a limited time and cannot be edited into a URL for another. It is
 verified without a database lookup, which is what lets audio be served by a
 plain file handler rather than an authenticated endpoint.
 
-Local storage is the default because it needs nothing. The S3 adapter is a
-separate concern and is not written here: an adapter that cannot be run against
-a real bucket is a guess, and a guess that looks like working code is worse than
-an honest gap.
+Local storage is the default because it needs nothing. `core/cloudinary_storage`
+is the hosted adapter, selected with STORAGE_BACKEND=cloudinary.
+
+An earlier draft of this note said a storage adapter that cannot be run against
+a real account is a guess. That was right about the risk and wrong about where
+it sits: what fails silently is the request signature, and signatures are
+exactly what can be checked without an account. The Cloudinary adapter's are
+verified against the vendor's own SDK. The genuinely untested part is the
+network round trip, which is a narrower and more honest gap.
 """
 
 from __future__ import annotations
@@ -166,28 +171,29 @@ class LocalStorage:
 def build_storage(*, root: Path, secret: str) -> ObjectStorage:
     """Pick the storage backend from configuration.
 
-    Local unless S3 is both selected and fully configured. Falling back rather
-    than raising on a half-filled config is deliberate: a missing bucket name
-    should not take down an app that works perfectly well off local disk, and
-    the backend in use is visible as `.name` wherever it matters.
+    Local unless Cloudinary is both selected and fully configured. Falling
+    back rather than raising on a half-filled config is deliberate: a missing
+    cloud name should not take down an app that works perfectly well off local
+    disk, and the backend in use is visible as `.name` wherever it matters.
     """
-    # Imported here rather than at module scope: s3_storage imports from this
-    # module, and at module scope that is a cycle.
+    # Imported here rather than at module scope: cloudinary_storage imports
+    # from this module, and at module scope that is a cycle.
     from core.config import get_settings
 
     settings = get_settings()
-    if (settings.storage_backend or "").strip().lower() == "s3":
-        if settings.s3_bucket and settings.s3_access_key and settings.s3_secret_key:
-            from core.s3_storage import S3Storage
+    if (settings.storage_backend or "").strip().lower() == "cloudinary":
+        if (
+            settings.cloudinary_cloud_name
+            and settings.cloudinary_api_key
+            and settings.cloudinary_api_secret
+        ):
+            from core.cloudinary_storage import CloudinaryStorage
 
-            return S3Storage(
-                bucket=settings.s3_bucket,
-                region=settings.s3_region,
-                access_key=settings.s3_access_key,
-                secret_key=settings.s3_secret_key,
-                endpoint=settings.s3_endpoint,
-                path_style=settings.s3_path_style,
-                public_host=settings.s3_public_host,
+            return CloudinaryStorage(
+                cloud_name=settings.cloudinary_cloud_name,
+                api_key=settings.cloudinary_api_key,
+                api_secret=settings.cloudinary_api_secret,
+                folder=settings.cloudinary_folder,
             )
 
     return LocalStorage(root=root, secret=secret)
