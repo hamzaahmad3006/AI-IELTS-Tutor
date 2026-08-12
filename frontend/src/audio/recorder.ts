@@ -33,6 +33,30 @@ export const MAX_RECORDING_BYTES = 10 * 1024 * 1024;
 
 export type PermissionResult = 'granted' | 'denied' | 'blocked';
 
+/**
+ * Quietest level the meter reports, in dBFS. Android bottoms out around -160,
+ * but nothing useful happens below -60 and mapping the full range would leave
+ * ordinary speech in the bottom third of the bar.
+ */
+export const SILENCE_DB = -60;
+
+/**
+ * Convert the recorder's metering to a 0-100 bar width.
+ *
+ * `currentMetering` is dBFS: negative, zero being the loudest the input can
+ * be. The level indicator was rendering it directly as a percentage, and
+ * because `Math.max(4, negative)` is always 4, the bar sat at its minimum
+ * whatever the candidate did. A "we can hear you" cue that cannot move is
+ * worse than no cue -- it actively tells them the microphone is dead.
+ */
+export const meteringToPercent = (db: number): number => {
+  if (!Number.isFinite(db)) {
+    return 0;
+  }
+  const clamped = Math.min(0, Math.max(SILENCE_DB, db));
+  return Math.round(((clamped - SILENCE_DB) / -SILENCE_DB) * 100);
+};
+
 export interface Recording {
   uri: string;
   name: string;
@@ -126,7 +150,7 @@ export class InterviewRecorder {
     }
 
     AudioRecorderPlayer.addRecordBackListener(meta => {
-      this.onLevel?.(meta.currentMetering ?? 0);
+      this.onLevel?.(meteringToPercent(meta.currentMetering ?? SILENCE_DB));
     });
 
     try {

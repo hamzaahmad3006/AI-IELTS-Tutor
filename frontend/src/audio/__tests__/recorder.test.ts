@@ -15,6 +15,8 @@ import {
   RecorderError,
   requestMicrophonePermission,
   toUploadFile,
+  meteringToPercent,
+  SILENCE_DB,
 } from '../recorder';
 
 const native = AudioRecorderPlayer as unknown as {
@@ -196,6 +198,33 @@ describe('InterviewRecorder', () => {
     callback({ currentMetering: -12 });
     callback({});
 
-    expect(levels).toEqual([-12, 0]);
+    // Percentages, not raw dBFS: -12 dBFS is loud, and a missing reading is
+    // treated as silence rather than as maximum.
+    expect(levels).toEqual([meteringToPercent(-12), 0]);
+    expect(levels[0]).toBe(80);
+  });
+});
+
+describe('meteringToPercent', () => {
+  it('maps dBFS onto the bar, not straight through', () => {
+    // The bug this replaced: currentMetering is negative, and the screen
+    // rendered Math.max(4, level) as a percentage — so the bar sat at 4%
+    // no matter how loud the candidate was. A "we can hear you" cue that
+    // cannot move tells them the microphone is dead.
+    expect(meteringToPercent(0)).toBe(100);
+    expect(meteringToPercent(SILENCE_DB)).toBe(0);
+    expect(meteringToPercent(-30)).toBe(50);
+    // Ambient room noise measured on a real device during QA.
+    expect(meteringToPercent(-31)).toBeGreaterThan(40);
+    expect(meteringToPercent(-35)).toBeGreaterThan(30);
+  });
+
+  it('clamps the extremes Android actually reports', () => {
+    // Android bottoms out near -160, and the meter occasionally emits 0/NaN
+    // between frames.
+    expect(meteringToPercent(-160)).toBe(0);
+    expect(meteringToPercent(10)).toBe(100);
+    expect(meteringToPercent(NaN)).toBe(0);
+    expect(meteringToPercent(-Infinity)).toBe(0);
   });
 });
