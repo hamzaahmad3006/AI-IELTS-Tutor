@@ -156,7 +156,10 @@ describe('useSpokenAnswer', () => {
       callback({ currentMetering: -8 });
     });
 
-    expect(result.current.level).toBe(-8);
+    // A 0-100 bar width, not the raw dBFS the native meter reports. Passed
+    // through unconverted, every negative reading rendered as the minimum and
+    // the level indicator never moved.
+    expect(result.current.level).toBe(87);
   });
 
   it('discards a recording on request', async () => {
