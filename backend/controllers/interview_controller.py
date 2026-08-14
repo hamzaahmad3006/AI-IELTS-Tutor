@@ -39,6 +39,7 @@ from core.storage import (
 )
 from core.errors import AppError, NotFoundError, ValidationError
 from core.livekit import VideoGrant, mint_access_token, room_name_for
+from voice.supervisor import ensure_worker
 from core.interview import (
     CueCard as ScriptCueCard,
     Interview,
@@ -551,6 +552,16 @@ class InterviewController:
             name=user.full_name,
             grant=VideoGrant(room=room),
         )
+
+        # Start the examiner as the token is issued. This is the one moment we
+        # know a candidate is about to join, and without it they would arrive
+        # in an empty room and wait for a voice that never comes.
+        #
+        # A failure here is logged, not raised: the token is still valid, and a
+        # silent room is a better outcome than a 500 on the request that was
+        # meant to start the exam.
+        ensure_worker(room)
+
         return RealtimeToken(
             url=minted.url,
             token=minted.token,

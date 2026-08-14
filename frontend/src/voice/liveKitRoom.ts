@@ -36,12 +36,25 @@ import {
 /** Topic the examiner agent publishes exam state to. Must match the backend. */
 export const STATE_TOPIC = 'exam-state';
 
-/** What the agent tells the client about where the exam is. */
+/**
+ * What the examiner worker tells the client about where the exam is.
+ *
+ * Every field is optional and the shape must match what `voice/live_worker.py`
+ * publishes, because nothing checks it at runtime: a renamed field here is not
+ * a type error, it is a UI that silently stops updating mid-interview.
+ */
 export interface ExamState {
-  phase?: string;
-  part?: number;
-  remainingMs?: number;
-  isExaminerSpeaking?: boolean;
+  /** The examiner is talking. */
+  speaking?: boolean;
+  /** The examiner is waiting for the candidate. */
+  listening?: boolean;
+  /** Transcribing, or asking the model for the next question. */
+  thinking?: boolean;
+  /** The interview is over. */
+  finished?: boolean;
+  /** What the examiner just said. */
+  text?: string;
+  /** What the candidate was heard to say. */
   transcript?: string;
 }
 
