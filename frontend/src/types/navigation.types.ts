@@ -39,6 +39,8 @@ export type RootStackParamList = {
   ListeningPractice: undefined;
   SpeakingPractice: undefined;
   SpeakingSession: undefined;
+  /** Live voice interview. The session id names the LiveKit room. */
+  LiveInterview: { sessionId: string };
   SpeakingParts: { part: SpeakingPart; full?: boolean };
   History: undefined;
   Plan: undefined;

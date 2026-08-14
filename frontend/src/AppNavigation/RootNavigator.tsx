@@ -9,6 +9,7 @@ import { Practice as ReadingPractice } from '../screens/Reading/Practice/Practic
 import { Practice as WritingPractice } from '../screens/Writing/Practice/Practice';
 import { Practice as ListeningPractice } from '../screens/Listening/Practice/Practice';
 import { Practice as SpeakingPractice } from '../screens/Speaking/Practice/Practice';
+import { LiveInterview } from '../screens/Speaking/LiveInterview/LiveInterview';
 import { SpeakingSession } from '../screens/Speaking/Session/SpeakingSession';
 import { SpeakingParts } from '../screens/Speaking/Parts/SpeakingParts';
 import { Plan } from '../screens/Plan/Plan';
@@ -42,6 +43,11 @@ export const RootNavigator: React.FC = () => (
     <Stack.Screen name="ReadingPractice" component={ReadingPractice} />
     <Stack.Screen name="ListeningPractice" component={ListeningPractice} />
     <Stack.Screen name="SpeakingPractice" component={SpeakingPractice} />
+    <Stack.Screen
+      name="LiveInterview"
+      component={LiveInterview}
+      options={{ presentation: 'fullScreenModal' }}
+    />
     <Stack.Screen name="SpeakingSession" component={SpeakingSession} />
     <Stack.Screen name="SpeakingParts" component={SpeakingParts} />
     <Stack.Screen name="Plan" component={Plan} />

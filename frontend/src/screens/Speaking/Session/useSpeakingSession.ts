@@ -3,11 +3,12 @@
 import { useCallback, useState } from 'react';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { interviewApi } from '@api';
 import type { RootStackParamList } from '@models';
 
 type Nav = NativeStackNavigationProp<RootStackParamList>;
 
-export type SessionChoice = 'full' | 'part1' | 'part2' | 'part3';
+export type SessionChoice = 'live' | 'full' | 'part1' | 'part2' | 'part3';
 
 export interface SessionOption {
   choice: SessionChoice;
@@ -17,6 +18,16 @@ export interface SessionOption {
 }
 
 export const SESSION_OPTIONS: SessionOption[] = [
+  {
+    // First because it is the one that behaves like a real examiner: it
+    // listens over WebRTC and asks its next question from what you said,
+    // rather than reading a fixed script.
+    choice: 'live',
+    title: 'Live AI interview',
+    subtitle:
+      'Speak with the examiner in real time — it listens and follows up',
+    minutes: 'Real-time',
+  },
   {
     choice: 'full',
     title: 'Full interview',
@@ -48,6 +59,8 @@ interface UseSpeakingSessionResult {
   selected: SessionChoice;
   select: (choice: SessionChoice) => void;
   start: () => void;
+  isStarting: boolean;
+  error: string | null;
   onBack: () => void;
 }
 
@@ -55,7 +68,26 @@ export const useSpeakingSession = (): UseSpeakingSessionResult => {
   const navigation = useNavigation<Nav>();
   const [selected, setSelected] = useState<SessionChoice>('full');
 
+  const [isStarting, setIsStarting] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
+
   const start = useCallback((): void => {
+    if (selected === 'live') {
+      // A session is created first: its id names the LiveKit room, and
+      // requesting the token for that room is what starts the examiner.
+      setIsStarting(true);
+      setError(null);
+      interviewApi
+        .start()
+        .then(session => {
+          navigation.navigate('LiveInterview', { sessionId: session.id });
+        })
+        .catch(() =>
+          setError('Could not start the interview. Please try again.'),
+        )
+        .finally(() => setIsStarting(false));
+      return;
+    }
     if (selected === 'part2') {
       navigation.navigate('SpeakingPractice');
       return;
@@ -69,6 +101,8 @@ export const useSpeakingSession = (): UseSpeakingSessionResult => {
 
   return {
     options: SESSION_OPTIONS,
+    isStarting,
+    error,
     selected,
     select: setSelected,
     start,
