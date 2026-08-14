@@ -42,6 +42,10 @@ def main() -> int:
         # the suites issue real (billed, non-deterministic) API calls, and
         # RATE_LIMIT_ENABLED=true made request-heavy suites 429 at random.
         env["AI_PROVIDER"] = "mock"
+        # Same guard for voice: STT_PROVIDER=deepgram in a real .env makes
+        # every suite run bill real transcription and synthesis.
+        env["STT_PROVIDER"] = "mock"
+        env["TTS_PROVIDER"] = "mock"
         env["RATE_LIMIT_ENABLED"] = "false"
         env["JWT_SECRET"] = "smoke-test-secret-not-used-outside-tests"
 

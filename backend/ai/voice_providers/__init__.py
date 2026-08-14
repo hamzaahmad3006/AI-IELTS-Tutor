@@ -19,6 +19,7 @@ from ai.voice import (
 from core.config import get_settings
 
 from .deepgram_stt import DeepgramSpeechToText
+from .deepgram_tts import DeepgramTextToSpeech
 from .elevenlabs_tts import ElevenLabsTextToSpeech, SpendLimitExceeded
 
 
@@ -33,6 +34,13 @@ def build_stt() -> SpeechToText:
 
 def build_tts() -> TextToSpeech:
     settings = get_settings()
+    # Checked first: Aura runs on the same key as transcription and emits raw
+    # PCM, so a real-time deployment needs one vendor rather than two and the
+    # transport needs no decoder.
+    if settings.tts_provider == "deepgram" and settings.deepgram_api_key:
+        return DeepgramTextToSpeech(
+            api_key=settings.deepgram_api_key, voice=settings.deepgram_voice
+        )
     if settings.tts_provider == "elevenlabs" and settings.elevenlabs_api_key:
         return ElevenLabsTextToSpeech(
             api_key=settings.elevenlabs_api_key,
@@ -46,6 +54,7 @@ def build_tts() -> TextToSpeech:
 
 __all__ = [
     "build_stt",
+    "DeepgramTextToSpeech",
     "build_tts",
     "DeepgramSpeechToText",
     "ElevenLabsTextToSpeech",

@@ -16,5 +16,14 @@ import os
 # Set, not setdefault: an AI_PROVIDER inherited from .env is exactly the value
 # that must not win here.
 os.environ["AI_PROVIDER"] = "mock"
+
+# The voice providers need the same guard, and for the same reason. They were
+# missed when this file was written because nothing was configured to use them
+# yet; the moment STT_PROVIDER=deepgram appeared in a real .env, the suite
+# started making billed transcription and synthesis calls on every run and
+# three tests began failing because a "no key means mock" assertion was now
+# talking to a live provider.
+os.environ["STT_PROVIDER"] = "mock"
+os.environ["TTS_PROVIDER"] = "mock"
 os.environ["RATE_LIMIT_ENABLED"] = "false"
 os.environ.setdefault("JWT_SECRET", "smoke-test-secret-not-used-outside-tests")

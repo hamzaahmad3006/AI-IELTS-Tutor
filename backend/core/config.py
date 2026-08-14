@@ -75,6 +75,9 @@ class Settings(BaseSettings):
     stt_provider: str = "mock"
     deepgram_api_key: str = ""
     deepgram_model: str = "nova-2"
+    #: Aura voice for the examiner. Same key as transcription, and it returns
+    #: raw PCM at the rate the LiveKit transport publishes.
+    deepgram_voice: str = "aura-2-thalia-en"
 
     # Voice: text-to-speech. Same default, same reason.
     tts_provider: str = "mock"
