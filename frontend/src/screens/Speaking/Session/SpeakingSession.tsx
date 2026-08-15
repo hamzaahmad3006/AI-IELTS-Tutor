@@ -15,7 +15,8 @@ import { useSpeakingSession } from './useSpeakingSession';
 
 export const SpeakingSession: React.FC = () => {
   const theme = useTheme();
-  const { options, selected, select, start, onBack } = useSpeakingSession();
+  const { options, selected, select, start, isStarting, error, onBack } =
+    useSpeakingSession();
 
   return (
     <ScreenContainer scroll>
@@ -87,12 +88,27 @@ export const SpeakingSession: React.FC = () => {
         </AppText>
       </Card>
 
-      <Button title="Start session" onPress={start} style={styles.start} />
+      {error ? (
+        <AppText variant="labelMd" color="error" style={styles.error}>
+          {error}
+        </AppText>
+      ) : null}
+
+      {/* The live interview creates a session over the network before it can
+          navigate, so without a disabled state the button looks broken for a
+          second and a double tap starts two interviews. */}
+      <Button
+        title={isStarting ? 'Starting…' : 'Start session'}
+        onPress={start}
+        disabled={isStarting}
+        style={styles.start}
+      />
     </ScreenContainer>
   );
 };
 
 const styles = StyleSheet.create({
+  error: { marginTop: SPACING.md },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
