@@ -46,8 +46,13 @@ export interface LiveInterviewState {
   toggleMute: () => Promise<void>;
 }
 
-/** Map the agent's state frames onto the phase the screen renders. */
-const phaseFor = (state: ExamState, current: Phase): Phase => {
+/**
+ * Map the agent's state frames onto the phase the screen renders.
+ *
+ * Exported so it can be tested without a room: it is pure, and the flicker
+ * rule below is the kind of thing a later simplification quietly removes.
+ */
+export const phaseFor = (state: ExamState, current: Phase): Phase => {
   if (state.finished) {
     return 'finished';
   }
