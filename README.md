@@ -110,6 +110,15 @@ Notes:
 - **Admin**: user management + AI-usage monitoring + reading-content CRUD (audit-logged)
 - Validation + RFC 7807 error contract, rate limiting, correlation IDs, Dockerized, GitHub Actions CI
 
-**Frontend** — design system + navigation + Redux, and 5 approved Stitch screens (Splash, Onboarding Target-Band, Home, Speaking, Writing Feedback) + Auth + tab stubs, currently on **mock data** (`API_CONFIG.useMock = true`). Wiring to the live backend and the remaining screens are the main outstanding work.
+**Real-time voice interview** — a spoken conversation with an AI examiner, over WebRTC:
+
+- The candidate joins a **LiveKit** room from the app; a worker process joins the same room as the examiner
+- **Deepgram** transcribes the answer, **Groq** writes the next question *from what was said*, **Deepgram Aura** speaks it back as PCM straight into the WebRTC track
+- Questions are generated per turn rather than read from a script, so the examiner follows up on specifics the candidate mentioned
+- Verified end to end against LiveKit Cloud; the request trace shows speak → listen → completion → speak with audio flowing both ways
+
+**Frontend** — design system + navigation + Redux, running against the **live backend** (`API_CONFIG.useMock = false`) and verified on a physical Android device: register → onboarding → dashboard → all four practice modules → progress → coach → profile → logout. Microphone capture is wired through the speaking paths, and WCAG AA contrast is enforced in CI.
+
+**Verified by** — 57 backend smoke suites, 370 frontend tests, ESLint at zero warnings, Prettier, `tsc --noEmit`, a Docker image build, and an Android APK containing the WebRTC and recorder native libraries for all four ABIs. All gated in CI on every push.
 
 The full, continuously-updated backlog is in [REMAINING_TASKS.md](REMAINING_TASKS.md).
