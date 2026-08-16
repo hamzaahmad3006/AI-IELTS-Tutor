@@ -34,6 +34,7 @@ export const LiveInterview: React.FC = () => {
 
   const {
     phase,
+    status,
     examinerText,
     lastAnswer,
     error,
@@ -69,6 +70,15 @@ export const LiveInterview: React.FC = () => {
 
       {/* Status. Deliberately the largest thing on screen: it is what makes a
           silent video legible. */}
+      {/* A reconnect is the one thing that looks identical to a hang: the orb
+          keeps its last state and nothing moves. Saying so is the difference
+          between "wait a moment" and "this is broken". */}
+      {status === 'reconnecting' ? (
+        <AppText variant="labelMd" color="warning" style={styles.reconnecting}>
+          Reconnecting…
+        </AppText>
+      ) : null}
+
       <Card style={styles.stage}>
         <View style={[styles.orb, { borderColor: accent }]}>
           {phase === 'thinking' || phase === 'connecting' ? (
@@ -185,6 +195,7 @@ const styles = StyleSheet.create({
     marginBottom: SPACING.lg,
   },
   phase: { marginTop: SPACING.xs },
+  reconnecting: { marginBottom: SPACING.sm },
   bubble: {
     marginTop: SPACING.lg,
     borderRadius: RADIUS.card,
