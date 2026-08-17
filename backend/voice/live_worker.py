@@ -47,14 +47,9 @@ from voice.livekit_transport import (
 
 logger = logging.getLogger("voice.worker")
 
-#: Silence, in seconds, that ends the candidate's turn. Longer than a
-#: conversational pause and shorter than an awkward one -- people pause hard
-#: mid-answer when thinking in a second language, and cutting them off at 800ms
-#: is the single most common way these agents feel hostile.
+
 END_OF_TURN_SILENCE_S = 2.0
 
-#: Below this a "turn" is a cough or a door. Answering it wastes an LLM call
-#: and makes the examiner look like it is interrupting.
 MIN_ANSWER_CHARS = 2
 
 IDENTITY = "ai-examiner"

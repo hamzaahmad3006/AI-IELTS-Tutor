@@ -76,10 +76,7 @@ def register_exception_handlers(app: FastAPI) -> None:
     async def http_exception_handler(
         request: Request, exc: StarletteHTTPException
     ) -> JSONResponse:
-        # Bare HTTPExceptions - raised by FastAPI itself for unmatched routes,
-        # and by call sites not yet migrated - get a code derived from the
-        # status. Far more useful than one blanket "http_error", which left
-        # clients string-matching the title to tell errors apart.
+       
         code = code_for_status(exc.status_code)
         return JSONResponse(
             status_code=exc.status_code,
